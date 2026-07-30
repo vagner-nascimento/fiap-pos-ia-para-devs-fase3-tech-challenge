@@ -1,0 +1,56 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_BACKEND_URL: http://localhost:3000
+    container_name: fiap-pos-ia-frontend
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - fiap-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fiap-pos-ia-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      PYTHONPATH: src
+      MONGODB_USER: db_user
+      MONGODB_PASSWORD: db_pass
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      DB_NAME: fiap_pos_ia_fase3
+    depends_on:
+      - mongodb
+    networks:
+      - fiap-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: db_user
+      MONGO_INITDB_ROOT_PASSWORD: db_pass
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - fiap-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  fiap-network:
+    driver: bridge
