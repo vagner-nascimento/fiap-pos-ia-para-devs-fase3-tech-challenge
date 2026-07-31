@@ -105,4 +105,5 @@ Esse script é útil quando você fez alterações no código e quer reiniciar a
 
 - O backend depende do MongoDB para subir corretamente.
 - O processamento de datasets é feito em background, então a API responde rapidamente e o estado pode ser acompanhado depois.
+- Uma execução pode terminar com status `failed`; nesse caso, o documento retornado pelo backend inclui o campo `error_message` com detalhes do problema.
 - Os datasets são baixados automaticamente na primeira execução, mas também podem ser tratados manualmente conforme descrito em [backend/datasets/README.md](backend/datasets/README.md).

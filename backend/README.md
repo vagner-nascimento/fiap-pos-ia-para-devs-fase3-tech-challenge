@@ -216,6 +216,20 @@ curl -X POST http://localhost:3000/preprocess/ \
 }
 ```
 
+Em caso de falha no processamento, o documento pode retornar:
+
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "train_data": 0,
+  "rag_data": 0,
+  "status": "failed",
+  "updated_date": "2026-07-30T22:42:00.000000+00:00",
+  "completion_percentage": 0,
+  "error_message": "Erro ao salvar arquivo rag.json: ..."
+}
+```
+
 **Códigos de erro:**
 
 | Código | Situação |
@@ -249,6 +263,8 @@ curl http://localhost:3000/preprocess/a1b2c3d4-e5f6-7890-abcd-ef1234567890
 }
 ```
 
+Quando a execução falha, o mesmo endpoint retorna o status `failed` e inclui o campo opcional `error_message` com a causa da falha.
+
 **Valores possíveis de `status`:**
 
 | Status | Significado |
@@ -256,6 +272,7 @@ curl http://localhost:3000/preprocess/a1b2c3d4-e5f6-7890-abcd-ef1234567890
 | `created` | Documento criado; processamento ainda não iniciou |
 | `in_progress` | Processamento em andamento |
 | `completed` | Processamento concluído (`completion_percentage` = 100) |
+| `failed` | Processamento interrompido por erro; o campo `error_message` descreve a falha |
 
 **Códigos de erro:**
 

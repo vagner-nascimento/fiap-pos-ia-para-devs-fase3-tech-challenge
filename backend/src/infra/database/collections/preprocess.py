@@ -11,7 +11,10 @@ PREPROCESS_COLLECTION: Final[str] = "preprocess"
 def _serialize_preprocess_document(document: Dict[str, Any]) -> Dict[str, Any]:
     if "updated_date" in document and isinstance(document["updated_date"], datetime):
         document["updated_date"] = document["updated_date"].isoformat()
-    return document
+    serialized = dict(document)
+    if "error_message" in serialized and not serialized["error_message"]:
+        serialized.pop("error_message")
+    return serialized
 
 
 def create_preprocess_document() -> Dict[str, Any]:
@@ -92,7 +95,6 @@ def update_preprocess_document(
     
     now = datetime.now(timezone.utc)
     
-    # Determinar status baseado no percentual de conclusão
     status = "completed" if completion_percentage >= 100 else "in_progress"
     
     update_data = {
@@ -105,11 +107,41 @@ def update_preprocess_document(
     
     result = collection.update_one(
         {"_id": doc_id},
-        {"$set": update_data}
+        {
+            "$set": update_data,
+            "$unset": {"error_message": ""},
+        }
     )
     
     if result.matched_count > 0:
-        # Retornar documento atualizado
         return get_preprocess_document(doc_id)
     
+    return None
+
+
+def mark_preprocess_document_failed(doc_id: str, error_message: str) -> Optional[Dict[str, Any]]:
+    """
+    Marca um documento de preprocessamento como falho e armazena a mensagem de erro.
+
+    Args:
+        doc_id: ID do documento a atualizar.
+        error_message: Mensagem de erro a persistir.
+
+    Returns:
+        Dict com o documento atualizado, ou None se não existir.
+    """
+    collection = get_collection(PREPROCESS_COLLECTION)
+
+    now = datetime.now(timezone.utc)
+    update_data = {
+        "status": "failed",
+        "error_message": error_message,
+        "updated_date": now,
+    }
+
+    result = collection.update_one({"_id": doc_id}, {"$set": update_data})
+
+    if result.matched_count > 0:
+        return get_preprocess_document(doc_id)
+
     return None

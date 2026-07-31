@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^c:/code/fiap-pos-ia/fase-3/fiap-pos-ia-para-devs-fase3-tech-challenge/\\.venv/Scripts/python\\.exe -m pytest backend/tests/test_preprocess_data\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
