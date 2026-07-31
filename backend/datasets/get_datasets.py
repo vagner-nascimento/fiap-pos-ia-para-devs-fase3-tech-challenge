@@ -2,10 +2,11 @@ import json
 import os
 import re
 import subprocess
-import requests
 from pathlib import Path
 from typing import Optional, Dict, List, Tuple
 from urllib.parse import quote, unquote, urlparse, urlunparse
+
+import requests
 from bs4 import BeautifulSoup
 
 SOURCE_NAME = "Fundação Hospitalar do Estado de Minas Gerais"

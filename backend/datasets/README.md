@@ -1,49 +1,68 @@
-# Datasets Downloader (PubMedQA & MedQuAD)
+# Datasets Downloader
 
-Este diretório contém o script responsável por baixar os datasets necessários para o projeto a partir de repositórios públicos no GitHub.
+Este diretorio contem os scripts usados pelo backend para obter os dados brutos e preparar a base de pre-processamento.
 
-## O que o script faz?
+## O que e baixado
 
-O script [`get_datasets.py`](file:///c:/code/fiap-pos-ia/fase-3/fiap-pos-ia-para-devs-fase3-tech-challenge/backend/datasets/get_datasets.py) faz o download automático dos seguintes repositórios:
-1. **PubMedQA**: [https://github.com/pubmedqa/pubmedqa](https://github.com/pubmedqa/pubmedqa)
-2. **MedQuAD**: [https://github.com/abachaa/MedQuAD](https://github.com/abachaa/MedQuAD)
+O script [`get_datasets.py`](get_datasets.py) trabalha com tres entradas:
 
-Os repositórios clonados são salvos no subdiretório `files/` dentro deste diretório (`backend/datasets/files/`):
-* `backend/datasets/files/pubmedqa`
-* `backend/datasets/files/MedQuAD`
+1. **PubMedQA** - [https://github.com/pubmedqa/pubmedqa](https://github.com/pubmedqa/pubmedqa)
+2. **MedQuAD** - [https://github.com/abachaa/MedQuAD](https://github.com/abachaa/MedQuAD)
+3. **Protocolos clinicos FHEMIG** - [https://www.fhemig.mg.gov.br/index.php/acesso-rapido/protocolos-clinicos](https://www.fhemig.mg.gov.br/index.php/acesso-rapido/protocolos-clinicos)
 
-> [!NOTE]
-> Se o repositório já tiver sido clonado anteriormente e a respectiva pasta já existir no destino, o script detectará a presença da pasta e pulará o download para evitar redundância.
+## Estrutura gerada
 
----
+Os arquivos baixados e intermediarios ficam em:
 
-## Pré-requisitos
+- `backend/datasets/files/qas/pubmedqa`
+- `backend/datasets/files/qas/MedQuAD`
+- `backend/datasets/files/clinical_protocols/clinical_protocols.json`
+- `backend/datasets/files/clinical_protocols/data/`
 
-Para que o script funcione corretamente, você precisará dos seguintes softwares instalados em seu ambiente:
+Os arquivos processados ficam em:
 
-1. **Python 3.x**: O ambiente de execução do script.
-2. **Git**: O utilitário Git CLI deve estar instalado e disponível no seu `PATH` global, pois o script utiliza comandos Git via subprocesso para realizar os clones.
+- `backend/datasets/preprocessed/qas/`
+- `backend/datasets/preprocessed/clinical_protocols/`
 
----
+## Pre-requisitos
 
-## Como Utilizar
+Para executar os scripts voce precisa de:
 
-1. Abra um terminal na pasta onde o script está localizado:
-   ```bash
-   cd backend/datasets
-   ```
+1. Python 3.x
+2. Git no PATH, para os clones dos repositórios de QA
+3. A dependencia `beautifulsoup4`, usada para extrair os links dos PDFs da pagina da FHEMIG
+4. A dependencia `requests`, usada para baixar os arquivos
 
-2. Execute o script utilizando o Python:
-   ```bash
-   python get_datasets.py
-   ```
+## Como usar
 
-3. Acompanhe a saída no terminal. Ao final, a estrutura do diretório de datasets ficará da seguinte forma:
-   ```text
-   backend/datasets/
-   ├── files/
-   │   ├── MedQuAD/
-   │   └── pubmedqa/
-   ├── get_datasets.py
-   └── README.md
-   ```
+### Baixar os datasets
+
+```bash
+cd backend/datasets
+python get_datasets.py
+```
+
+### Saida esperada
+
+Ao final, a estrutura fica parecida com:
+
+```text
+backend/datasets/
+|-- files/
+|   |-- qas/
+|   |   |-- pubmedqa/
+|   |   `-- MedQuAD/
+|   `-- clinical_protocols/
+|       |-- clinical_protocols.json
+|       `-- data/
+`-- preprocessed/
+    |-- qas/
+    `-- clinical_protocols/
+```
+
+## Observacoes
+
+- O backend processa PubMedQA, MedQuAD e protocolos clinicos em etapas separadas.
+- PubMedQA e MedQuAD geram registros no formato de QA.
+- Os protocolos clinicos geram registros com o campo `content_text`, extraido dos PDFs.
+- O percentual informado no preprocessamento e aplicado ao split entre treino e RAG para MedQuAD e protocolos clinicos.

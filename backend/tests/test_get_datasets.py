@@ -1,3 +1,4 @@
+import uuid
 from pathlib import Path
 import sys
 
@@ -14,7 +15,10 @@ class DummyResponse:
         return None
 
 
-def test_download_clinical_protocol_files_writes_to_target_dir(tmp_path, monkeypatch):
+def test_download_clinical_protocol_files_writes_to_target_dir(monkeypatch):
+    base_tmp_dir = Path(__file__).resolve().parents[1] / ".tmp-tests"
+    base_tmp_dir.mkdir(parents=True, exist_ok=True)
+
     class DummyRequests:
         def get(self, url, timeout=30):
             assert url == "https://example.com/protocolo.pdf"
@@ -24,7 +28,9 @@ def test_download_clinical_protocol_files_writes_to_target_dir(tmp_path, monkeyp
 
     protocols = [{"name": "protocolo.pdf", "url": "https://example.com/protocolo.pdf", "source": "Test"}]
 
-    downloaded = get_datasets.download_clinical_protocol_files(protocols, tmp_path)
+    tmp_dir = base_tmp_dir / f"pytest-{uuid.uuid4().hex}"
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+    downloaded = get_datasets.download_clinical_protocol_files(protocols, tmp_dir)
 
     assert len(downloaded) == 1
     downloaded_path = Path(downloaded[0])
