@@ -1,12 +1,31 @@
 import { useCallback, useState } from "react";
 import { startPreprocess } from "../api/preprocess";
 import { usePreprocessPolling } from "../hooks/usePreprocessPolling";
-import type { PreprocessDocument } from "../types/preprocess";
+import type { PreprocessDocument, StepStatus } from "../types/preprocess";
 import "./PreProcessingPage.css";
 
 function statusClassName(status: string): string {
   return `status-badge status-${status}`;
 }
+
+function stepStatusClassName(status: StepStatus): string {
+  return `step-status step-${status}`;
+}
+
+function stepStatusLabel(status: StepStatus): string {
+  const labels: Record<StepStatus, string> = {
+    pending: "Pendente",
+    in_progress: "Em andamento",
+    completed: "Concluído",
+    error: "Erro",
+  };
+  return labels[status];
+}
+
+const STEP_NAMES: Record<string, string> = {
+  one_download_datasets: "Download dos Datasets",
+  step_two_data_extraction: "Extração de Dados",
+};
 
 export function PreProcessingPage() {
   const [ragPercent, setRagPercent] = useState(0.5);
@@ -128,20 +147,16 @@ export function PreProcessingPage() {
                   <strong>{document.id}</strong>
                 </div>
                 <div className="status-item">
+                  <span>RAG Percent</span>
+                  <strong>{(document.rag_percent * 100).toFixed(0)}%</strong>
+                </div>
+                <div className="status-item">
                   <span>Status</span>
                   <strong>
                     <span className={statusClassName(document.status)}>
                       {document.status}
                     </span>
                   </strong>
-                </div>
-                <div className="status-item">
-                  <span>Train data</span>
-                  <strong>{document.train_data.toLocaleString("pt-BR")}</strong>
-                </div>
-                <div className="status-item">
-                  <span>RAG data</span>
-                  <strong>{document.rag_data.toLocaleString("pt-BR")}</strong>
                 </div>
                 <div className="status-item">
                   <span>Atualizado em</span>
@@ -151,6 +166,77 @@ export function PreProcessingPage() {
                 </div>
               </div>
 
+              {/* Overall Error Message */}
+              {document.error_message && (
+                <div className="alert alert-error">
+                  <strong>Erro geral:</strong> {document.error_message}
+                </div>
+              )}
+
+              {/* Steps Status */}
+              <div className="steps-container">
+                <h3>Status dos Steps</h3>
+                {Object.entries(document.steps).map(([stepKey, stepInfo]) => (
+                  <div key={stepKey} className="step-item">
+                    <div className="step-header">
+                      <span className="step-name">
+                        {STEP_NAMES[stepKey] || stepKey}
+                      </span>
+                      <span className={stepStatusClassName(stepInfo.status)}>
+                        {stepStatusLabel(stepInfo.status)}
+                      </span>
+                    </div>
+                    {stepInfo.error_message && (
+                      <div className="step-error">
+                        <strong>Erro:</strong> {stepInfo.error_message}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Results */}
+              <div className="results-container">
+                <h3>Resultados</h3>
+                <div className="results-grid">
+                  <div className="result-group">
+                    <h4>QAs</h4>
+                    <div className="result-item">
+                      <span>Train data</span>
+                      <strong>
+                        {document.results.QAs.train_data.toLocaleString("pt-BR")}
+                      </strong>
+                    </div>
+                    <div className="result-item">
+                      <span>RAG data</span>
+                      <strong>
+                        {document.results.QAs.rag_data.toLocaleString("pt-BR")}
+                      </strong>
+                    </div>
+                  </div>
+                  <div className="result-group">
+                    <h4>Clinical Protocols</h4>
+                    <div className="result-item">
+                      <span>Train data</span>
+                      <strong>
+                        {document.results.clinical_protocols.train_data.toLocaleString(
+                          "pt-BR"
+                        )}
+                      </strong>
+                    </div>
+                    <div className="result-item">
+                      <span>RAG data</span>
+                      <strong>
+                        {document.results.clinical_protocols.rag_data.toLocaleString(
+                          "pt-BR"
+                        )}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
               <div>
                 <div className="status-item">
                   <span>Conclusão — {document.completion_percentage.toFixed(1)}%</span>

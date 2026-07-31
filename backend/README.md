@@ -45,7 +45,7 @@ src/
             └── preprocess.py    # CRUD da collection "preprocess"
 
 datasets/
-├── clone_datasets.py    # Clone dos repositórios PubMedQA e MedQuAD
+├── get_datasets.py      # Clone dos repositórios PubMedQA e MedQuAD
 ├── files/               # Datasets clonados (gerado em runtime)
 └── preprocessed/        # train.json e rag.json (gerado em runtime)
 ```
@@ -349,7 +349,7 @@ backend/
 │   ├── services/
 │   └── infra/database/
 └── datasets/
-    ├── clone_datasets.py
+    ├── get_datasets.py
     ├── files/              # Gerado em runtime
     └── preprocessed/       # Gerado em runtime
 ```

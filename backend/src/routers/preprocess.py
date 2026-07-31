@@ -25,15 +25,36 @@ class PreprocessRequest(BaseModel):
             raise ValueError('rag_percent deve estar entre 0.0 e 1.0')
         return v
 
+
+class StepInfo(BaseModel):
+    """Informações de um step individual."""
+    status: str
+    error_message: Optional[str] = None
+
+
+class ResultsData(BaseModel):
+    """Dados de resultados para um tipo específico."""
+    train_data: int
+    rag_data: int
+
+
+class Results(BaseModel):
+    """Resultados do preprocessamento."""
+    QAs: ResultsData
+    clinical_protocols: ResultsData
+
+
 class PreprocessResponse(BaseModel):
     """Modelo para a resposta do preprocessamento."""
 
     model_config = ConfigDict(populate_by_name=True)
 
     id: str = Field(validation_alias="_id")
-    train_data: int
-    rag_data: int
+    rag_percent: float
+    steps: Dict[str, StepInfo]
+    results: Results
     status: str
+    error_message: Optional[str] = None
     updated_date: str
     completion_percentage: float
 
@@ -57,11 +78,7 @@ async def preprocess_endpoint(request: PreprocessRequest, background_tasks: Back
         HTTPException: Em caso de erro no processamento.
     """
     try:
-        # Chamar a função de preprocessamento com background tasks
-        document = preprocess_data(rag_percent=request.rag_percent, background_tasks=background_tasks)
-        
-
-        
+        document = preprocess_data(rag_percent=request.rag_percent, background_tasks=background_tasks)        
         return document
         
     except FileNotFoundError as e:

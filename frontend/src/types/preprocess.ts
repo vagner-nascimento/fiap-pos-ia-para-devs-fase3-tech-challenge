@@ -4,11 +4,30 @@ export type PreprocessStatus =
   | "completed"
   | "error";
 
-export interface PreprocessDocument {
-  id: string;
+export type StepStatus = "pending" | "in_progress" | "completed" | "error";
+
+export interface StepInfo {
+  status: StepStatus;
+  error_message?: string;
+}
+
+export interface ResultsData {
   train_data: number;
   rag_data: number;
+}
+
+export interface Results {
+  QAs: ResultsData;
+  clinical_protocols: ResultsData;
+}
+
+export interface PreprocessDocument {
+  id: string;
+  rag_percent: number;
+  steps: Record<string, StepInfo>;
+  results: Results;
   status: PreprocessStatus;
+  error_message?: string;
   updated_date: string;
   completion_percentage: number;
 }

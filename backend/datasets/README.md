@@ -4,7 +4,7 @@ Este diretório contém o script responsável por baixar os datasets necessário
 
 ## O que o script faz?
 
-O script [`clone_datasets.py`](file:///c:/code/fiap-pos-ia/fase-3/fiap-pos-ia-para-devs-fase3-tech-challenge/backend/datasets/clone_datasets.py) faz o download automático dos seguintes repositórios:
+O script [`get_datasets.py`](file:///c:/code/fiap-pos-ia/fase-3/fiap-pos-ia-para-devs-fase3-tech-challenge/backend/datasets/get_datasets.py) faz o download automático dos seguintes repositórios:
 1. **PubMedQA**: [https://github.com/pubmedqa/pubmedqa](https://github.com/pubmedqa/pubmedqa)
 2. **MedQuAD**: [https://github.com/abachaa/MedQuAD](https://github.com/abachaa/MedQuAD)
 
@@ -35,7 +35,7 @@ Para que o script funcione corretamente, você precisará dos seguintes software
 
 2. Execute o script utilizando o Python:
    ```bash
-   python clone_datasets.py
+   python get_datasets.py
    ```
 
 3. Acompanhe a saída no terminal. Ao final, a estrutura do diretório de datasets ficará da seguinte forma:
@@ -44,6 +44,6 @@ Para que o script funcione corretamente, você precisará dos seguintes software
    ├── files/
    │   ├── MedQuAD/
    │   └── pubmedqa/
-   ├── clone_datasets.py
+   ├── get_datasets.py
    └── README.md
    ```
