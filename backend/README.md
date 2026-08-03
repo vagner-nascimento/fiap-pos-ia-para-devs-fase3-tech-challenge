@@ -1,9 +1,10 @@
 # FIAP POS IA - Backend
 
-API REST em FastAPI responsavel pelo pre-processamento de datasets medicos. Hoje o fluxo trata duas familias de dados:
+API REST em FastAPI responsavel pelo pre-processamento de datasets medicos. Hoje o fluxo trata duas familias de dados e uma etapa adicional de traducao local:
 
 - QAs, a partir de PubMedQA e MedQuAD;
 - protocolos clinicos FHEMIG, com extracao de texto dos PDFs.
+- traducao dos QAs para pt-BR com um modelo local de machine translation.
 
 O progresso de cada execucao e persistido no MongoDB.
 
@@ -38,7 +39,9 @@ src/
 |-- routers/
 |   `-- preprocess.py    # POST /preprocess, GET /preprocess/{id}
 |-- services/
-|   `-- preprocess_data.py   # Logica de processamento em background
+|   |-- preprocess_data.py   # Logica de processamento em background
+|   `-- preprocess/
+|       `-- step_three_translation.py   # Traducao local dos QAs
 `-- infra/
     `-- database/
         |-- mongodb.py           # Conexao singleton com MongoDB
@@ -52,6 +55,8 @@ datasets/
 ```
 
 O processamento pesado roda em background task do FastAPI. O endpoint POST /preprocess retorna imediatamente com o ID da execucao, e o cliente consulta o progresso via GET /preprocess/{id}.
+
+Quando ha uma GPU Nvidia disponivel com driver/runtime configurados, o backend usa CUDA automaticamente para a etapa de traducao. Se nao houver GPU, ele faz fallback para CPU, o que deixa a traducao bem mais lenta.
 
 ## Pre-requisitos
 
@@ -78,6 +83,10 @@ Definidas em `pyproject.toml`:
 | `requests` | Download dos protocolos clinicos |
 | `beautifulsoup4` | Parse do HTML com links dos PDFs |
 | `pdfplumber` | Extracao de texto dos PDFs |
+| `transformers` | Carregamento do modelo local de traducao |
+| `torch` | Inferencia do modelo com suporte a CPU/GPU |
+| `sentencepiece` | Tokenizacao usada pelo modelo de traducao |
+| `sacremoses` | Pre e pos-processamento de texto para traducao |
 
 Dependencias de desenvolvimento: `pytest`, `black`, `mypy`.
 
@@ -107,6 +116,8 @@ cp .env.example .env
 ```bash
 docker compose -f app-docker-compose.yaml up --build -d
 ```
+
+O primeiro build pode demorar bastante porque a imagem do backend instala dependencias grandes de IA e, em ambientes Linux com GPU Nvidia, baixa tambem bibliotecas CUDA.
 
 Para reiniciar os containers:
 
@@ -238,8 +249,9 @@ flowchart TD
     F --> G[Processa PubMedQA e MedQuAD]
     G --> H[Extrai texto dos PDFs dos protocolos]
     H --> I[Divide train e RAG]
-    I --> J[Salva JSONs em datasets/preprocessed/]
-    J --> K[Atualiza MongoDB]
+    I --> J[Traduz os QAs com o modelo local]
+    J --> K[Salva JSONs em datasets/preprocessed/]
+    K --> L[Atualiza MongoDB]
 ```
 
 ### Regras de divisao dos dados
@@ -249,6 +261,14 @@ flowchart TD
 - Os resultados sao salvos separadamente em:
   - `datasets/preprocessed/qas/`
   - `datasets/preprocessed/clinical_protocols/`
+
+### Step 3 - traducao local
+
+A etapa de traducao usa localmente o modelo `Helsinki-NLP/opus-mt-tc-big-en-pt`, carregado por `transformers` e executado com `torch`.
+
+- Se o backend encontrar uma GPU Nvidia disponivel, a inferencia roda em CUDA.
+- Se nao encontrar GPU, o modelo roda em CPU, o que aumenta bastante o tempo de execucao.
+- Os arquivos traduzidos sao gerados com sufixo `_pt_br.json`.
 
 ## Estrutura do projeto
 

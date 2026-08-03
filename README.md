@@ -64,6 +64,14 @@ O arquivo [app-docker-compose.yaml](app-docker-compose.yaml) sobe a aplicação 
 docker compose -f app-docker-compose.yaml up --build -d
 ```
 
+Observação: o primeiro build pode demorar bastante, principalmente por causa do backend, que baixa dependências grandes de IA e pacotes de suporte à execução em GPU Nvidia.
+
+Depois de subir a aplicação, acompanhe os logs em tempo real com `docker compose logs -f` ou, usando o arquivo deste projeto, `docker compose -f app-docker-compose.yaml logs -f`:
+
+```bash
+docker compose -f app-docker-compose.yaml logs -f
+```
+
 ### Acesso
 
 - Frontend: http://localhost:8080
@@ -89,5 +97,6 @@ O script [restart-app.sh](restart-app.sh) facilita a reinicialização completa 
 
 - O backend depende do MongoDB para subir corretamente.
 - O processamento de datasets é feito em background, então a API responde rapidamente e o estado pode ser acompanhado depois.
+- Quando houver uma GPU Nvidia compatível e o runtime/driver estiverem instalados, o backend usa GPU automaticamente; caso contrário, ele faz fallback para CPU, o que deixa a tradução dos datasets bem mais lenta.
 - Uma execução pode terminar com status `error`; em cenários de falha de fallback interno, também pode aparecer `failed`.
 - Os datasets são baixados automaticamente na primeira execução, mas também podem ser tratados manualmente conforme descrito em [backend/datasets/README.md](backend/datasets/README.md).
