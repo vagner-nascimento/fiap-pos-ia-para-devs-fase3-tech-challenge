@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Tuple
 
 import pdfplumber
 
+from infra.database.collections.preprocess import update_step_status
 
 _script_dir = os.path.dirname(os.path.abspath(__file__))
 _backend_dir = os.path.abspath(os.path.join(_script_dir, "..", "..", ".."))
@@ -52,6 +53,7 @@ def _extract_text_from_pdf(pdf_path: Path) -> str:
 
 
 def _extract_qas_data(
+    doc_id: str,
     qas_paths: Dict[str, str],
     rag_percent: float,
 ) -> Tuple[str, str]:
@@ -59,6 +61,8 @@ def _extract_qas_data(
     Process QA datasets (PubMedQA and MedQuAD), split them into train and RAG
     and persist the results as JSON files.
     """
+    update_step_status(doc_id, "two_data_extraction", "in_progress", completion_percentage=0)
+
     pubmedqa_path = os.path.join(
         qas_paths.get("pubmedqa", os.path.join(_datasets_dir, "files", "qas", "pubmedqa")),
         "data",
@@ -105,6 +109,8 @@ def _extract_qas_data(
     else:
         print(f"Aviso: Arquivo PubMedQA não encontrado em {pubmedqa_path}")
 
+    update_step_status(doc_id, "two_data_extraction", "in_progress", completion_percentage=25)
+
     print("Processando dados de MedQuAD...")
     medquad_entries: List[Dict[str, Any]] = []
 
@@ -115,6 +121,10 @@ def _extract_qas_data(
                 for file_name in files:
                     if file_name.endswith(".xml"):
                         xml_files.append(os.path.join(root_dir, file_name))
+
+            file_progress = 0
+            total_files = len(xml_files)
+            per_file_progress = 25.0 / total_files if total_files > 0 else 0.0
 
             for xml_path in xml_files:
                 try:
@@ -160,8 +170,10 @@ def _extract_qas_data(
         print(
             f"MedQuAD processado: {len(medquad_entries)} registros com respostas preenchidas encontrados."
         )
+        update_step_status(doc_id, "two_data_extraction", "in_progress", completion_percentage=50)
     else:
         print(f"Aviso: Diretório MedQuAD não encontrado em {medquad_dir}")
+        update_step_status(doc_id, "two_data_extraction", "in_progress", completion_percentage=50)
 
     pubmedqa_rag, pubmedqa_train = _split_dataset_for_rag(pubmedqa_entries, rag_percent)
     medquad_rag, medquad_train = _split_dataset_for_rag(medquad_entries, rag_percent)
@@ -188,6 +200,7 @@ def _extract_qas_data(
 
 
 def _extract_clinical_protocols_data(
+    doc_id: str,
     clinical_protocols_paths: Tuple[Path, Path],
     rag_percent: float,
 ) -> Tuple[str, str]:
@@ -206,6 +219,8 @@ def _extract_clinical_protocols_data(
     print("Processando dados de protocolos clínicos...")
     clinical_entries: List[Dict[str, Any]] = []
 
+    update_step_status(doc_id, "two_data_extraction", "in_progress", completion_percentage=50)
+
     if json_path.exists():
         try:
             with json_path.open("r", encoding="utf-8") as handle:
@@ -220,10 +235,21 @@ def _extract_clinical_protocols_data(
         if not isinstance(protocols_data, list):
             raise ValueError("Arquivo de protocolos clínicos deve conter uma lista de registros")
 
+        total_protocols = len(protocols_data)
+        protocol_progress = 0
+        per_protocol_progress = 50.0 / total_protocols if total_protocols > 0 else 0.0
+
         for protocol in protocols_data:
             pdf_name = (protocol.get("name") or "").strip()
             if not pdf_name:
                 print("Aviso: Protocolo sem nome, pulando...")
+                protocol_progress += 1
+                update_step_status(
+                    doc_id,
+                    "two_data_extraction",
+                    "in_progress",
+                    completion_percentage=min(100.0, 50.0 + per_protocol_progress * protocol_progress),
+                )
                 continue
 
             safe_name = re.sub(r"[^\w.-]+", "_", pdf_name, flags=re.UNICODE).strip("._-") or pdf_name
@@ -235,6 +261,13 @@ def _extract_clinical_protocols_data(
 
             if not pdf_path.exists():
                 print(f"Aviso: PDF não encontrado em {pdf_path}, pulando protocolo...")
+                protocol_progress += 1
+                update_step_status(
+                    doc_id,
+                    "two_data_extraction",
+                    "in_progress",
+                    completion_percentage=min(100.0, 50.0 + per_protocol_progress * protocol_progress),
+                )
                 continue
 
             print(f"Extraindo texto de {pdf_path.name}...")
@@ -242,6 +275,13 @@ def _extract_clinical_protocols_data(
 
             if not content_text:
                 print(f"Aviso: Não foi possível extrair texto de {pdf_path.name}, pulando...")
+                protocol_progress += 1
+                update_step_status(
+                    doc_id,
+                    "two_data_extraction",
+                    "in_progress",
+                    completion_percentage=min(100.0, 50.0 + per_protocol_progress * protocol_progress),
+                )
                 continue
 
             clinical_entries.append(
@@ -253,10 +293,31 @@ def _extract_clinical_protocols_data(
                 }
             )
             print(f"Texto extraído com sucesso: {len(content_text)} caracteres")
+            protocol_progress += 1
+            update_step_status(
+                doc_id,
+                "two_data_extraction",
+                "in_progress",
+                completion_percentage=min(100.0, 50.0 + per_protocol_progress * protocol_progress),
+            )
+
+        if total_protocols == 0:
+            update_step_status(
+                doc_id,
+                "two_data_extraction",
+                "in_progress",
+                completion_percentage=100,
+            )
 
         print(f"Protocolos clínicos processados: {len(clinical_entries)} registros com texto extraído.")
     else:
         print(f"Aviso: Arquivo de protocolos clínicos não encontrado em {json_path}")
+        update_step_status(
+            doc_id,
+            "two_data_extraction",
+            "in_progress",
+            completion_percentage=100,
+        )
 
     clinical_rag, clinical_train = _split_dataset_for_rag(clinical_entries, rag_percent)
 
@@ -279,6 +340,7 @@ def _extract_clinical_protocols_data(
 
 
 def extract_data(
+    doc_id: str,
     qas_paths: Dict[str, str],
     clinical_protocols_paths: Tuple[Path, Path],
     rag_percent: float,
@@ -286,6 +348,14 @@ def extract_data(
     """
     Process all datasets and generate train/RAG files for QA and clinical protocols.
     """
-    qas_data_paths = _extract_qas_data(qas_paths, rag_percent)
-    clinical_data_paths = _extract_clinical_protocols_data(clinical_protocols_paths, rag_percent)
+    qas_data_paths = _extract_qas_data(
+        doc_id,
+        qas_paths,
+        rag_percent,
+    )
+    clinical_data_paths = _extract_clinical_protocols_data(
+        doc_id,
+        clinical_protocols_paths,
+        rag_percent,
+    )
     return (*qas_data_paths, *clinical_data_paths)

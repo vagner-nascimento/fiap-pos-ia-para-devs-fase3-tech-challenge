@@ -22,10 +22,26 @@ function stepStatusLabel(status: StepStatus): string {
   return labels[status];
 }
 
+function formatPercentage(value: number): string {
+  if (!Number.isFinite(value)) {
+    return "0%";
+  }
+
+  if (value < 1) {
+    return `${value.toFixed(2)}%`;
+  }
+
+  if (value < 10) {
+    return `${value.toFixed(1)}%`;
+  }
+
+  return `${value.toFixed(0)}%`;
+}
+
 const STEP_NAMES: Record<string, string> = {
   one_download_datasets: "Download dos Datasets",
-  step_two_data_extraction: "Extração de Dados",
-  step_three_translating: "Curadoria - Tradução dos Dados",
+  two_data_extraction: "Extração de Dados",
+  three_translating: "Curadoria - Tradução dos Dados",
 };
 
 export function PreProcessingPage() {
@@ -177,23 +193,31 @@ export function PreProcessingPage() {
               {/* Steps Status */}
               <div className="steps-container">
                 <h3>Status dos Steps</h3>
-                {Object.entries(document.steps).map(([stepKey, stepInfo]) => (
-                  <div key={stepKey} className="step-item">
-                    <div className="step-header">
-                      <span className="step-name">
-                        {STEP_NAMES[stepKey] || stepKey}
-                      </span>
-                      <span className={stepStatusClassName(stepInfo.status)}>
-                        {stepStatusLabel(stepInfo.status)}
-                      </span>
-                    </div>
-                    {stepInfo.error_message && (
-                      <div className="step-error">
-                        <strong>Erro:</strong> {stepInfo.error_message}
+                {Object.entries(document.steps).map(([stepKey, stepInfo]) => {
+                  const stepCompletion = stepInfo.completion_percentage ?? 0;
+                  return (
+                    <div key={stepKey} className="step-item">
+                      <div className="step-header">
+                        <div>
+                          <span className="step-name">
+                            {STEP_NAMES[stepKey] || stepKey}
+                          </span>
+                          <span className="step-percent">
+                            {formatPercentage(stepCompletion)}
+                          </span>
+                        </div>
+                        <span className={stepStatusClassName(stepInfo.status)}>
+                          {stepStatusLabel(stepInfo.status)}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                ))}
+                      {stepInfo.error_message && (
+                        <div className="step-error">
+                          <strong>Erro:</strong> {stepInfo.error_message}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Results */}
@@ -240,7 +264,7 @@ export function PreProcessingPage() {
               {/* Progress Bar */}
               <div>
                 <div className="status-item">
-                  <span>Conclusão — {document.completion_percentage.toFixed(1)}%</span>
+                  <span>Conclusão — {formatPercentage(document.completion_percentage)}</span>
                   <div className="progress-bar" aria-hidden="true">
                     <div
                       className="progress-bar-fill"

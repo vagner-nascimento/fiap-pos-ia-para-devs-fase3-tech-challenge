@@ -29,6 +29,16 @@ services:
       MONGODB_HOST: mongodb
       MONGODB_PORT: 27017
       DB_NAME: fiap_pos_ia_fase3
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: ["gpu"]
+              count: all
+              driver: nvidia
     depends_on:
       - mongodb
     networks:

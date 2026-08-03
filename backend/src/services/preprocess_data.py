@@ -27,13 +27,14 @@ def _read_json_count(file_path: str) -> int:
 def _report_progress(
     doc_id: str,
     last_reported_percentage: int,
-    current_percentage: int,
+    current_percentage: float,
     results: Dict[str, Dict[str, int]],
 ) -> int:
-    """Atualiza o progresso apenas quando houver avanço de pelo menos 5%."""
-    if current_percentage >= last_reported_percentage + 5:
-        update_preprocess_document(doc_id, results, current_percentage)
-        return current_percentage
+    """Atualiza o progresso apenas quando houver avanço real no percentual."""
+    rounded_percentage = int(round(current_percentage))
+    if rounded_percentage > last_reported_percentage:
+        update_preprocess_document(doc_id, results, min(100.0, rounded_percentage))
+        return rounded_percentage
     return last_reported_percentage
 
 
@@ -53,8 +54,12 @@ def preprocess_data_background(rag_percent: float, doc_id: str) -> None:
         doc_id: ID do documento na collection preprocess.
     """
     try:
-        last_reported_percentage = 0
-        
+        def _current_overall_percentage() -> float:
+            current_doc = get_preprocess_document(doc_id)
+            if not current_doc:
+                return 0.0
+            return float(current_doc.get("completion_percentage", 0.0))
+
         # Inicializar estrutura de resultados
         results = {
             "QAs": {
@@ -74,19 +79,14 @@ def preprocess_data_background(rag_percent: float, doc_id: str) -> None:
         # Step 1 — Download dos datasets
         # ------------------------------------------------------------------
         print("Step 1: Baixando datasets...")
-        update_step_status(doc_id, "one_download_datasets", "in_progress")
-        
+        update_step_status(doc_id, "one_download_datasets", "in_progress", completion_percentage=0)
+
         try:
-            datasets = step_one.download_datasets()
-            update_step_status(doc_id, "one_download_datasets", "completed")
+            datasets = step_one.download_datasets(doc_id)
         except Exception as e:
             error_message = f"Erro no download dos datasets: {e}"
-            update_step_status(doc_id, "one_download_datasets", "error", error_message)
+            update_step_status(doc_id, "one_download_datasets", "error", error_message, completion_percentage=0)
             raise
-
-        last_reported_percentage = _report_progress(
-            doc_id, last_reported_percentage, 20, results
-        )
 
         qas_paths: Dict[str, str] = datasets["qas"]
         clinical_protocols_paths: Tuple[Path, Path] = datasets["clinical_protocols"]
@@ -95,10 +95,11 @@ def preprocess_data_background(rag_percent: float, doc_id: str) -> None:
         # Step 2 — Extração e geração dos arquivos JSON
         # ------------------------------------------------------------------
         print("Step 2: Extraindo e processando dados QA...")
-        update_step_status(doc_id, "step_two_data_extraction", "in_progress")
+        update_step_status(doc_id, "two_data_extraction", "in_progress", completion_percentage=0)
         
         try:
             train_qa_path, rag_qa_path, train_clinical_path, rag_clinical_path = step_two.extract_data(
+                doc_id,
                 qas_paths=qas_paths,
                 clinical_protocols_paths=clinical_protocols_paths,
                 rag_percent=rag_percent,
@@ -117,43 +118,50 @@ def preprocess_data_background(rag_percent: float, doc_id: str) -> None:
             results["clinical_protocols"]["train_data"] = clinical_train_count
             results["clinical_protocols"]["rag_data"] = clinical_rag_count
             
-            update_step_status(doc_id, "step_two_data_extraction", "completed")
+            update_step_status(
+                doc_id,
+                "two_data_extraction",
+                "completed",
+                completion_percentage=100,
+            )
+            update_preprocess_document(doc_id, results, _current_overall_percentage())
             
         except Exception as e:
             error_message = f"Erro na extração de dados: {e}"
-            update_step_status(doc_id, "step_two_data_extraction", "error", error_message)
+            update_step_status(doc_id, "two_data_extraction", "error", error_message, completion_percentage=0)
             raise
-
-        last_reported_percentage = _report_progress(
-            doc_id, last_reported_percentage, 60, results
-        )
 
         # ------------------------------------------------------------------
         # Step 3 — Tradução dos dados QA
         # ------------------------------------------------------------------
         print("Step 3: Traduzindo dados QA para português...")
-        update_step_status(doc_id, "step_three_translating", "in_progress")
+        update_step_status(doc_id, "three_translating", "in_progress", completion_percentage=0)
 
         try:
-            translated_train_path, translated_rag_path = step_three.translate((train_qa_path, rag_qa_path))
+            translated_train_path, translated_rag_path = step_three.translate(
+                doc_id,
+                (train_qa_path, rag_qa_path),
+            )
 
             results["QAs"]["train_data"] = _read_json_count(translated_train_path)
             results["QAs"]["rag_data"] = _read_json_count(translated_rag_path)
 
-            update_step_status(doc_id, "step_three_translating", "completed")
+            update_step_status(
+                doc_id,
+                "three_translating",
+                "completed",
+                completion_percentage=100,
+            )
+            update_preprocess_document(doc_id, results, _current_overall_percentage())
         except Exception as e:
             error_message = f"Erro na tradução de dados QA: {e}"
-            update_step_status(doc_id, "step_three_translating", "error", error_message)
+            update_step_status(doc_id, "three_translating", "error", error_message, completion_percentage=0)
             raise
-
-        last_reported_percentage = _report_progress(
-            doc_id, last_reported_percentage, 90, results
-        )
 
         # ------------------------------------------------------------------
         # Progresso final
         # ------------------------------------------------------------------
-        _report_progress(doc_id, last_reported_percentage, 100, results)
+        update_preprocess_document(doc_id, results, 100)
         print(
             f"Pipeline concluída com sucesso! "
             f"QAs: train={results['QAs']['train_data']} | rag={results['QAs']['rag_data']} | "
@@ -166,7 +174,6 @@ def preprocess_data_background(rag_percent: float, doc_id: str) -> None:
         # Tentar identificar qual step falhou baseado no status atual
         current_doc = None
         try:
-            from infra.database.collections.preprocess import get_preprocess_document
             current_doc = get_preprocess_document(doc_id)
         except Exception:
             pass

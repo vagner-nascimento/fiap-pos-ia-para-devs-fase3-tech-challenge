@@ -9,6 +9,7 @@ export type StepStatus = "pending" | "in_progress" | "completed" | "error";
 export interface StepInfo {
   status: StepStatus;
   error_message?: string;
+  completion_percentage?: number;
 }
 
 export interface ResultsData {

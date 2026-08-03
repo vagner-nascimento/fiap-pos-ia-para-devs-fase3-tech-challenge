@@ -1,11 +1,16 @@
 import uuid
 from datetime import datetime, timezone
-from typing import Dict, Any, Optional
-from typing import Final
+from typing import Dict, Any, Optional, Final
 
 from infra.database.mongodb import get_collection
 
 PREPROCESS_COLLECTION: Final[str] = "preprocess"
+
+STEP_WEIGHTS: Final[Dict[str, float]] = {
+    "one_download_datasets": 0.2,
+    "two_data_extraction": 0.4,
+    "three_translating": 0.4,
+}
 
 
 def _serialize_preprocess_document(document: Dict[str, Any]) -> Dict[str, Any]:
@@ -37,20 +42,31 @@ def _calculate_overall_status(steps: Dict[str, Dict[str, Any]]) -> str:
     
     step_statuses = [step_info.get("status", "pending") for step_info in steps.values()]
     
-    # Se algum step está em erro, status geral é error
     if "error" in step_statuses:
         return "error"
     
-    # Se algum step está em progresso, status geral é in_progress
-    if "in_progress" in step_statuses:
-        return "in_progress"
-    
-    # Se todos estão completed, status geral é completed
     if all(status == "completed" for status in step_statuses):
         return "completed"
     
-    # Se todos estão pending, status geral é created
+    if any(status in {"in_progress", "completed"} for status in step_statuses):
+        return "in_progress"
+    
     return "created"
+
+
+def _calculate_overall_completion(steps: Dict[str, Dict[str, Any]]) -> float:
+    """
+    Calcula o percentual geral de conclusão com base nos completion_percentage dos steps.
+    """
+    if not steps:
+        return 0.0
+
+    total = 0.0
+    for step_name, weight in STEP_WEIGHTS.items():
+        step_info = steps.get(step_name, {})
+        total += step_info.get("completion_percentage", 0.0) * weight
+
+    return min(100.0, round(total, 2))
 
 
 def create_preprocess_document(rag_percent: float = 0.5) -> Dict[str, Any]:
@@ -76,14 +92,17 @@ def create_preprocess_document(rag_percent: float = 0.5) -> Dict[str, Any]:
         "steps": {
             "one_download_datasets": {
                 "status": "pending",
+                "completion_percentage": 0,
                 "error_message": None
             },
-            "step_two_data_extraction": {
+            "two_data_extraction": {
                 "status": "pending",
+                "completion_percentage": 0,
                 "error_message": None
             },
-            "step_three_translating": {
+            "three_translating": {
                 "status": "pending",
+                "completion_percentage": 0,
                 "error_message": None
             }
         },
@@ -132,7 +151,8 @@ def update_step_status(
     doc_id: str,
     step_name: str,
     status: str,
-    error_message: Optional[str] = None
+    error_message: Optional[str] = None,
+    completion_percentage: Optional[float] = None,
 ) -> Optional[Dict[str, Any]]:
     """
     Atualiza o status de um step específico e recalcula o status geral.
@@ -142,6 +162,7 @@ def update_step_status(
         step_name: Nome do step (ex: "one_download_datasets").
         status: Novo status do step ("pending", "in_progress", "completed", "error").
         error_message: Mensagem de erro (apenas se status for "error").
+        completion_percentage: Percentual de conclusão do step (0 a 100).
         
     Returns:
         Dict com o documento atualizado, ou None se não existir.
@@ -162,6 +183,8 @@ def update_step_status(
         f"{step_key}.error_message": error_message if status == "error" else None,
         "updated_date": now
     }
+    if completion_percentage is not None:
+        update_data[f"{step_key}.completion_percentage"] = completion_percentage
     
     result = collection.update_one(
         {"_id": doc_id},
@@ -180,6 +203,9 @@ def update_step_status(
                 "error_message": error_message if overall_status == "error" else None
             }
             
+            overall_update["completion_percentage"] = _calculate_overall_completion(
+                updated_doc.get("steps", {})
+            )
             collection.update_one(
                 {"_id": doc_id},
                 {"$set": overall_update}

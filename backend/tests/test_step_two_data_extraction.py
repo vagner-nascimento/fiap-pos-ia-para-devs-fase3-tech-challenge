@@ -37,7 +37,7 @@ def test_extract_clinical_protocols_data_creates_split_files(monkeypatch):
         lambda pdf_path: f"content for {Path(pdf_path).name}",
     )
 
-    train_path, rag_path = step_two._extract_clinical_protocols_data((json_path, pdfs_dir), 0.5)
+    train_path, rag_path = step_two._extract_clinical_protocols_data("doc-123", (json_path, pdfs_dir), 0.5)
 
     train_file = Path(train_path)
     rag_file = Path(rag_path)

@@ -30,6 +30,7 @@ class StepInfo(BaseModel):
     """Informações de um step individual."""
     status: str
     error_message: Optional[str] = None
+    completion_percentage: Optional[float] = None
 
 
 class ResultsData(BaseModel):
