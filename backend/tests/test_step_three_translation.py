@@ -16,6 +16,8 @@ def test_get_translator_uses_seq2seq_components(monkeypatch):
         def batch_decode(self, generated_tokens, skip_special_tokens=True):
             return ["Olá, mundo!"]
 
+    generate_kwargs = {}
+
     class FakeModel:
         def to(self, device):
             return self
@@ -24,6 +26,7 @@ def test_get_translator_uses_seq2seq_components(monkeypatch):
             return self
 
         def generate(self, **kwargs):
+            generate_kwargs.update(kwargs)
             return [[1, 2, 3]]
 
     monkeypatch.setattr(step_three_translation, "_translator", None)
@@ -34,6 +37,9 @@ def test_get_translator_uses_seq2seq_components(monkeypatch):
 
     result = translator("hello")
     assert result == [{"translation_text": "Olá, mundo!"}]
+    assert generate_kwargs["max_new_tokens"] == 256
+    assert generate_kwargs["num_beams"] == 1
+    assert generate_kwargs["do_sample"] is False
 
 
 def test_translate_creates_translated_files(tmp_path, monkeypatch):
@@ -145,7 +151,7 @@ def test_translate_updates_status_at_six_second_intervals(tmp_path, monkeypatch)
     source_data = []
     translated_texts = {}
 
-    for index in range(9):
+    for index in range(17):
         question = f"Question {index}?"
         context = f"Context {index}."
         answer = f"Answer {index}."
@@ -192,6 +198,49 @@ def test_translate_updates_status_at_six_second_intervals(tmp_path, monkeypatch)
         ("in_progress", 100.0),
         ("completed", 100),
     ]
+
+
+def test_translate_uses_larger_translation_batches(tmp_path, monkeypatch):
+    source_data = []
+    translated_texts = {}
+
+    for index in range(17):
+        question = f"Question {index}?"
+        context = f"Context {index}."
+        answer = f"Answer {index}."
+        source_data.append(
+            {
+                "question": question,
+                "contexts": [context],
+                "answer": answer,
+            }
+        )
+        translated_texts[question] = f"Pergunta {index}?"
+        translated_texts[context] = f"Contexto {index}."
+        translated_texts[answer] = f"Resposta {index}."
+
+    input_file = tmp_path / "qa.json"
+    empty_file = tmp_path / "empty.json"
+    input_file.write_text(json.dumps(source_data, ensure_ascii=False), encoding="utf-8")
+    empty_file.write_text("[]", encoding="utf-8")
+
+    batches = []
+
+    class FakePipeline:
+        def __call__(self, texts):
+            batch = [texts] if isinstance(texts, str) else list(texts)
+            batches.append(batch)
+            return [{"translation_text": translated_texts[text]} for text in batch]
+
+    monkeypatch.setattr(step_three_translation, "_get_translator", lambda: FakePipeline())
+    monkeypatch.setattr(step_three_translation, "update_step_status", lambda *args, **kwargs: None)
+
+    output_paths = step_three_translation.translate("doc-123", (input_file, empty_file))
+
+    assert len(output_paths) == 2
+    assert len(batches) == 2
+    assert len(batches[0]) == 48
+    assert len(batches[1]) == 3
 
 
 def test_translate_raises_on_missing_file(tmp_path):

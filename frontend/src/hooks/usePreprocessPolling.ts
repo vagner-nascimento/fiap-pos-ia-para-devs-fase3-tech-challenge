@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { getPreprocessStatus } from "../api/preprocess";
 import { isTerminalStatus, type PreprocessDocument } from "../types/preprocess";
 
-const POLL_INTERVAL_MS = 2000;
+const POLL_INTERVAL_MS = 5000;
 
 interface UsePreprocessPollingOptions {
   docId: string | null;

@@ -152,7 +152,7 @@ export function PreProcessingPage() {
           {isPolling && (
             <div className="polling-indicator">
               <span className="polling-dot" aria-hidden="true" />
-              Atualizando status a cada 2 segundos...
+              Atualizando status a cada 5 segundos...
             </div>
           )}
 

@@ -9,8 +9,8 @@ _translator: Optional[Any] = None
 
 from infra.database.collections.preprocess import update_step_status
 
-_TRANSLATION_BATCH_SIZE = 8
-_STATUS_UPDATE_INTERVAL_SECONDS = 6.0
+_TRANSLATION_BATCH_SIZE = 16
+_STATUS_UPDATE_INTERVAL_SECONDS = 10.0
 _MAX_NEW_TOKENS = 256
 
 
@@ -54,7 +54,12 @@ def _get_translator() -> Any:
 
             inference_context = torch.inference_mode() if torch is not None else nullcontext()
             with inference_context:
-                generated_tokens = model.generate(**inputs, max_new_tokens=_MAX_NEW_TOKENS)
+                generated_tokens = model.generate(
+                    **inputs,
+                    max_new_tokens=_MAX_NEW_TOKENS,
+                    num_beams=1,
+                    do_sample=False,
+                )
 
             translated_texts = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
             return [{"translation_text": translated_text} for translated_text in translated_texts]

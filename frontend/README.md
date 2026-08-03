@@ -19,7 +19,7 @@ O frontend permite:
 
 1. configurar o percentual RAG;
 2. iniciar o pre-processamento;
-3. acompanhar o progresso com polling a cada 2 segundos;
+3. acompanhar o progresso com polling a cada 5 segundos;
 4. visualizar os resultados separados para `QAs` e `clinical_protocols`.
 
 A aplicacao e uma SPA servida pelo Vite em desenvolvimento e pelo nginx em producao.
@@ -121,7 +121,7 @@ flowchart TD
     A[Usuario define rag_percent] --> B[Clica em Iniciar]
     B --> C[POST /preprocess]
     C --> D[Exibe documento retornado]
-    D --> E[Polling a cada 2s]
+    D --> E[Polling a cada 5s]
     E --> F{GET /preprocess/id}
     F -->|created / in_progress| E
     F -->|completed / error| G[Para polling]
