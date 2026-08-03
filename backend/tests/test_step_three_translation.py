@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 import pytest
 import transformers
@@ -9,8 +8,10 @@ from src.services.preprocess import step_three_translation
 
 def test_get_translator_uses_seq2seq_components(monkeypatch):
     class FakeTokenizer:
-        def __call__(self, text, return_tensors=None, truncation=None, max_length=None):
-            return {"input_ids": [1, 2]}
+        def __call__(self, text, return_tensors=None, truncation=None, padding=None):
+            assert isinstance(text, list)
+            assert text == ["hello"]
+            return {"input_ids": [[1, 2]]}
 
         def batch_decode(self, generated_tokens, skip_special_tokens=True):
             return ["Olá, mundo!"]
@@ -26,7 +27,6 @@ def test_get_translator_uses_seq2seq_components(monkeypatch):
             return [[1, 2, 3]]
 
     monkeypatch.setattr(step_three_translation, "_translator", None)
-    monkeypatch.setattr(transformers, "pipeline", lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("pipeline não deveria ser usado")))
     monkeypatch.setattr(transformers.AutoTokenizer, "from_pretrained", staticmethod(lambda *args, **kwargs: FakeTokenizer()))
     monkeypatch.setattr(transformers.AutoModelForSeq2SeqLM, "from_pretrained", staticmethod(lambda *args, **kwargs: FakeModel()))
 
@@ -42,10 +42,10 @@ def test_translate_creates_translated_files(tmp_path, monkeypatch):
             "question": "What is the role of mitochondria?",
             "contexts": [
                 "Mitochondria are involved in energy production.",
-                "They also play roles in apoptosis."
+                "They also play roles in apoptosis.",
             ],
             "answer": "Mitochondria produce ATP.",
-            "metadata": {"source": "pubmedqa", "url": "https://example.com"}
+            "metadata": {"source": "pubmedqa", "url": "https://example.com"},
         }
     ]
 
@@ -56,18 +56,37 @@ def test_translate_creates_translated_files(tmp_path, monkeypatch):
         "What is the role of mitochondria?": "Qual é o papel das mitocôndrias?",
         "Mitochondria are involved in energy production.": "As mitocôndrias estão envolvidas na produção de energia.",
         "They also play roles in apoptosis.": "Elas também desempenham papéis na apoptose.",
-        "Mitochondria produce ATP.": "As mitocôndrias produzem ATP."
+        "Mitochondria produce ATP.": "As mitocôndrias produzem ATP.",
     }
 
+    calls = []
+
     class FakePipeline:
-        def __call__(self, text):
-            return [{"translation_text": translated_texts[text]}]
+        def __call__(self, texts):
+            batch = [texts] if isinstance(texts, str) else list(texts)
+            calls.append(batch)
+            return [{"translation_text": translated_texts[text]} for text in batch]
 
     monkeypatch.setattr(step_three_translation, "_get_translator", lambda: FakePipeline())
+    monkeypatch.setattr(step_three_translation, "update_step_status", lambda *args, **kwargs: None)
 
     output_paths = step_three_translation.translate("doc-123", (input_file, input_file))
 
     assert len(output_paths) == 2
+    assert calls == [
+        [
+            source_data[0]["question"],
+            source_data[0]["contexts"][0],
+            source_data[0]["contexts"][1],
+            source_data[0]["answer"],
+        ],
+        [
+            source_data[0]["question"],
+            source_data[0]["contexts"][0],
+            source_data[0]["contexts"][1],
+            source_data[0]["answer"],
+        ],
+    ]
     for output_path in output_paths:
         assert output_path.exists()
         assert output_path.name == "qa_pt_br.json"
@@ -80,6 +99,99 @@ def test_translate_creates_translated_files(tmp_path, monkeypatch):
         ]
         assert saved[0]["answer"] == translated_texts[source_data[0]["answer"]]
         assert saved[0]["metadata"] == source_data[0]["metadata"]
+
+
+def test_translate_preserves_non_string_contexts(tmp_path, monkeypatch):
+    source_data = [
+        {
+            "question": "What is the role of mitochondria?",
+            "contexts": [
+                "Mitochondria are involved in energy production.",
+                {"source": "keep-me"},
+                42,
+            ],
+            "answer": "Mitochondria produce ATP.",
+        }
+    ]
+
+    input_file = tmp_path / "qa.json"
+    input_file.write_text(json.dumps(source_data, ensure_ascii=False), encoding="utf-8")
+
+    translated_texts = {
+        "What is the role of mitochondria?": "Qual é o papel das mitocôndrias?",
+        "Mitochondria are involved in energy production.": "As mitocôndrias estão envolvidas na produção de energia.",
+        "Mitochondria produce ATP.": "As mitocôndrias produzem ATP.",
+    }
+
+    class FakePipeline:
+        def __call__(self, texts):
+            batch = [texts] if isinstance(texts, str) else list(texts)
+            return [{"translation_text": translated_texts[text]} for text in batch]
+
+    monkeypatch.setattr(step_three_translation, "_get_translator", lambda: FakePipeline())
+    monkeypatch.setattr(step_three_translation, "update_step_status", lambda *args, **kwargs: None)
+
+    output_paths = step_three_translation.translate("doc-123", (input_file, input_file))
+
+    saved = json.loads(output_paths[0].read_text(encoding="utf-8"))
+    assert saved[0]["contexts"] == [
+        translated_texts[source_data[0]["contexts"][0]],
+        {"source": "keep-me"},
+        42,
+    ]
+
+
+def test_translate_updates_status_at_six_second_intervals(tmp_path, monkeypatch):
+    source_data = []
+    translated_texts = {}
+
+    for index in range(9):
+        question = f"Question {index}?"
+        context = f"Context {index}."
+        answer = f"Answer {index}."
+        source_data.append(
+            {
+                "question": question,
+                "contexts": [context],
+                "answer": answer,
+            }
+        )
+        translated_texts[question] = f"Pergunta {index}?"
+        translated_texts[context] = f"Contexto {index}."
+        translated_texts[answer] = f"Resposta {index}."
+
+    input_file = tmp_path / "qa.json"
+    empty_file = tmp_path / "empty.json"
+    input_file.write_text(json.dumps(source_data, ensure_ascii=False), encoding="utf-8")
+    empty_file.write_text("[]", encoding="utf-8")
+
+    status_calls = []
+
+    class FakePipeline:
+        def __call__(self, texts):
+            batch = [texts] if isinstance(texts, str) else list(texts)
+            return [{"translation_text": translated_texts[text]} for text in batch]
+
+    monkeypatch.setattr(step_three_translation, "_get_translator", lambda: FakePipeline())
+    monkeypatch.setattr(
+        step_three_translation,
+        "update_step_status",
+        lambda doc_id, step_name, status, error_message=None, completion_percentage=None: status_calls.append(
+            (status, completion_percentage)
+        ),
+    )
+
+    monotonic_values = iter([0.0, 5.0, 12.0])
+    monkeypatch.setattr(step_three_translation.time, "monotonic", lambda: next(monotonic_values))
+
+    output_paths = step_three_translation.translate("doc-123", (input_file, empty_file))
+
+    assert len(output_paths) == 2
+    assert status_calls == [
+        ("in_progress", 0),
+        ("in_progress", 100.0),
+        ("completed", 100),
+    ]
 
 
 def test_translate_raises_on_missing_file(tmp_path):
