@@ -4,6 +4,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.infra.database.collections import preprocess as preprocess_collection
+from src.services import preprocess_data
 
 
 class FakeCollection:
@@ -110,14 +111,18 @@ def test_update_step_status_completed_updates_overall_status(monkeypatch) -> Non
         document["_id"], "one_download_datasets", "completed"
     )
     
-    # Marcar segundo step como completed
+    # Marcar segundo e terceiro steps como completed
     updated = preprocess_collection.update_step_status(
         document["_id"], "step_two_data_extraction", "completed"
+    )
+    updated = preprocess_collection.update_step_status(
+        document["_id"], "step_three_translating", "completed"
     )
 
     assert updated is not None
     assert updated["steps"]["one_download_datasets"]["status"] == "completed"
     assert updated["steps"]["step_two_data_extraction"]["status"] == "completed"
+    assert updated["steps"]["step_three_translating"]["status"] == "completed"
     assert updated["status"] == "completed"
 
 
@@ -160,3 +165,43 @@ def test_mark_preprocess_document_failed_stores_error_message(monkeypatch) -> No
     assert updated is not None
     assert updated["status"] == "failed"
     assert updated["error_message"] == "boom"
+
+
+def test_preprocess_data_background_runs_translation_for_qa_only(monkeypatch, tmp_path) -> None:
+    calls: list[tuple[str, object]] = []
+
+    def fake_update_preprocess_document(doc_id: str, results: dict, percentage: int) -> None:
+        calls.append(("update_preprocess_document", (doc_id, results, percentage)))
+
+    def fake_update_step_status(doc_id: str, step_name: str, status: str, error_message: str | None = None) -> None:
+        calls.append(("update_step_status", (doc_id, step_name, status, error_message)))
+
+    def fake_download_datasets() -> dict:
+        return {
+            "qas": {"pubmedqa": str(tmp_path / "qa_repo")},
+            "clinical_protocols": (tmp_path / "protocols.json", tmp_path / "pdfs"),
+        }
+
+    def fake_extract_data(qas_paths: dict, clinical_protocols_paths: tuple, rag_percent: float) -> tuple[str, str, str, str]:
+        train_qa = tmp_path / "train_qa.json"
+        rag_qa = tmp_path / "rag_qa.json"
+        train_clinical = tmp_path / "train_clinical.json"
+        rag_clinical = tmp_path / "rag_clinical.json"
+        for path in (train_qa, rag_qa, train_clinical, rag_clinical):
+            path.write_text("[]", encoding="utf-8")
+        return str(train_qa), str(rag_qa), str(train_clinical), str(rag_clinical)
+
+    def fake_translate(paths: tuple) -> tuple:
+        calls.append(("translate", paths))
+        return (tmp_path / "train_qa_pt_br.json", tmp_path / "rag_qa_pt_br.json")
+
+    monkeypatch.setattr(preprocess_data, "update_preprocess_document", fake_update_preprocess_document)
+    monkeypatch.setattr(preprocess_data, "update_step_status", fake_update_step_status)
+    monkeypatch.setattr(preprocess_data.step_one, "download_datasets", fake_download_datasets)
+    monkeypatch.setattr(preprocess_data.step_two, "extract_data", fake_extract_data)
+    monkeypatch.setattr(preprocess_data.step_three, "translate", fake_translate)
+
+    preprocess_data.preprocess_data_background(0.5, "doc-123")
+
+    assert any(call[0] == "translate" for call in calls)
+    assert any(call[1][1] == "step_three_translating" and call[1][2] == "completed" for call in calls if call[0] == "update_step_status")

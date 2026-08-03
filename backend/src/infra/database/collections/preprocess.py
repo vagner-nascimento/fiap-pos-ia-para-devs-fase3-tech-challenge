@@ -81,6 +81,10 @@ def create_preprocess_document(rag_percent: float = 0.5) -> Dict[str, Any]:
             "step_two_data_extraction": {
                 "status": "pending",
                 "error_message": None
+            },
+            "step_three_translating": {
+                "status": "pending",
+                "error_message": None
             }
         },
         "results": {

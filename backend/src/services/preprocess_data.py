@@ -1,5 +1,4 @@
-import os
-import sys
+import json
 from typing import Dict, Any, Tuple
 from anyio import Path
 from fastapi import HTTPException, BackgroundTasks
@@ -13,6 +12,16 @@ from infra.database.collections.preprocess import (
 )
 from services.preprocess import step_one_download_datasets as step_one
 from services.preprocess import step_two_data_extraction as step_two
+from services.preprocess import step_three_translation as step_three
+
+
+def _read_json_count(file_path: str) -> int:
+    """Retorna a quantidade de itens em um arquivo JSON, caso exista."""
+    try:
+        with open(file_path, "r", encoding="utf-8") as handle:
+            return len(json.load(handle))
+    except Exception:
+        return 0
 
 
 def _report_progress(
@@ -94,35 +103,11 @@ def preprocess_data_background(rag_percent: float, doc_id: str) -> None:
                 clinical_protocols_paths=clinical_protocols_paths,
                 rag_percent=rag_percent,
             )
-            
-            # Determinar contagens a partir dos arquivos salvos
-            import json as _json
 
-            # Contagens de QA
-            try:
-                with open(train_qa_path, "r", encoding="utf-8") as f:
-                    qa_train_count = len(_json.load(f))
-            except Exception:
-                qa_train_count = 0
-
-            try:
-                with open(rag_qa_path, "r", encoding="utf-8") as f:
-                    qa_rag_count = len(_json.load(f))
-            except Exception:
-                qa_rag_count = 0
-            
-            # Contagens de Clinical Protocols
-            try:
-                with open(train_clinical_path, "r", encoding="utf-8") as f:
-                    clinical_train_count = len(_json.load(f))
-            except Exception:
-                clinical_train_count = 0
-
-            try:
-                with open(rag_clinical_path, "r", encoding="utf-8") as f:
-                    clinical_rag_count = len(_json.load(f))
-            except Exception:
-                clinical_rag_count = 0
+            qa_train_count = _read_json_count(train_qa_path)
+            qa_rag_count = _read_json_count(rag_qa_path)
+            clinical_train_count = _read_json_count(train_clinical_path)
+            clinical_rag_count = _read_json_count(rag_clinical_path)
             
             # Atualizar resultados de QAs
             results["QAs"]["train_data"] = qa_train_count
@@ -138,6 +123,32 @@ def preprocess_data_background(rag_percent: float, doc_id: str) -> None:
             error_message = f"Erro na extração de dados: {e}"
             update_step_status(doc_id, "step_two_data_extraction", "error", error_message)
             raise
+
+        last_reported_percentage = _report_progress(
+            doc_id, last_reported_percentage, 60, results
+        )
+
+        # ------------------------------------------------------------------
+        # Step 3 — Tradução dos dados QA
+        # ------------------------------------------------------------------
+        print("Step 3: Traduzindo dados QA para português...")
+        update_step_status(doc_id, "step_three_translating", "in_progress")
+
+        try:
+            translated_train_path, translated_rag_path = step_three.translate((train_qa_path, rag_qa_path))
+
+            results["QAs"]["train_data"] = _read_json_count(translated_train_path)
+            results["QAs"]["rag_data"] = _read_json_count(translated_rag_path)
+
+            update_step_status(doc_id, "step_three_translating", "completed")
+        except Exception as e:
+            error_message = f"Erro na tradução de dados QA: {e}"
+            update_step_status(doc_id, "step_three_translating", "error", error_message)
+            raise
+
+        last_reported_percentage = _report_progress(
+            doc_id, last_reported_percentage, 90, results
+        )
 
         # ------------------------------------------------------------------
         # Progresso final

@@ -25,6 +25,7 @@ function stepStatusLabel(status: StepStatus): string {
 const STEP_NAMES: Record<string, string> = {
   one_download_datasets: "Download dos Datasets",
   step_two_data_extraction: "Extração de Dados",
+  step_three_translating: "Curadoria - Tradução dos Dados",
 };
 
 export function PreProcessingPage() {
