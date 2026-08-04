@@ -1,10 +1,11 @@
 # FIAP POS IA - Backend
 
-API REST em FastAPI responsavel pelo pre-processamento de datasets medicos. Hoje o fluxo trata duas familias de dados e uma etapa adicional de traducao local:
+API REST em FastAPI responsavel pelo pre-processamento de datasets medicos e fine tuning de modelos de linguagem. Hoje o fluxo trata duas familias de dados e uma etapa adicional de traducao local:
 
 - QAs, a partir de PubMedQA e MedQuAD;
-- protocolos clinicos FHEMIG, com extracao de texto dos PDFs.
-- traducao dos QAs para pt-BR com um modelo local de machine translation.
+- protocolos clinicos FHEMIG, com extracao de texto dos PDFs;
+- traducao dos QAs para pt-BR com um modelo local de machine translation;
+- fine tuning do modelo hospital helper com os dados processados.
 
 O progresso de cada execucao e persistido no MongoDB.
 
@@ -16,6 +17,7 @@ O progresso de cada execucao e persistido no MongoDB.
 - Configuracao
 - Como subir a aplicacao
 - Endpoints da API
+- Fluxo de fine tuning
 - Fluxo de preprocessamento
 - Estrutura do projeto
 - Documentacao interativa
@@ -26,7 +28,9 @@ O backend expoe endpoints para:
 
 1. iniciar o pre-processamento dos datasets;
 2. consultar o status de uma execucao em andamento ou concluida;
-3. verificar a saude da aplicacao.
+3. iniciar o fine tuning do modelo hospital helper;
+4. consultar o status do fine tuning em andamento ou concluido;
+5. verificar a saude da aplicacao.
 
 Na inicializacao, a API testa a conexao com o MongoDB. Se a conexao falhar, a aplicacao nao sobe.
 
@@ -37,21 +41,28 @@ src/
 |-- main.py              # Ponto de entrada (uvicorn na porta 3000)
 |-- server.py            # Factory da aplicacao FastAPI, CORS e lifespan
 |-- routers/
-|   `-- preprocess.py    # POST /preprocess, GET /preprocess/{id}
+|   |-- preprocess.py    # POST /preprocess, GET /preprocess/{id}
+|   `-- fine_tunning.py  # POST /fine-tunning, GET /fine-tunning/{id}
 |-- services/
 |   |-- preprocess_data.py   # Logica de processamento em background
+|   |-- fine_tunning.py      # Logica de fine tuning em background
 |   `-- preprocess/
 |       `-- step_three_translation.py   # Traducao local dos QAs
 `-- infra/
     `-- database/
         |-- mongodb.py           # Conexao singleton com MongoDB
         `-- collections/
-            `-- preprocess.py    # CRUD da collection preprocess
+            |-- preprocess.py    # CRUD da collection preprocess
+            `-- fine_tunning.py  # CRUD da collection fine_tunning
 
 datasets/
 |-- get_datasets.py      # Clone do PubMedQA/MedQuAD e download dos protocolos clinicos
 |-- files/               # Datasets baixados em runtime
 `-- preprocessed/        # Arquivos JSON gerados em runtime
+
+models/
+|-- hospital_helper/     # Modelo fine-tuned gerado
+`-- hospital_helper_tokenizer/  # Tokenizer do modelo fine-tuned
 ```
 
 O processamento pesado roda em background task do FastAPI. O endpoint POST /preprocess retorna imediatamente com o ID da execucao, e o cliente consulta o progresso via GET /preprocess/{id}.
@@ -83,10 +94,14 @@ Definidas em `pyproject.toml`:
 | `requests` | Download dos protocolos clinicos |
 | `beautifulsoup4` | Parse do HTML com links dos PDFs |
 | `pdfplumber` | Extracao de texto dos PDFs |
-| `transformers` | Carregamento do modelo local de traducao |
-| `torch` | Inferencia do modelo com suporte a CPU/GPU |
+| `transformers` | Carregamento do modelo local de traducao e fine tuning |
+| `torch` | Inferencia e treinamento do modelo com suporte a CPU/GPU |
 | `sentencepiece` | Tokenizacao usada pelo modelo de traducao |
 | `sacremoses` | Pre e pos-processamento de texto para traducao |
+| `peft` | LoRA para fine tuning eficiente |
+| `trl` | SFTTrainer para fine tuning |
+| `datasets` | Manipulacao de datasets para treinamento |
+| `bitsandbytes` | Quantizacao 4-bit (quando disponivel) |
 
 Dependencias de desenvolvimento: `pytest`, `black`, `mypy`.
 
@@ -106,6 +121,7 @@ cp .env.example .env
 | `MONGODB_HOST` | Host do MongoDB | `localhost` |
 | `MONGODB_PORT` | Porta do MongoDB | `27017` |
 | `DB_NAME` | Nome do banco de dados | `fiap_pos_ia_fase3` |
+| `FINE_TUNING_BASE_MODEL` | Modelo base para fine tuning | `Qwen/Qwen2.5-1.5B-Instruct` |
 
 > Com Docker Compose, o host do MongoDB deve ser `mongodb`, nao `localhost`.
 
@@ -237,7 +253,7 @@ Consulta o status de uma execucao pelo ID.
 
 ### `POST /fine-tunning`
 
-Inicia o fine tuning do modelo `hospital_helper` a partir de um `preprocess_id` ja concluido.
+Inicia o fine tuning do modelo `hospital_helper` a partir de um `preprocess_id` ja concluido. O treinamento roda em background e a resposta retorna imediatamente com o documento criado.
 
 **Regras principais:**
 
@@ -245,7 +261,8 @@ Inicia o fine tuning do modelo `hospital_helper` a partir de um `preprocess_id` 
 2. o preprocess precisa estar com status `completed`;
 3. se nao existir, a API retorna `404`;
 4. se existir mas nao estiver concluido, a API retorna `422`;
-5. o treino usa GPU quando disponivel e CPU como fallback.
+5. o treino usa GPU quando disponivel e CPU como fallback;
+6. o progresso e atualizado periodicamente no MongoDB.
 
 **Body:**
 
@@ -253,8 +270,16 @@ Inicia o fine tuning do modelo `hospital_helper` a partir de um `preprocess_id` 
 |-------|------|-------------|-----------|
 | `preprocess_id` | `str` | Sim | ID do preprocessamento anterior |
 | `base_model_name` | `str` | Nao | Override opcional do modelo base |
-| `include_clinical_protocols` | `bool` | Nao | Inclui protocolos clinicos no treino |
-| `use_4bit` | `bool` | Nao | Habilita 4-bit quando o ambiente suportar |
+| `include_clinical_protocols` | `bool` | Nao | Inclui protocolos clinicos no treino (padrao: true) |
+| `use_4bit` | `bool` | Nao | Habilita 4-bit quando o ambiente suportar (padrao: false) |
+| `max_seq_length` | `int` | Nao | Tamanho maximo da sequencia (padrao: 2048) |
+| `num_train_epochs` | `float` | Nao | Numero de epocas (padrao: 1.0) |
+| `per_device_train_batch_size` | `int` | Nao | Batch size por dispositivo (padrao: 1) |
+| `gradient_accumulation_steps` | `int` | Nao | Passos de acumulacao de gradiente (padrao: 4) |
+| `learning_rate` | `float` | Nao | Taxa de aprendizado (padrao: 2e-4) |
+| `warmup_ratio` | `float` | Nao | Razao de warmup (padrao: 0.03) |
+| `logging_steps` | `int` | Nao | Passos de logging (padrao: 5) |
+| `seed` | `int` | Nao | Semente aleatoria (padrao: 3407) |
 
 **Exemplo:**
 
@@ -264,17 +289,173 @@ curl -X POST http://localhost:3000/fine-tunning/ \
   -d '{"preprocess_id":"<id>", "use_4bit": false}'
 ```
 
-**Resposta:**
+**Resposta (documento criado):**
 
 ```json
 {
+  "_id": "550e8400-e29b-41d4-a716-446655440000",
   "preprocess_id": "<id>",
-  "device": "cuda",
-  "model_output_dir": "backend/models/hospital_helper",
-  "tokenizer_output_dir": "backend/models/hospital_helper_tokenizer",
-  "summary_path": "backend/models/hospital_helper/training_summary.json"
+  "preprocess_snapshot": {
+    "_id": "<id>",
+    "status": "completed",
+    "rag_percent": 0.5,
+    "updated_date": "2026-08-04T10:00:00.000000+00:00"
+  },
+  "base_model_name": "Qwen/Qwen2.5-1.5B-Instruct",
+  "status": "pendding",
+  "completion_percentage": 0,
+  "error_message": null,
+  "created_date": "2026-08-04T10:05:00.000000+00:00",
+  "updated_date": "2026-08-04T10:05:00.000000+00:00",
+  "started_date": null,
+  "finished_date": null,
+  "device": null,
+  "dataset_size": 0,
+  "qas_examples": 0,
+  "clinical_protocol_examples": 0,
+  "estimated_total_steps": 0,
+  "current_step": 0,
+  "current_epoch": null,
+  "current_loss": null,
+  "loss_history": [],
+  "training_metrics": {}
 }
 ```
+
+### `GET /fine-tunning/{doc_id}`
+
+Consulta o status de um fine tuning em andamento ou concluido pelo ID.
+
+**Resposta de exemplo (durante o treinamento):**
+
+```json
+{
+  "_id": "550e8400-e29b-41d4-a716-446655440000",
+  "preprocess_id": "<id>",
+  "base_model_name": "Qwen/Qwen2.5-1.5B-Instruct",
+  "status": "in_progress",
+  "completion_percentage": 45.5,
+  "error_message": null,
+  "created_date": "2026-08-04T10:05:00.000000+00:00",
+  "updated_date": "2026-08-04T10:15:00.000000+00:00",
+  "started_date": "2026-08-04T10:05:05.000000+00:00",
+  "finished_date": null,
+  "device": "cuda",
+  "dataset_size": 15000,
+  "qas_examples": 15000,
+  "clinical_protocol_examples": 120,
+  "estimated_total_steps": 15000,
+  "current_step": 6825,
+  "current_epoch": 0.45,
+  "current_loss": 0.234,
+  "loss_history": [
+    {
+      "step": 0,
+      "epoch": 0.0,
+      "loss": 2.5,
+      "timestamp": "2026-08-04T10:05:10.000000+00:00"
+    },
+    {
+      "step": 100,
+      "epoch": 0.01,
+      "loss": 1.8,
+      "timestamp": "2026-08-04T10:06:00.000000+00:00"
+    }
+  ],
+  "training_metrics": {}
+}
+```
+
+**Resposta de exemplo (concluido):**
+
+```json
+{
+  "_id": "550e8400-e29b-41d4-a716-446655440000",
+  "preprocess_id": "<id>",
+  "base_model_name": "Qwen/Qwen2.5-1.5B-Instruct",
+  "status": "completed",
+  "completion_percentage": 100,
+  "error_message": null,
+  "created_date": "2026-08-04T10:05:00.000000+00:00",
+  "updated_date": "2026-08-04T10:30:00.000000+00:00",
+  "started_date": "2026-08-04T10:05:05.000000+00:00",
+  "finished_date": "2026-08-04T10:30:00.000000+00:00",
+  "device": "cuda",
+  "dataset_size": 15000,
+  "qas_examples": 15000,
+  "clinical_protocol_examples": 120,
+  "estimated_total_steps": 15000,
+  "current_step": 15000,
+  "current_epoch": 1.0,
+  "current_loss": 0.12,
+  "loss_history": [...],
+  "training_metrics": {
+    "train_loss": 0.12,
+    "train_runtime": 1500.5,
+    "train_samples_per_second": 10.0,
+    "train_steps_per_second": 10.0
+  }
+}
+```
+
+**Resposta de exemplo (erro):**
+
+```json
+{
+  "_id": "550e8400-e29b-41d4-a716-446655440000",
+  "preprocess_id": "<id>",
+  "base_model_name": "Qwen/Qwen2.5-1.5B-Instruct",
+  "status": "error",
+  "completion_percentage": 23.5,
+  "error_message": "CUDA out of memory",
+  "created_date": "2026-08-04T10:05:00.000000+00:00",
+  "updated_date": "2026-08-04T10:10:00.000000+00:00",
+  "started_date": "2026-08-04T10:05:05.000000+00:00",
+  "finished_date": "2026-08-04T10:10:00.000000+00:00"
+}
+```
+
+## Fluxo de fine tuning
+
+O fluxo de fine tuning segue estes passos:
+
+1. **Validacao**: Verifica se o `preprocess_id` existe e esta com status `completed`
+2. **Criacao do documento**: Cria um documento na collection `fine_tunning` com status `pendding`
+3. **Retorno imediato**: Retorna o documento criado com ID para o cliente
+4. **Treinamento em background**: Inicia o treinamento em background task
+5. **Atualizacao de progresso**: Callback do Trainer atualiza status, completion_percentage e loss_history a cada 5 segundos
+6. **Conclusao**: Ao finalizar, marca como `completed` com 100% e salva metricas finais
+7. **Erro**: Em caso de falha, marca como `error` com `error_message` preenchido
+
+```mermaid
+flowchart TD
+    A[POST /fine-tunning] --> B[Valida preprocess_id]
+    B --> C[Cria documento fine_tunning]
+    C --> D[Retorna ID imediatamente]
+    C --> E[Background task]
+    E --> F[Carrega dados preprocessados]
+    F --> G[Carrega modelo base]
+    G --> H[Aplica LoRA]
+    H --> I[Inicia treinamento]
+    I --> J[Callback atualiza progresso]
+    J --> K[Treinamento concluido?]
+    K -->|Nao| J
+    K -->|Sim| L[Salva modelo e tokenizer]
+    L --> M[Atualiza MongoDB com metricas]
+    M --> N[Status: completed]
+    J --> O[Erro?]
+    O -->|Sim| P[Atualiza MongoDB com erro]
+    P --> Q[Status: error]
+```
+
+**Campos de progresso monitorados:**
+
+- `status`: `pendding` → `in_progress` → `completed` ou `error`
+- `completion_percentage`: 0 a 100, calculado baseado em `current_step / estimated_total_steps`
+- `current_loss`: Loss atual do treinamento
+- `loss_history`: Array com historico de loss por step/epoch para acompanhar eficiencia
+- `training_metrics`: Metricas finais do treinamento (train_loss, train_runtime, etc.)
+- `error_message`: Mensagem de erro em caso de falha
 
 ## Fluxo de preprocessamento
 

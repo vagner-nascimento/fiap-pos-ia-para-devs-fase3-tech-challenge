@@ -1,23 +1,36 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import torch
 from datasets import Dataset
-from fastapi import HTTPException
+from fastapi import BackgroundTasks, HTTPException
 from peft import LoraConfig, TaskType, get_peft_model, prepare_model_for_kbit_training
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     BitsAndBytesConfig,
+    TrainerCallback,
+    TrainerControl,
+    TrainerState,
     TrainingArguments,
 )
 from trl import SFTTrainer
 
+from infra.database.collections.fine_tunning import (
+    create_fine_tunning_document,
+    get_fine_tunning_document,
+    mark_fine_tunning_document_completed,
+    mark_fine_tunning_document_failed,
+    update_fine_tunning_document,
+)
 from infra.database.collections.preprocess import get_preprocess_document
 
 
@@ -57,7 +70,7 @@ def _join_contexts(contexts: Any) -> str:
     if not isinstance(contexts, list):
         return ""
 
-    cleaned_contexts = []
+    cleaned_contexts: List[str] = []
     for context in contexts:
         normalized = _normalize_text(context)
         if normalized:
@@ -177,14 +190,13 @@ def _build_training_texts(
     return texts, stats
 
 
-def _resolve_device() -> torch.device:
-    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
 def _validate_preprocess_id(preprocess_id: str) -> Dict[str, Any]:
     preprocess = get_preprocess_document(preprocess_id)
     if preprocess is None:
-        raise HTTPException(status_code=404, detail=f"Preprocessamento com ID {preprocess_id} nao encontrado")
+        raise HTTPException(
+            status_code=404,
+            detail=f"Preprocessamento com ID {preprocess_id} nao encontrado",
+        )
 
     status = preprocess.get("status")
     if status != "completed":
@@ -198,6 +210,75 @@ def _validate_preprocess_id(preprocess_id: str) -> Dict[str, Any]:
         )
 
     return preprocess
+
+
+def _resolve_device() -> torch.device:
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def _build_training_payload(
+    *,
+    preprocess_id: str,
+    preprocess: Dict[str, Any],
+    qas_train_path: Union[str, Path],
+    clinical_protocols_train_path: Union[str, Path],
+    base_model_name: str,
+    model_output_dir: Union[str, Path],
+    tokenizer_output_dir: Union[str, Path],
+    include_clinical_protocols: bool,
+    use_4bit: bool,
+    max_seq_length: int,
+    num_train_epochs: float,
+    per_device_train_batch_size: int,
+    gradient_accumulation_steps: int,
+    learning_rate: float,
+    warmup_ratio: float,
+    logging_steps: int,
+    seed: int,
+) -> Dict[str, Any]:
+    return {
+        "preprocess_id": preprocess_id,
+        "preprocess_snapshot": {
+            "_id": preprocess_id,
+            "status": preprocess.get("status"),
+            "rag_percent": preprocess.get("rag_percent"),
+            "updated_date": preprocess.get("updated_date"),
+        },
+        "base_model_name": base_model_name,
+        "qas_train_path": str(Path(qas_train_path)),
+        "clinical_protocols_train_path": str(Path(clinical_protocols_train_path)),
+        "model_output_dir": str(Path(model_output_dir)),
+        "tokenizer_output_dir": str(Path(tokenizer_output_dir)),
+        "summary_path": str(Path(model_output_dir) / "training_summary.json"),
+        "include_clinical_protocols": include_clinical_protocols,
+        "use_4bit_requested": use_4bit,
+        "use_4bit_effective": None,
+        "status": "pendding",
+        "completion_percentage": 0,
+        "error_message": None,
+        "created_date": datetime.now(timezone.utc),
+        "updated_date": datetime.now(timezone.utc),
+        "started_date": None,
+        "finished_date": None,
+        "device": None,
+        "dataset_size": 0,
+        "qas_examples": 0,
+        "clinical_protocol_examples": 0,
+        "estimated_total_steps": 0,
+        "current_step": 0,
+        "current_epoch": None,
+        "current_loss": None,
+        "loss_history": [],
+        "training_metrics": {},
+        "max_seq_length": max_seq_length,
+        "num_train_epochs": num_train_epochs,
+        "per_device_train_batch_size": per_device_train_batch_size,
+        "gradient_accumulation_steps": gradient_accumulation_steps,
+        "learning_rate": learning_rate,
+        "warmup_ratio": warmup_ratio,
+        "logging_steps": logging_steps,
+        "seed": seed,
+    }
 
 
 def _load_model(
@@ -241,8 +322,7 @@ def _load_model(
 
     if effective_use_4bit:
         model = prepare_model_for_kbit_training(model)
-
-    if supports_gpu and not effective_use_4bit:
+    elif supports_gpu:
         model = model.to(device)
 
     return model, tokenizer, effective_use_4bit
@@ -268,6 +348,300 @@ def _apply_lora(model: Any) -> Any:
     return get_peft_model(model, lora_config)
 
 
+def _estimate_total_steps(
+    dataset_size: int,
+    per_device_train_batch_size: int,
+    gradient_accumulation_steps: int,
+    num_train_epochs: float,
+) -> int:
+    if dataset_size <= 0:
+        return 1
+
+    effective_batch = max(1, per_device_train_batch_size * gradient_accumulation_steps)
+    steps_per_epoch = max(1, math.ceil(dataset_size / effective_batch))
+    total_epochs = max(1, math.ceil(num_train_epochs))
+    return max(1, steps_per_epoch * total_epochs)
+
+
+class FineTunningProgressCallback(TrainerCallback):
+    def __init__(self, doc_id: str, estimated_total_steps: int) -> None:
+        self.doc_id = doc_id
+        self.estimated_total_steps = max(1, estimated_total_steps)
+        self.last_persist_at = 0.0
+        self.current_loss: Optional[float] = None
+        self.current_epoch: Optional[float] = None
+        self.loss_history: List[Dict[str, Any]] = []
+
+    def _persist(self, state: TrainerState, force: bool = False) -> None:
+        now = time.monotonic()
+        if not force and now - self.last_persist_at < 5.0:
+            return
+
+        completion = min(
+            100.0,
+            round((state.global_step / self.estimated_total_steps) * 100.0, 2),
+        )
+        update_fine_tunning_document(
+            self.doc_id,
+            {
+                "status": "in_progress",
+                "completion_percentage": completion,
+                "current_step": state.global_step,
+                "current_epoch": self.current_epoch,
+                "current_loss": self.current_loss,
+                "loss_history": list(self.loss_history),
+            },
+        )
+        self.last_persist_at = now
+
+    def on_train_begin(
+        self,
+        args: TrainingArguments,
+        state: TrainerState,
+        control: TrainerControl,
+        **kwargs: Any,
+    ) -> None:
+        update_fine_tunning_document(
+            self.doc_id,
+            {
+                "status": "in_progress",
+                "started_date": datetime.now(timezone.utc),
+                "completion_percentage": 0,
+                "current_step": 0,
+            },
+        )
+
+    def on_log(
+        self,
+        args: TrainingArguments,
+        state: TrainerState,
+        control: TrainerControl,
+        logs: Dict[str, Any],
+        **kwargs: Any,
+    ) -> None:
+        if not logs:
+            return
+
+        if logs.get("loss") is not None:
+            self.current_loss = float(logs["loss"])
+            self.current_epoch = float(state.epoch) if state.epoch is not None else self.current_epoch
+            entry = {
+                "step": state.global_step,
+                "epoch": self.current_epoch,
+                "loss": self.current_loss,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+            if not self.loss_history or self.loss_history[-1].get("step") != state.global_step:
+                self.loss_history.append(entry)
+            else:
+                self.loss_history[-1] = entry
+
+        if logs.get("eval_loss") is not None:
+            self.loss_history.append(
+                {
+                    "step": state.global_step,
+                    "epoch": float(state.epoch) if state.epoch is not None else None,
+                    "loss": float(logs["eval_loss"]),
+                    "kind": "eval_loss",
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                }
+            )
+
+        self._persist(state)
+
+    def on_step_end(
+        self,
+        args: TrainingArguments,
+        state: TrainerState,
+        control: TrainerControl,
+        **kwargs: Any,
+    ) -> None:
+        self._persist(state)
+
+    def on_train_end(
+        self,
+        args: TrainingArguments,
+        state: TrainerState,
+        control: TrainerControl,
+        **kwargs: Any,
+    ) -> None:
+        self._persist(state, force=True)
+
+
+def _training_job(doc_id: str) -> None:
+    document = get_fine_tunning_document(doc_id)
+    if document is None:
+        return
+
+    try:
+        _validate_preprocess_id(document["preprocess_id"])
+
+        qas_path = Path(document["qas_train_path"])
+        clinical_protocols_path = Path(document["clinical_protocols_train_path"])
+        model_output_path = Path(document["model_output_dir"])
+        tokenizer_output_path = Path(document["tokenizer_output_dir"])
+        summary_path = Path(document["summary_path"])
+
+        qas_data = _read_json_list(qas_path)
+        clinical_protocols_data = _read_json_list(clinical_protocols_path)
+        training_texts, stats = _build_training_texts(
+            qas_data=qas_data,
+            clinical_protocols_data=clinical_protocols_data,
+            include_clinical_protocols=bool(document["include_clinical_protocols"]),
+        )
+
+        if not training_texts:
+            raise ValueError("Nenhum exemplo valido foi encontrado para o fine tuning.")
+
+        device = _resolve_device()
+        model, tokenizer, effective_use_4bit = _load_model(
+            model_name=document["base_model_name"],
+            use_4bit=bool(document["use_4bit_requested"]),
+            device=device,
+        )
+        model = _apply_lora(model)
+
+        estimated_total_steps = _estimate_total_steps(
+            dataset_size=len(training_texts),
+            per_device_train_batch_size=int(document["per_device_train_batch_size"]),
+            gradient_accumulation_steps=int(document["gradient_accumulation_steps"]),
+            num_train_epochs=float(document["num_train_epochs"]),
+        )
+
+        update_fine_tunning_document(
+            doc_id,
+            {
+                "device": device.type,
+                "use_4bit_effective": effective_use_4bit,
+                "dataset_size": len(training_texts),
+                "qas_examples": stats["qas_examples"],
+                "clinical_protocol_examples": stats["clinical_protocol_examples"],
+                "estimated_total_steps": estimated_total_steps,
+            },
+        )
+
+        precision = {
+            "fp16": device.type == "cuda" and not torch.cuda.is_bf16_supported(),
+            "bf16": device.type == "cuda" and torch.cuda.is_bf16_supported(),
+        }
+
+        training_args = TrainingArguments(
+            output_dir=str(model_output_path / "checkpoints"),
+            num_train_epochs=float(document["num_train_epochs"]),
+            per_device_train_batch_size=int(document["per_device_train_batch_size"]),
+            gradient_accumulation_steps=int(document["gradient_accumulation_steps"]),
+            learning_rate=float(document["learning_rate"]),
+            warmup_ratio=float(document["warmup_ratio"]),
+            logging_steps=int(document["logging_steps"]),
+            save_strategy="epoch",
+            save_total_limit=1,
+            report_to=[],
+            seed=int(document["seed"]),
+            fp16=precision["fp16"],
+            bf16=precision["bf16"],
+            remove_unused_columns=False,
+            optim="adamw_torch",
+            gradient_checkpointing=True,
+        )
+
+        trainer = SFTTrainer(
+            model=model,
+            tokenizer=tokenizer,
+            train_dataset=Dataset.from_dict({"text": training_texts}),
+            dataset_text_field="text",
+            max_seq_length=int(document["max_seq_length"]),
+            args=training_args,
+            packing=False,
+        )
+        trainer.add_callback(FineTunningProgressCallback(doc_id, estimated_total_steps))
+
+        train_output = trainer.train()
+
+        model_output_path.mkdir(parents=True, exist_ok=True)
+        tokenizer_output_path.mkdir(parents=True, exist_ok=True)
+
+        model.save_pretrained(model_output_path)
+        tokenizer.save_pretrained(tokenizer_output_path)
+
+        training_metrics = dict(train_output.metrics or {})
+        training_metrics["loss_history"] = get_fine_tunning_document(doc_id).get("loss_history", [])
+
+        with summary_path.open("w", encoding="utf-8") as handle:
+            json.dump(
+                {
+                    "preprocess_id": document["preprocess_id"],
+                    "device": device.type,
+                    "dataset_size": len(training_texts),
+                    "training_metrics": training_metrics,
+                },
+                handle,
+                ensure_ascii=False,
+                indent=2,
+                default=str,
+            )
+
+        mark_fine_tunning_document_completed(
+            doc_id,
+            {
+                "training_metrics": training_metrics,
+                "current_loss": training_metrics.get("train_loss"),
+                "current_step": estimated_total_steps,
+                "current_epoch": float(document["num_train_epochs"]),
+                "device": device.type,
+                "use_4bit_effective": effective_use_4bit,
+                "dataset_size": len(training_texts),
+                "qas_examples": stats["qas_examples"],
+                "clinical_protocol_examples": stats["clinical_protocol_examples"],
+                "summary_path": str(summary_path),
+            },
+        )
+
+    except Exception as exc:
+        mark_fine_tunning_document_failed(doc_id, str(exc))
+
+
+def _prepare_training_document(
+    preprocess_id: str,
+    qas_train_path: Union[str, Path],
+    clinical_protocols_train_path: Union[str, Path],
+    *,
+    base_model_name: str,
+    model_output_dir: Union[str, Path],
+    tokenizer_output_dir: Union[str, Path],
+    include_clinical_protocols: bool,
+    use_4bit: bool,
+    max_seq_length: int,
+    num_train_epochs: float,
+    per_device_train_batch_size: int,
+    gradient_accumulation_steps: int,
+    learning_rate: float,
+    warmup_ratio: float,
+    logging_steps: int,
+    seed: int,
+) -> Dict[str, Any]:
+    preprocess = _validate_preprocess_id(preprocess_id)
+    payload = _build_training_payload(
+        preprocess_id=preprocess_id,
+        preprocess=preprocess,
+        qas_train_path=qas_train_path,
+        clinical_protocols_train_path=clinical_protocols_train_path,
+        base_model_name=base_model_name,
+        model_output_dir=model_output_dir,
+        tokenizer_output_dir=tokenizer_output_dir,
+        include_clinical_protocols=include_clinical_protocols,
+        use_4bit=use_4bit,
+        max_seq_length=max_seq_length,
+        num_train_epochs=num_train_epochs,
+        per_device_train_batch_size=per_device_train_batch_size,
+        gradient_accumulation_steps=gradient_accumulation_steps,
+        learning_rate=learning_rate,
+        warmup_ratio=warmup_ratio,
+        logging_steps=logging_steps,
+        seed=seed,
+    )
+    return create_fine_tunning_document(payload)
+
+
 def fine_tunning(
     preprocess_id: str,
     qas_train_path: Union[str, Path] = DEFAULT_QAS_TRAIN_PATH,
@@ -286,100 +660,44 @@ def fine_tunning(
     warmup_ratio: float = 0.03,
     logging_steps: int = 5,
     seed: int = 3407,
+    background_tasks: Optional[BackgroundTasks] = None,
 ) -> Dict[str, Any]:
     """
-    Fine tune pipeline for the hospital helper model.
+    Cria o documento de fine tuning e agenda o treinamento em background.
     """
 
-    _validate_preprocess_id(preprocess_id)
-
-    qas_path = Path(qas_train_path)
-    clinical_protocols_path = Path(clinical_protocols_train_path)
-    model_output_path = Path(model_output_dir)
-    tokenizer_output_path = Path(tokenizer_output_dir)
-    summary_path = model_output_path / "training_summary.json"
-
-    qas_data = _read_json_list(qas_path)
-    clinical_protocols_data = _read_json_list(clinical_protocols_path)
-
-    training_texts, stats = _build_training_texts(
-        qas_data=qas_data,
-        clinical_protocols_data=clinical_protocols_data,
+    document = _prepare_training_document(
+        preprocess_id,
+        qas_train_path,
+        clinical_protocols_train_path,
+        base_model_name=base_model_name,
+        model_output_dir=model_output_dir,
+        tokenizer_output_dir=tokenizer_output_dir,
         include_clinical_protocols=include_clinical_protocols,
-    )
-
-    if not training_texts:
-        raise ValueError("Nenhum exemplo valido foi encontrado para o fine tuning.")
-
-    dataset = Dataset.from_dict({"text": training_texts})
-    device = _resolve_device()
-    model, tokenizer, effective_use_4bit = _load_model(
-        model_name=base_model_name,
         use_4bit=use_4bit,
-        device=device,
-    )
-    model = _apply_lora(model)
-
-    precision = {
-        "fp16": device.type == "cuda" and not torch.cuda.is_bf16_supported(),
-        "bf16": device.type == "cuda" and torch.cuda.is_bf16_supported(),
-    }
-
-    training_args = TrainingArguments(
-        output_dir=str(model_output_path / "checkpoints"),
+        max_seq_length=max_seq_length,
         num_train_epochs=num_train_epochs,
         per_device_train_batch_size=per_device_train_batch_size,
         gradient_accumulation_steps=gradient_accumulation_steps,
         learning_rate=learning_rate,
         warmup_ratio=warmup_ratio,
         logging_steps=logging_steps,
-        save_strategy="epoch",
-        save_total_limit=1,
-        report_to=[],
         seed=seed,
-        fp16=precision["fp16"],
-        bf16=precision["bf16"],
-        remove_unused_columns=False,
-        optim="adamw_torch",
-        gradient_checkpointing=True,
     )
 
-    trainer = SFTTrainer(
-        model=model,
-        tokenizer=tokenizer,
-        train_dataset=dataset,
-        dataset_text_field="text",
-        max_seq_length=max_seq_length,
-        args=training_args,
-        packing=False,
-    )
+    if background_tasks is not None:
+        background_tasks.add_task(_training_job, document["_id"])
+    else:
+        _training_job(document["_id"])
+        refreshed = get_fine_tunning_document(document["_id"])
+        if refreshed is not None:
+            return refreshed
 
-    train_output = trainer.train()
+    return document
 
-    model_output_path.mkdir(parents=True, exist_ok=True)
-    tokenizer_output_path.mkdir(parents=True, exist_ok=True)
 
-    model.save_pretrained(model_output_path)
-    tokenizer.save_pretrained(tokenizer_output_path)
-
-    summary: Dict[str, Any] = {
-        "preprocess_id": preprocess_id,
-        "base_model_name": base_model_name,
-        "include_clinical_protocols": include_clinical_protocols,
-        "use_4bit_requested": use_4bit,
-        "use_4bit_effective": effective_use_4bit,
-        "device": device.type,
-        "max_seq_length": max_seq_length,
-        "dataset_size": len(training_texts),
-        "qas_examples": stats["qas_examples"],
-        "clinical_protocol_examples": stats["clinical_protocol_examples"],
-        "model_output_dir": str(model_output_path),
-        "tokenizer_output_dir": str(tokenizer_output_path),
-        "training_metrics": train_output.metrics,
-    }
-
-    with summary_path.open("w", encoding="utf-8") as handle:
-        json.dump(summary, handle, ensure_ascii=False, indent=2, default=str)
-
-    summary["summary_path"] = str(summary_path)
-    return summary
+def get_fine_tunning_status(doc_id: str) -> Dict[str, Any]:
+    document = get_fine_tunning_document(doc_id)
+    if document is None:
+        raise HTTPException(status_code=404, detail=f"Documento com ID {doc_id} nao encontrado")
+    return document
