@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import "./Layout.css";
 
-type MenuItem = "pre-processing";
+type MenuItem = "pre-processing" | "fine-tuning";
 
 interface LayoutProps {
   activeMenu: MenuItem;
@@ -25,6 +25,13 @@ export function Layout({ activeMenu, onMenuChange, children }: LayoutProps) {
             onClick={() => onMenuChange("pre-processing")}
           >
             Pre Processing
+          </button>
+          <button
+            type="button"
+            className={`nav-item${activeMenu === "fine-tuning" ? " active" : ""}`}
+            onClick={() => onMenuChange("fine-tuning")}
+          >
+            Fine Tuning
           </button>
         </nav>
       </aside>

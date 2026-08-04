@@ -44,7 +44,11 @@ const STEP_NAMES: Record<string, string> = {
   three_translating: "Curadoria - Tradução dos Dados",
 };
 
-export function PreProcessingPage() {
+interface Props {
+  onPreprocessComplete?: (id: string) => void;
+}
+
+export function PreProcessingPage({ onPreprocessComplete }: Props) {
   const [ragPercent, setRagPercent] = useState(0.5);
   const [document, setDocument] = useState<PreprocessDocument | null>(null);
   const [pollingDocId, setPollingDocId] = useState<string | null>(null);
@@ -88,7 +92,10 @@ export function PreProcessingPage() {
   const handlePollingComplete = useCallback(() => {
     setIsPolling(false);
     setPollingDocId(null);
-  }, []);
+    if (document && document.status === "completed" && onPreprocessComplete) {
+      onPreprocessComplete(document.id);
+    }
+  }, [document, onPreprocessComplete]);
 
   usePreprocessPolling({
     docId: pollingDocId,
