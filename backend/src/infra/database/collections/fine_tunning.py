@@ -1,5 +1,4 @@
 import copy
-import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, Final, Optional
 
@@ -26,11 +25,9 @@ def _serialize_fine_tunning_document(document: Dict[str, Any]) -> Dict[str, Any]
 def create_fine_tunning_document(payload: Dict[str, Any]) -> Dict[str, Any]:
     collection = get_collection(FINE_TUNNING_COLLECTION)
 
-    doc_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc)
 
     document = {
-        "_id": doc_id,
         "status": "pendding",
         "completion_percentage": 0,
         "error_message": None,
@@ -44,7 +41,11 @@ def create_fine_tunning_document(payload: Dict[str, Any]) -> Dict[str, Any]:
         **payload,
     }
 
-    collection.insert_one(document)
+    result = collection.insert_one(document)
+    # Buscar o documento inserido para obter o _id gerado pelo MongoDB
+    inserted_document = collection.find_one({"_id": result.inserted_id})
+    if inserted_document:
+        return _serialize_fine_tunning_document(inserted_document)
     return _serialize_fine_tunning_document(document)
 
 

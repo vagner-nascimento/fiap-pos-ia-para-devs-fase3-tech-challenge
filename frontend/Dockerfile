@@ -2,10 +2,13 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-COPY package.json ./
+COPY package.json package-lock.json ./
 RUN npm install
 
-COPY . .
+COPY index.html ./
+COPY vite.config.ts ./
+COPY tsconfig*.json ./
+COPY src ./src
 
 ARG VITE_BACKEND_URL=http://localhost:3000
 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL

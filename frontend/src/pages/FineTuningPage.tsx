@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { startFineTuning } from "../api/fineTuning";
 import { useFineTuningPolling } from "../hooks/useFineTuningPolling";
 import type { FineTuningDocument } from "../types/fineTuning";
@@ -54,6 +54,10 @@ export function FineTuningPage({ lastPreprocessId }: Props) {
   const [isStarting, setIsStarting] = useState(false);
   const [isPolling, setIsPolling] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUseLastPreprocess(lastPreprocessId !== null);
+  }, [lastPreprocessId]);
 
   const handleStart = async () => {
     setError(null);
@@ -468,8 +472,18 @@ export function FineTuningPage({ lastPreprocessId }: Props) {
                   </div>
                 </div>
               )}
+
+              <div className="response-block">
+                <h3>Resposta da API</h3>
+                <pre>{JSON.stringify(document, null, 2)}</pre>
+              </div>
             </>
-          ) : null}
+          ) : (
+            <p className="empty-state">
+              Nenhuma execução iniciada. Clique em &quot;Iniciar fine tuning&quot;
+              para começar.
+            </p>
+          )}
         </div>
       </section>
     </div>
