@@ -235,6 +235,47 @@ Consulta o status de uma execucao pelo ID.
 }
 ```
 
+### `POST /fine-tunning`
+
+Inicia o fine tuning do modelo `hospital_helper` a partir de um `preprocess_id` ja concluido.
+
+**Regras principais:**
+
+1. o `preprocess_id` deve existir no MongoDB;
+2. o preprocess precisa estar com status `completed`;
+3. se nao existir, a API retorna `404`;
+4. se existir mas nao estiver concluido, a API retorna `422`;
+5. o treino usa GPU quando disponivel e CPU como fallback.
+
+**Body:**
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `preprocess_id` | `str` | Sim | ID do preprocessamento anterior |
+| `base_model_name` | `str` | Nao | Override opcional do modelo base |
+| `include_clinical_protocols` | `bool` | Nao | Inclui protocolos clinicos no treino |
+| `use_4bit` | `bool` | Nao | Habilita 4-bit quando o ambiente suportar |
+
+**Exemplo:**
+
+```bash
+curl -X POST http://localhost:3000/fine-tunning/ \
+  -H "Content-Type: application/json" \
+  -d '{"preprocess_id":"<id>", "use_4bit": false}'
+```
+
+**Resposta:**
+
+```json
+{
+  "preprocess_id": "<id>",
+  "device": "cuda",
+  "model_output_dir": "backend/models/hospital_helper",
+  "tokenizer_output_dir": "backend/models/hospital_helper_tokenizer",
+  "summary_path": "backend/models/hospital_helper/training_summary.json"
+}
+```
+
 ## Fluxo de preprocessamento
 
 Quando `POST /preprocess` e chamado, a sequencia em background e:
