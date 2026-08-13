@@ -30,7 +30,9 @@ O backend expoe endpoints para:
 2. consultar o status de uma execucao em andamento ou concluida;
 3. iniciar o fine tuning do modelo hospital helper;
 4. consultar o status do fine tuning em andamento ou concluido;
-5. verificar a saude da aplicacao.
+5. gerar a base RAG para uso futuro por um agente de IA;
+6. consultar o status da geracao da base RAG;
+7. verificar a saude da aplicacao.
 
 Na inicializacao, a API testa a conexao com o MongoDB. Se a conexao falhar, a aplicacao nao sobe.
 
@@ -43,9 +45,11 @@ src/
 |-- routers/
 |   |-- preprocess.py    # POST /preprocess, GET /preprocess/{id}
 |   `-- fine_tunning.py  # POST /fine-tunning, GET /fine-tunning/{id}
+|   `-- rag_database.py  # POST /rag-database, GET /rag-database/{id}
 |-- services/
 |   |-- preprocess_data.py   # Logica de processamento em background
 |   |-- fine_tunning.py      # Logica de fine tuning em background
+|   `-- rag_database.py      # Logica de geracao da base RAG em background
 |   `-- preprocess/
 |       `-- step_three_translation.py   # Traducao local dos QAs
 `-- infra/
@@ -53,7 +57,8 @@ src/
         |-- mongodb.py           # Conexao singleton com MongoDB
         `-- collections/
             |-- preprocess.py    # CRUD da collection preprocess
-            `-- fine_tunning.py  # CRUD da collection fine_tunning
+            |-- fine_tunning.py  # CRUD da collection fine_tunning
+            `-- rag_database.py  # CRUD das collections da base RAG
 
 datasets/
 |-- get_datasets.py      # Clone do PubMedQA/MedQuAD e download dos protocolos clinicos
@@ -122,6 +127,7 @@ cp .env.example .env
 | `MONGODB_PORT` | Porta do MongoDB | `27017` |
 | `DB_NAME` | Nome do banco de dados | `fiap_pos_ia_fase3` |
 | `FINE_TUNING_BASE_MODEL` | Modelo base para fine tuning | `Qwen/Qwen2.5-1.5B-Instruct` |
+| `RAG_EMBEDDING_MODEL` | Modelo de embeddings para a base RAG | `hkunlp/instructor-base` |
 
 > Com Docker Compose, o host do MongoDB deve ser `mongodb`, nao `localhost`.
 
@@ -397,6 +403,102 @@ Consulta o status de um fine tuning em andamento ou concluido pelo ID.
   }
 }
 ```
+
+### `POST /rag-database`
+
+Gera e persiste a base RAG a partir dos arquivos preprocessados existentes. O processo roda em background e a resposta retorna imediatamente com o documento de controle criado.
+
+**Regras principais:**
+
+1. o `preprocess_id` deve existir no MongoDB;
+2. o preprocess precisa estar com status `completed`;
+3. se nao existir, a API retorna `404`;
+4. se existir mas nao estiver concluido, a API retorna `422`;
+5. os documentos da base sao persistidos em `rag_documents`;
+6. cada documento inclui `metadatas.source` para rastreabilidade de origem.
+
+**Body:**
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `preprocess_id` | `str` | Sim | ID do preprocessamento concluido |
+
+**Exemplo:**
+
+```bash
+curl -X POST http://localhost:3000/rag-database/ \
+  -H "Content-Type: application/json" \
+  -d '{"preprocess_id":"<id>"}'
+```
+
+**Resposta (documento criado):**
+
+```json
+{
+  "_id": "3c3efdbb-4f8e-4d1c-8f4a-0c8d5a8b5e0d",
+  "batch_id": "3c3efdbb-4f8e-4d1c-8f4a-0c8d5a8b5e0d",
+  "preprocess_id": "<id>",
+  "preprocess_snapshot": {
+    "_id": "<id>",
+    "status": "completed",
+    "rag_percent": 0.5,
+    "updated_date": "2026-08-13T10:00:00+00:00"
+  },
+  "qas_rag_path": "backend/datasets/preprocessed/qas/rag_pt_br.json",
+  "clinical_protocols_rag_path": "backend/datasets/preprocessed/clinical_protocols/rag.json",
+  "embedding_model": "hkunlp/instructor-base",
+  "splitter_name": "RecursiveCharacterTextSplitter",
+  "splitter_chunk_size": 2400,
+  "splitter_chunk_overlap": 200,
+  "status": "pendding",
+  "completion_percentage": 0,
+  "error_message": null,
+  "current_step": 0,
+  "estimated_total_steps": 2,
+  "qas_documents": 0,
+  "clinical_protocol_documents": 0,
+  "total_documents": 0
+}
+```
+
+### `GET /rag-database/{doc_id}`
+
+Consulta o status da geracao da base RAG pelo ID.
+
+**Resposta de exemplo (concluido):**
+
+```json
+{
+  "_id": "3c3efdbb-4f8e-4d1c-8f4a-0c8d5a8b5e0d",
+  "batch_id": "3c3efdbb-4f8e-4d1c-8f4a-0c8d5a8b5e0d",
+  "preprocess_id": "<id>",
+  "preprocess_snapshot": {
+    "_id": "<id>",
+    "status": "completed",
+    "rag_percent": 0.5,
+    "updated_date": "2026-08-13T10:00:00+00:00"
+  },
+  "status": "completed",
+  "completion_percentage": 100,
+  "error_message": null,
+  "current_step": 2,
+  "estimated_total_steps": 2,
+  "qas_documents": 8703,
+  "clinical_protocol_documents": 42,
+  "total_documents": 8745
+}
+```
+
+### Estrutura do corpus RAG
+
+Os documentos gravados em `rag_documents` seguem uma estrutura pensada para recuperacao e citacao:
+
+- `content`: texto normalizado usado na indexacao;
+- `dataset` / `source_type`: identifica se o documento veio de `qas` ou `clinical_protocols`;
+- `embedding`: vetor gerado para recuperar o documento no futuro;
+- `metadatas.source`: guarda a origem que o agente pode exibir ao responder.
+
+Para `qas`, `metadatas.source` replica o objeto `metadata` do dataset original. Para `clinical_protocols`, `metadatas.source` contem `name`, `url` e `source`.
 
 **Resposta de exemplo (erro):**
 
