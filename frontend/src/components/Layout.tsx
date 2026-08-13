@@ -1,37 +1,22 @@
 import type { ReactNode } from "react";
 import "./Layout.css";
 
-type MenuItem = "pre-processing" | "fine-tuning";
-
 interface LayoutProps {
-  activeMenu: MenuItem;
-  onMenuChange: (menu: MenuItem) => void;
   children: ReactNode;
 }
 
-export function Layout({ activeMenu, onMenuChange, children }: LayoutProps) {
+export function Layout({ children }: LayoutProps) {
   return (
     <div className="layout">
       <aside className="sidebar">
         <div className="brand">
           FIAP POS IA
-          <span>Fase 3 — Tech Challenge</span>
+          <span>Fase 3 - Tech Challenge</span>
         </div>
 
-        <nav className="nav">
-          <button
-            type="button"
-            className={`nav-item${activeMenu === "pre-processing" ? " active" : ""}`}
-            onClick={() => onMenuChange("pre-processing")}
-          >
+        <nav className="nav" aria-label="Menu lateral">
+          <button type="button" className="nav-item active" disabled>
             Pre Processing
-          </button>
-          <button
-            type="button"
-            className={`nav-item${activeMenu === "fine-tuning" ? " active" : ""}`}
-            onClick={() => onMenuChange("fine-tuning")}
-          >
-            Fine Tuning
           </button>
         </nav>
       </aside>
