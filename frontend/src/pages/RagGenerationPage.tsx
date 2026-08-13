@@ -95,10 +95,10 @@ export function RagGenerationPage({ lastPreprocessId }: Props) {
 
       <section className="card">
         <form onSubmit={(event) => void handleSubmit(event)} className="form-section">
-          <h3>ID do Preprocessamento</h3>
+          <h3>Preprocessamento</h3>
 
           <div className="form-row">
-            <label htmlFor="rag-preprocess-id">ID do Preprocessamento</label>
+            <label htmlFor="rag-preprocess-id">ID</label>
             <input
               id="rag-preprocess-id"
               type="text"
