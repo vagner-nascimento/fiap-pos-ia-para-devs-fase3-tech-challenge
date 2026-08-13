@@ -16,7 +16,7 @@ function stepStatusLabel(status: StepStatus): string {
   const labels: Record<StepStatus, string> = {
     pending: "Pendente",
     in_progress: "Em andamento",
-    completed: "Concluído",
+    completed: "ConcluÃ­do",
     error: "Erro",
   };
   return labels[status];
@@ -40,8 +40,8 @@ function formatPercentage(value: number): string {
 
 const STEP_NAMES: Record<string, string> = {
   one_download_datasets: "Download dos Datasets",
-  two_data_extraction: "Extração de Dados",
-  three_translating: "Curadoria - Tradução dos Dados",
+  two_data_extraction: "ExtraÃ§Ã£o de Dados",
+  three_translating: "Curadoria - TraduÃ§Ã£o dos Dados",
 };
 
 interface Props {
@@ -190,14 +190,12 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
                 </div>
               </div>
 
-              {/* Overall Error Message */}
               {document.error_message && (
                 <div className="alert alert-error">
                   <strong>Erro geral:</strong> {document.error_message}
                 </div>
               )}
 
-              {/* Steps Status */}
               <div className="steps-container">
                 <h3>Status dos Steps</h3>
                 {Object.entries(document.steps).map(([stepKey, stepInfo]) => {
@@ -227,7 +225,6 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
                 })}
               </div>
 
-              {/* Results */}
               <div className="results-container">
                 <h3>Resultados</h3>
                 <div className="results-grid">
@@ -252,7 +249,7 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
                       <span>Train data</span>
                       <strong>
                         {document.results.clinical_protocols.train_data.toLocaleString(
-                          "pt-BR"
+                          "pt-BR",
                         )}
                       </strong>
                     </div>
@@ -260,7 +257,7 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
                       <span>RAG data</span>
                       <strong>
                         {document.results.clinical_protocols.rag_data.toLocaleString(
-                          "pt-BR"
+                          "pt-BR",
                         )}
                       </strong>
                     </div>
@@ -268,10 +265,9 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
                 </div>
               </div>
 
-              {/* Progress Bar */}
               <div>
                 <div className="status-item">
-                  <span>Conclusão — {formatPercentage(document.completion_percentage)}</span>
+                  <span>ConclusÃ£o — {formatPercentage(document.completion_percentage)}</span>
                   <div className="progress-bar" aria-hidden="true">
                     <div
                       className="progress-bar-fill"
@@ -288,8 +284,8 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
             </>
           ) : (
             <p className="empty-state">
-              Nenhuma execução iniciada. Clique em &quot;Iniciar preprocessamento&quot;
-              para começar.
+              Nenhuma execuÃ§Ã£o iniciada. Clique em &quot;Iniciar preprocessamento&quot;
+              para comeÃ§ar.
             </p>
           )}
         </div>

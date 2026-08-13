@@ -8,17 +8,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
-from fastapi import BackgroundTasks, HTTPException
+from fastapi import HTTPException
 
 from infra.database.collections.preprocess import get_preprocess_document
-from infra.database.collections.rag_database import (
-    create_rag_generation_document,
-    get_rag_generation_document,
-    insert_rag_documents,
-    mark_rag_generation_document_completed,
-    mark_rag_generation_document_failed,
-    update_rag_generation_document,
-)
+from infra.database.collections.rag_database import insert_rag_documents
 
 try:
     from langchain_community.embeddings import HuggingFaceInstructEmbeddings as _RealEmbeddingModel
@@ -327,130 +320,68 @@ def _build_rag_documents(
     return enriched_documents, stats
 
 
-def _build_generation_payload(
-    *,
+def generate_rag_database(
     preprocess_id: str,
-    preprocess: Dict[str, Any],
-    qas_rag_path: Union[str, Path],
-    clinical_protocols_rag_path: Union[str, Path],
-    batch_id: str,
-    embedding_model_name: str,
-    splitter_chunk_size: int,
-    splitter_chunk_overlap: int,
+    qas_rag_path: Optional[Union[str, Path]] = None,
+    clinical_protocols_rag_path: Optional[Union[str, Path]] = None,
+    *,
+    embedding_model_name: Optional[str] = None,
+    splitter_chunk_size: int = DEFAULT_PROTOCOL_CHUNK_SIZE,
+    splitter_chunk_overlap: int = DEFAULT_PROTOCOL_CHUNK_OVERLAP,
 ) -> Dict[str, Any]:
-    now = datetime.now(timezone.utc)
-    return {
-        "_id": batch_id,
-        "batch_id": batch_id,
-        "preprocess_id": preprocess_id,
-        "preprocess_snapshot": {
+    resolved_qas_rag_path = Path(qas_rag_path or DEFAULT_QAS_RAG_PATH)
+    resolved_clinical_protocols_rag_path = Path(
+        clinical_protocols_rag_path or DEFAULT_CLINICAL_PROTOCOLS_RAG_PATH
+    )
+    started_at = datetime.now(timezone.utc)
+    batch_id = str(uuid.uuid4())
+    resolved_embedding_model_name = embedding_model_name or DEFAULT_RAG_EMBEDDING_MODEL
+
+    print(
+        "[RAG][SYNC] Solicitacao recebida "
+        f"preprocess_id={preprocess_id} batch_id={batch_id}"
+    )
+
+    try:
+        preprocess = _validate_preprocess_id(preprocess_id)
+        preprocess_snapshot = {
             "_id": preprocess_id,
             "status": preprocess.get("status"),
             "rag_percent": preprocess.get("rag_percent"),
             "updated_date": preprocess.get("updated_date"),
-        },
-        "qas_rag_path": str(Path(qas_rag_path)),
-        "clinical_protocols_rag_path": str(Path(clinical_protocols_rag_path)),
-        "embedding_model": embedding_model_name,
-        "splitter_name": "RecursiveCharacterTextSplitter",
-        "splitter_chunk_size": splitter_chunk_size,
-        "splitter_chunk_overlap": splitter_chunk_overlap,
-        "status": "pendding",
-        "completion_percentage": 0,
-        "error_message": None,
-        "created_date": now,
-        "updated_date": now,
-        "started_date": None,
-        "finished_date": None,
-        "current_step": 0,
-        "estimated_total_steps": 2,
-        "qas_documents": 0,
-        "clinical_protocol_documents": 0,
-        "total_documents": 0,
-    }
-
-
-def _prepare_generation_document(
-    preprocess_id: str,
-    qas_rag_path: Union[str, Path],
-    clinical_protocols_rag_path: Union[str, Path],
-    *,
-    embedding_model_name: Optional[str] = None,
-    splitter_chunk_size: int = DEFAULT_PROTOCOL_CHUNK_SIZE,
-    splitter_chunk_overlap: int = DEFAULT_PROTOCOL_CHUNK_OVERLAP,
-) -> Dict[str, Any]:
-    preprocess = _validate_preprocess_id(preprocess_id)
-    batch_id = str(uuid.uuid4())
-    resolved_embedding_model_name = embedding_model_name or DEFAULT_RAG_EMBEDDING_MODEL
-    payload = _build_generation_payload(
-        preprocess_id=preprocess_id,
-        preprocess=preprocess,
-        qas_rag_path=qas_rag_path,
-        clinical_protocols_rag_path=clinical_protocols_rag_path,
-        batch_id=batch_id,
-        embedding_model_name=resolved_embedding_model_name,
-        splitter_chunk_size=splitter_chunk_size,
-        splitter_chunk_overlap=splitter_chunk_overlap,
-    )
-    return create_rag_generation_document(payload)
-
-
-def _generation_job(
-    doc_id: str,
-    *,
-    embedding_model_name: Optional[str] = None,
-    splitter_chunk_size: int = DEFAULT_PROTOCOL_CHUNK_SIZE,
-    splitter_chunk_overlap: int = DEFAULT_PROTOCOL_CHUNK_OVERLAP,
-) -> None:
-    document = get_rag_generation_document(doc_id)
-    if document is None:
-        return
-
-    try:
-        print(f"[RAG] Iniciando geracao da base RAG para preprocess_id={document['preprocess_id']}")
-        _validate_preprocess_id(document["preprocess_id"])
-
-        qas_path = Path(document["qas_rag_path"])
-        clinical_protocols_path = Path(document["clinical_protocols_rag_path"])
-
-        update_rag_generation_document(
-            doc_id,
-            {
-                "status": "in_progress",
-                "started_date": datetime.now(timezone.utc),
-                "completion_percentage": 0,
-                "current_step": 0,
-            },
-        )
-
-        print(f"[RAG] Lendo arquivo de QAs: {qas_path}")
-        qas_data = _read_json_list(qas_path)
-        print(f"[RAG] QAs carregados: {len(qas_data)} registros")
-
-        print(f"[RAG] Lendo arquivo de protocolos clinicos: {clinical_protocols_path}")
-        clinical_protocols_data = _read_json_list(clinical_protocols_path)
-        print(f"[RAG] Protocolos clinicos carregados: {len(clinical_protocols_data)} registros")
-
-        resolved_embedding_model_name = (
-            embedding_model_name
-            or document.get("embedding_model")
-            or DEFAULT_RAG_EMBEDDING_MODEL
-        )
-        print(f"[RAG] Carregando modelo de embeddings: {resolved_embedding_model_name}")
-        embedding_model = _build_embedding_model(resolved_embedding_model_name)
+        }
         print(
-            "[RAG] Criando splitter recursivo "
-            f"(chunk_size={splitter_chunk_size}, chunk_overlap={splitter_chunk_overlap})"
+            "[RAG][SYNC] Preprocessamento validado "
+            f"status={preprocess_snapshot['status']}"
+        )
+
+        print(f"[RAG][SYNC] Lendo QAs em {resolved_qas_rag_path}")
+        qas_data = _read_json_list(resolved_qas_rag_path)
+        print(f"[RAG][SYNC] QAs carregados: {len(qas_data)} registros")
+
+        print(f"[RAG][SYNC] Lendo protocolos clinicos em {resolved_clinical_protocols_rag_path}")
+        clinical_protocols_data = _read_json_list(resolved_clinical_protocols_rag_path)
+        print(
+            "[RAG][SYNC] Protocolos clinicos carregados: "
+            f"{len(clinical_protocols_data)} registros"
+        )
+
+        print(f"[RAG][SYNC] Carregando modelo de embeddings: {resolved_embedding_model_name}")
+        embedding_model = _build_embedding_model(resolved_embedding_model_name)
+
+        print(
+            "[RAG][SYNC] Criando splitter recursivo "
+            f"chunk_size={splitter_chunk_size} chunk_overlap={splitter_chunk_overlap}"
         )
         splitter = _build_text_splitter(
             chunk_size=splitter_chunk_size,
             chunk_overlap=splitter_chunk_overlap,
         )
 
-        print("[RAG] Processando documentos e gerando embeddings")
+        print("[RAG][SYNC] Preparando documentos e embeddings")
         documents, stats = _build_rag_documents(
-            preprocess_id=document["preprocess_id"],
-            batch_id=document["batch_id"],
+            preprocess_id=preprocess_id,
+            batch_id=batch_id,
             qas_data=qas_data,
             clinical_protocols_data=clinical_protocols_data,
             embedding_model=embedding_model,
@@ -461,108 +392,44 @@ def _generation_job(
             raise ValueError("Nenhum documento valido foi encontrado para a base RAG.")
 
         print(
-            "[RAG] Documentos preparados: "
-            f"QAs={stats['qas_documents']} | "
-            f"Clinical Protocols={stats['clinical_protocol_documents']} | "
-            f"Total={len(documents)}"
+            "[RAG][SYNC] Documentos preparados "
+            f"qas={stats['qas_documents']} clinical={stats['clinical_protocol_documents']} "
+            f"total={len(documents)}"
         )
-        print("[RAG] Persistindo documentos no MongoDB")
+        print("[RAG][SYNC] Persistindo documentos no MongoDB")
         inserted_documents = insert_rag_documents(documents)
-        print(f"[RAG] Documentos persistidos: {len(inserted_documents)}")
+        print(f"[RAG][SYNC] Documentos persistidos: {len(inserted_documents)}")
 
-        update_rag_generation_document(
-            doc_id,
-            {
-                "current_step": 1,
-                "completion_percentage": 50,
-                "qas_documents": stats["qas_documents"],
-                "clinical_protocol_documents": stats["clinical_protocol_documents"],
-                "total_documents": len(inserted_documents),
-            },
-        )
-
-        mark_rag_generation_document_completed(
-            doc_id,
-            {
-                "current_step": 2,
-                "qas_documents": stats["qas_documents"],
-                "clinical_protocol_documents": stats["clinical_protocol_documents"],
-                "total_documents": len(inserted_documents),
-            },
-        )
+        finished_at = datetime.now(timezone.utc)
+        response = {
+            "id": batch_id,
+            "batch_id": batch_id,
+            "preprocess_id": preprocess_id,
+            "preprocess_snapshot": preprocess_snapshot,
+            "qas_rag_path": str(resolved_qas_rag_path),
+            "clinical_protocols_rag_path": str(resolved_clinical_protocols_rag_path),
+            "embedding_model": resolved_embedding_model_name,
+            "splitter_name": "RecursiveCharacterTextSplitter",
+            "splitter_chunk_size": splitter_chunk_size,
+            "splitter_chunk_overlap": splitter_chunk_overlap,
+            "status": "completed",
+            "error_message": None,
+            "created_date": started_at.isoformat(),
+            "updated_date": finished_at.isoformat(),
+            "qas_documents": stats["qas_documents"],
+            "clinical_protocol_documents": stats["clinical_protocol_documents"],
+            "total_documents": len(inserted_documents),
+        }
         print(
-            "[RAG] Geracao concluida com sucesso! "
-            f"QAs={stats['qas_documents']} | "
-            f"Clinical Protocols={stats['clinical_protocol_documents']} | "
-            f"Total={len(inserted_documents)}"
+            "[RAG][SYNC] Geracao concluida com sucesso "
+            f"batch_id={batch_id} total={response['total_documents']}"
         )
-
+        return response
+    except HTTPException:
+        raise
     except Exception as exc:
-        print(f"[RAG] Erro na geracao da base RAG: {exc}")
-        mark_rag_generation_document_failed(doc_id, str(exc))
-
-
-def generate_rag_database(
-    preprocess_id: str,
-    qas_rag_path: Optional[Union[str, Path]] = None,
-    clinical_protocols_rag_path: Optional[Union[str, Path]] = None,
-    *,
-    embedding_model_name: Optional[str] = None,
-    splitter_chunk_size: int = DEFAULT_PROTOCOL_CHUNK_SIZE,
-    splitter_chunk_overlap: int = DEFAULT_PROTOCOL_CHUNK_OVERLAP,
-    background_tasks: Optional[BackgroundTasks] = None,
-) -> Dict[str, Any]:
-    resolved_qas_rag_path = qas_rag_path or DEFAULT_QAS_RAG_PATH
-    resolved_clinical_protocols_rag_path = (
-        clinical_protocols_rag_path or DEFAULT_CLINICAL_PROTOCOLS_RAG_PATH
-    )
-    print(
-        "[RAG] Solicitacao recebida para preprocess_id="
-        f"{preprocess_id}"
-    )
-    document = _prepare_generation_document(
-        preprocess_id,
-        resolved_qas_rag_path,
-        resolved_clinical_protocols_rag_path,
-        embedding_model_name=embedding_model_name,
-        splitter_chunk_size=splitter_chunk_size,
-        splitter_chunk_overlap=splitter_chunk_overlap,
-    )
-
-    if background_tasks is not None:
-        background_tasks.add_task(
-            _generation_job,
-            document["_id"],
-            embedding_model_name=embedding_model_name,
-            splitter_chunk_size=splitter_chunk_size,
-            splitter_chunk_overlap=splitter_chunk_overlap,
+        print(
+            "[RAG][SYNC] Erro na geracao da base RAG "
+            f"preprocess_id={preprocess_id} batch_id={batch_id}: {exc}"
         )
-    else:
-        _generation_job(
-            document["_id"],
-            embedding_model_name=embedding_model_name,
-            splitter_chunk_size=splitter_chunk_size,
-            splitter_chunk_overlap=splitter_chunk_overlap,
-        )
-        refreshed = get_rag_generation_document(document["_id"])
-        if refreshed is not None:
-            print(f"[RAG] Documento final recarregado: {_short_status(refreshed)}")
-            return refreshed
-
-    print(f"[RAG] Documento inicial criado: {_short_status(document)}")
-    return document
-
-
-def get_rag_generation_status(doc_id: str) -> Dict[str, Any]:
-    document = get_rag_generation_document(doc_id)
-    if document is None:
-        raise HTTPException(status_code=404, detail=f"Documento com ID {doc_id} nao encontrado")
-    return document
-
-
-def _short_status(document: Dict[str, Any]) -> str:
-    return (
-        f"id={document.get('id') or document.get('_id')} "
-        f"status={document.get('status')} "
-        f"completion={document.get('completion_percentage')}"
-    )
+        raise

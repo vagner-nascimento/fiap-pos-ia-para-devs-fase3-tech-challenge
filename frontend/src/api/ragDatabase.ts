@@ -9,7 +9,3 @@ export function startRagGeneration(
     body: JSON.stringify(request),
   });
 }
-
-export function getRagGenerationStatus(docId: string): Promise<RagGenerationDocument> {
-  return apiFetch<RagGenerationDocument>(`/rag-database/${docId}`);
-}
