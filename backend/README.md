@@ -32,7 +32,8 @@ O backend expoe endpoints para:
 3. iniciar o fine tuning do modelo hospital helper;
 4. consultar o status do fine tuning em andamento ou concluido;
 5. gerar a base RAG para uso futuro por um agente de IA;
-6. verificar a saude da aplicacao.
+6. realizar consultas semanticas por similaridade na base RAG;
+7. verificar a saude da aplicacao.
 
 Na inicializacao, a API testa a conexao com o MongoDB. Se a conexao falhar, a aplicacao nao sobe.
 
@@ -44,8 +45,8 @@ src/
 |-- server.py            # Factory da aplicacao FastAPI, CORS e lifespan
 |-- routers/
 |   |-- preprocess.py    # POST /preprocess, GET /preprocess/{id}
-|   `-- fine_tunning.py  # POST /fine-tunning, GET /fine-tunning/{id}
-|   `-- rag_database.py  # POST /rag-database
+|   |-- fine_tunning.py  # POST /fine-tunning, GET /fine-tunning/{id}
+|   `-- rag_database.py  # POST /rag-database, POST /rag-database/query
 |-- services/
 |   |-- preprocess_data.py   # Logica de processamento em background
 |   |-- fine_tunning.py      # Logica de fine tuning em background
@@ -462,6 +463,57 @@ curl -X POST http://localhost:3000/rag-database/ \
 }
 ```
 
+### `POST /rag-database/query`
+
+Realiza a consulta por similaridade vetorial na base RAG. A rota recebe a query textual, gera o embedding da consulta, calcula a similaridade com os documentos persistidos no MongoDB e retorna os documentos mais relevantes ordenados por score.
+
+**Body:**
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `query` | `str` | Sim | Texto da consulta do usuario |
+| `top_k` | `int` | Nao | Quantidade maxima de documentos a retornar (padrao: 5, min: 1, max: 50) |
+| `preprocess_id` | `str` | Nao | Filtro opcional para limitar a busca aos documentos de um preprocessamento especifico |
+| `similarity_threshold` | `float` | Nao | Score minimo de similaridade para filtrar os resultados (ex: 0.2) |
+
+**Exemplo:**
+
+```bash
+curl -X POST http://localhost:3000/rag-database/query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "como tratar tuberculose?", "top_k": 5}'
+```
+
+**Resposta:**
+
+```json
+{
+  "query": "como tratar tuberculose?",
+  "total_results": 1,
+  "documents": [
+    {
+      "id": "f39ea3dd-0c0f-403f-a616-d601eaf27000-qas-002437",
+      "preprocess_id": "a8c752bb-c270-436b-b9fd-1aaec5b1dcdb",
+      "dataset": "qas",
+      "source_type": "qas",
+      "content": "### QAs RAG\nPergunta: Quais são os tratamentos da tuberculose pulmonar?\nResposta: O tratamento da tuberculose pulmonar é realizado com o esquema RIPE (Rifampicina, Isoniazida, Pirazinamida e Etambutol)...",
+      "similarity_score": 0.372707,
+      "metadatas": {
+        "source": {
+          "source": "PubMedQA",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/..."
+        },
+        "question": "Quais são os tratamentos da tuberculose pulmonar?",
+        "answer": "O tratamento da tuberculose...",
+        "contexts_count": 1
+      },
+      "chunk_index": null,
+      "chunk_total": null
+    }
+  ]
+}
+```
+
 ### Estrutura do corpus RAG
 
 Os documentos gravados em `rag_documents` seguem uma estrutura pensada para recuperacao e citacao:
@@ -478,6 +530,33 @@ Se um protocolo for dividido em varios chunks, todos os chunks herdam a mesma `m
 ### Observacao sobre consulta de status do RAG
 
 O fluxo atual nao expoe mais `GET /rag-database/{doc_id}`. Como a geracao passou a ser sincrona, a resposta do `POST /rag-database/` ja traz o resumo final da execucao.
+
+---
+
+### Tecnicas Aplicadas a Consulta por Query no RAG
+
+Para garantir a precisao da busca vetorial e contornar limitacoes de ambiente sem bibliotecas de deep learning pesadas instaladas, foram aplicadas as seguintes tecnicas:
+
+#### 1. Fallback Semantico com Feature Hashing (256d) L2-Normalizado
+- **Problema de vetores aleatorios**: Modelos de fallback ingênuos que usam SHA-256 de texto completo geram valores exclusivamente positivos $[0.0, 1.0]$. A Cosine Similarity entre vetores inteiramente positivos e sempre alta ($\approx 0.95 - 0.98$), fazendo com que documentos totalmente irrelevantes (ex: *"Rim Ectopico"*) aparecessem no topo de consultas sobre *"tuberculose"*.
+- **Solucao**: O `_FallbackEmbeddingModel` utiliza **Feature Hashing (256 dimensões)** com sinais determinísticos ($\pm 1$) derivados do hash SHA-256 de cada token. Documentos com vocabulário diferente cancelam seus componentes no produto escalar, resultando em similaridade de cosseno $\approx 0.0$.
+- **Normalizacao L2**: Todos os vetores gerados sao divididos por sua norma euclidiana ($\|\mathbf{v}\| = 1$), garantindo que a escala de magnitude do texto nao distorça o cálculo da similaridade de cosseno.
+
+#### 2. Tokenizacao Especializada em Portugues e Stemming de Radicais
+- **Remocao de acentuacao**: Normalização de texto via `unicodedata` NFD para ignorar acentos diacríticos (ex: *"hipertensão"* vs *"hipertensao"*).
+- **Filtragem de Stopwords**: Remoção de palavras funcionais da língua portuguesa (`PT_STOPWORDS`), garantindo que conectivos e artigos nao influenciem o vetor de busca.
+- **Stemming de Radicais (5 caracteres)**: Extração automática do prefixo inicial das palavras (ex: *"tratar"*, *"tratamento"*, *"tratamentos"* $\rightarrow$ radical `trata`), permitindo que variações gramaticais da mesma raiz semântica coincidam no espaço vetorial.
+- **Bigramas**: Indexação de pares de palavras consecutivas para capturar o contexto de frases compostas.
+
+#### 3. Pontuacao Hibrida (Hybrid Scoring)
+- Quando o modelo de fallback está ativo, o sistema combina a **similaridade de cosseno** do vetor ($60\%$) com o **índice de sobreposição de palavras-chave da consulta** ($40\%$):
+  $$\text{Score Final} = (0.6 \times \text{CosineSimilarity}) + (0.4 \times \text{KeywordOverlapRatio})$$
+- Essa abordagem híbrida prioriza documentos que contêm os termos médicos centrais da pergunta do usuário.
+
+#### 4. Recalculamento Dnamico de Embeddings Incompativeis ou Legados
+- Para evitar a necessidade de reprocessar toda a base RAG no MongoDB quando a dimensão do vetor muda (ex: bases antigas de 16d ou alterações no modelo), o serviço `query_rag_documents` verifica a dimensão do vetor armazenado em cada documento.
+- Caso ocorra divergência de dimensão entre a query e o documento no banco, o sistema recalcula dinamicamente o embedding do campo `content` usando o modelo ativo, garantindo consultas precisas instantaneamente.
+
 
 ## Fluxo de fine tuning
 

@@ -1,17 +1,23 @@
 import hashlib
 import json
+import math
 import os
 import re
 import uuid
 from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Final, List, Optional, Sequence, Tuple, Union
+
 
 from fastapi import HTTPException
 
 from infra.database.collections.preprocess import get_preprocess_document
-from infra.database.collections.rag_database import insert_rag_documents
+from infra.database.collections.rag_database import (
+    get_rag_documents_for_search,
+    insert_rag_documents,
+)
+
 
 try:
     from langchain_community.embeddings import HuggingFaceInstructEmbeddings as _RealEmbeddingModel
@@ -59,22 +65,67 @@ class _FallbackTextSplitter:
         return chunks
 
 
+PT_STOPWORDS: Final[set] = {
+    "a", "ao", "aos", "aquela", "aquelas", "aquele", "aqueles", "aquilo", "as", "ate", "até",
+    "com", "como", "da", "das", "de", "dela", "delas", "dele", "deles", "depois", "do",
+    "dos", "e", "ela", "elas", "ele", "eles", "em", "entre", "era", "eras", "eram",
+    "essa", "essas", "esse", "esses", "esta", "estamos", "estas", "estava", "estavam",
+    "este", "estes", "estou", "eu", "foi", "fomos", "foram", "ha", "há", "isso", "isto",
+    "ja", "já", "lhe", "lhes", "mais", "mas", "me", "mesmo", "meu", "meus", "minha", "minhas",
+    "muito", "na", "nas", "nem", "no", "nos", "nossa", "nossas", "nosso", "nossos",
+    "num", "numa", "o", "os", "ou", "para", "pela", "pelas", "pelo", "pelos", "por",
+    "qual", "quais", "quando", "que", "quem", "se", "seja", "sem", "seu", "seus", "so", "só", "sua",
+    "suas", "tambem", "também", "te", "tem", "temos", "tenho", "ter", "um", "uma", "voce", "você", "voces", "vocês"
+}
+
+
+def _remove_accents(text: str) -> str:
+    import unicodedata
+    return "".join(c for c in unicodedata.normalize("NFD", text) if unicodedata.category(c) != "MN")
+
+
+def _tokenize_pt(text: str) -> List[str]:
+    normalized = _remove_accents(_normalize_text(text).lower())
+    words = re.findall(r"\b[a-z0-9]{2,}\b", normalized)
+    filtered = [w for w in words if w not in PT_STOPWORDS]
+    return filtered if filtered else words
+
+
 class _FallbackEmbeddingModel:
     def __init__(self, model_name: str) -> None:
         self.model_name = model_name
-        self.embedding_dimension = 16
+        self.embedding_dimension = 256
 
     def _embed_one(self, text: str) -> List[float]:
-        normalized = _normalize_text(text)
-        digest = hashlib.sha256(normalized.encode("utf-8")).digest()
-        vector: List[float] = []
-        for index in range(self.embedding_dimension):
-            start = (index * 2) % len(digest)
-            chunk = digest[start : start + 2]
-            if len(chunk) < 2:
-                chunk = chunk + digest[: 2 - len(chunk)]
-            value = int.from_bytes(chunk, byteorder="big", signed=False)
-            vector.append(round(value / 65535.0, 6))
+        tokens = _tokenize_pt(text)
+        if not tokens:
+            return [0.0] * self.embedding_dimension
+
+        vector: List[float] = [0.0] * self.embedding_dimension
+
+        for token in tokens:
+            stem = token[:5] if len(token) >= 5 else token
+            h = int(hashlib.sha256(token.encode("utf-8")).hexdigest(), 16)
+            idx = h % self.embedding_dimension
+            sign = 1.0 if ((h >> 16) & 1) == 1 else -1.0
+            vector[idx] += sign * 1.0
+
+            if stem != token:
+                h_stem = int(hashlib.sha256(f"stem_{stem}".encode("utf-8")).hexdigest(), 16)
+                idx_stem = h_stem % self.embedding_dimension
+                sign_stem = 1.0 if ((h_stem >> 16) & 1) == 1 else -1.0
+                vector[idx_stem] += sign_stem * 0.8
+
+        for i in range(len(tokens) - 1):
+            bigram = f"{tokens[i]}_{tokens[i+1]}"
+            h_bg = int(hashlib.sha256(bigram.encode("utf-8")).hexdigest(), 16)
+            idx_bg = h_bg % self.embedding_dimension
+            sign_bg = 1.0 if ((h_bg >> 16) & 1) == 1 else -1.0
+            vector[idx_bg] += sign_bg * 1.5
+
+        norm = math.sqrt(sum(val * val for val in vector))
+        if norm > 0:
+            return [round(val / norm, 6) for val in vector]
         return vector
 
     def embed_documents(self, texts: Sequence[str]) -> List[List[float]]:
@@ -82,6 +133,7 @@ class _FallbackEmbeddingModel:
 
     def embed_query(self, text: str) -> List[float]:
         return self._embed_one(text)
+
 
 
 def _normalize_text(value: Any) -> str:
@@ -433,3 +485,91 @@ def generate_rag_database(
             f"preprocess_id={preprocess_id} batch_id={batch_id}: {exc}"
         )
         raise
+
+
+def _cosine_similarity(vec_a: List[float], vec_b: List[float]) -> float:
+    if not vec_a or not vec_b or len(vec_a) != len(vec_b):
+        return 0.0
+    dot_product = sum(a * b for a, b in zip(vec_a, vec_b))
+    norm_a = math.sqrt(sum(a * a for a in vec_a))
+    norm_b = math.sqrt(sum(b * b for b in vec_b))
+    if norm_a == 0.0 or norm_b == 0.0:
+        return 0.0
+    return dot_product / (norm_a * norm_b)
+
+
+def query_rag_documents(
+    query: str,
+    top_k: int = 5,
+    preprocess_id: Optional[str] = None,
+    similarity_threshold: Optional[float] = None,
+    embedding_model_name: Optional[str] = None,
+) -> Dict[str, Any]:
+    normalized_query = _normalize_text(query)
+    if not normalized_query:
+        raise HTTPException(status_code=400, detail="A query de busca nao pode ser vazia.")
+
+    if top_k < 1:
+        raise HTTPException(status_code=400, detail="O parametro top_k deve ser maior ou igual a 1.")
+
+    embedding_model = _build_embedding_model(embedding_model_name)
+    query_vector = embedding_model.embed_query(normalized_query)
+    query_tokens = set(_tokenize_pt(normalized_query))
+
+    raw_documents = get_rag_documents_for_search(preprocess_id=preprocess_id)
+    if not raw_documents:
+        return {
+            "query": normalized_query,
+            "total_results": 0,
+            "documents": [],
+        }
+
+    is_fallback = isinstance(embedding_model, _FallbackEmbeddingModel)
+
+    scored_documents: List[Dict[str, Any]] = []
+    for doc in raw_documents:
+        doc_content = doc.get("content", "")
+        doc_embedding = doc.get("embedding")
+
+        # Recalcular embedding caso os vetores não tenham a mesma dimensão
+        # (ex: documentos gravados anteriormente com sha256 16d ou modelo alternativo)
+        if not isinstance(doc_embedding, list) or len(doc_embedding) != len(query_vector):
+            doc_embedding = embedding_model.embed_query(doc_content)
+
+        cos_sim = _cosine_similarity(query_vector, doc_embedding)
+
+        if is_fallback and query_tokens:
+            doc_tokens = set(_tokenize_pt(doc_content))
+            overlap = query_tokens.intersection(doc_tokens)
+            overlap_ratio = len(overlap) / len(query_tokens) if query_tokens else 0.0
+            # Combinação de similaridade vetorial com sobreposição de palavras-chave
+            final_score = round((cos_sim * 0.6) + (overlap_ratio * 0.4), 6)
+        else:
+            final_score = round(cos_sim, 6)
+
+        if similarity_threshold is not None and final_score < similarity_threshold:
+            continue
+
+        scored_doc = {
+            "id": str(doc.get("_id", "")),
+            "preprocess_id": str(doc.get("preprocess_id", "")),
+            "dataset": str(doc.get("dataset", "")),
+            "source_type": str(doc.get("source_type", "")),
+            "content": str(doc_content),
+            "similarity_score": final_score,
+            "metadatas": doc.get("metadatas", {}) if isinstance(doc.get("metadatas"), dict) else {},
+            "chunk_index": doc.get("chunk_index"),
+            "chunk_total": doc.get("chunk_total"),
+        }
+        scored_documents.append(scored_doc)
+
+    scored_documents.sort(key=lambda item: item["similarity_score"], reverse=True)
+    limited_documents = scored_documents[:top_k]
+
+    return {
+        "query": normalized_query,
+        "total_results": len(limited_documents),
+        "documents": limited_documents,
+    }
+
+

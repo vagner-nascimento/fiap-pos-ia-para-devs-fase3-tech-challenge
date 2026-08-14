@@ -1,7 +1,7 @@
 import copy
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict, Final, List
+from typing import Any, Dict, Final, List, Optional
 
 from infra.database.mongodb import get_collection
 
@@ -49,3 +49,41 @@ def insert_rag_documents(documents: List[Dict[str, Any]]) -> List[Dict[str, Any]
         inserted_documents.append(_serialize_document(prepared_document))
 
     return inserted_documents
+
+
+def get_rag_documents_for_search(preprocess_id: Optional[str] = None) -> List[Dict[str, Any]]:
+    collection = get_collection(RAG_DOCUMENTS_COLLECTION)
+    filter_query: Dict[str, Any] = {}
+    if preprocess_id:
+        filter_query["preprocess_id"] = preprocess_id
+
+    projection = {
+        "_id": 1,
+        "batch_id": 1,
+        "preprocess_id": 1,
+        "dataset": 1,
+        "source_type": 1,
+        "content": 1,
+        "metadatas": 1,
+        "embedding": 1,
+        "chunk_index": 1,
+        "chunk_total": 1,
+    }
+
+    if hasattr(collection, "find"):
+        try:
+            cursor = collection.find(filter_query, projection)
+        except TypeError:
+            cursor = collection.find(filter_query)
+        documents = list(cursor)
+    elif hasattr(collection, "documents"):
+        raw_docs = list(collection.documents.values())
+        if preprocess_id:
+            documents = [doc for doc in raw_docs if doc.get("preprocess_id") == preprocess_id]
+        else:
+            documents = raw_docs
+    else:
+        documents = []
+
+    return [_serialize_document(doc) for doc in documents]
+
