@@ -1,6 +1,6 @@
 # FIAP POS IA - Backend
 
-API REST em FastAPI responsavel pelo pre-processamento de datasets medicos e fine tuning de modelos de linguagem. Hoje o fluxo trata duas familias de dados e uma etapa adicional de traducao local:
+API REST em FastAPI responsavel pelo pre-processamento dos datasets medicos e fine tuning de modelos de linguagem. Hoje o fluxo trata duas familias de dados e uma etapa adicional de traducao local:
 
 - QAs, a partir de PubMedQA e MedQuAD;
 - protocolos clinicos FHEMIG, com extracao de texto dos PDFs;
@@ -19,6 +19,7 @@ O progresso de cada execucao e persistido no MongoDB.
 - Endpoints da API
 - Fluxo de fine tuning
 - Fluxo de preprocessamento
+- Fluxo de RAG
 - Estrutura do projeto
 - Documentacao interativa
 
@@ -31,8 +32,7 @@ O backend expoe endpoints para:
 3. iniciar o fine tuning do modelo hospital helper;
 4. consultar o status do fine tuning em andamento ou concluido;
 5. gerar a base RAG para uso futuro por um agente de IA;
-6. consultar o status da geracao da base RAG;
-7. verificar a saude da aplicacao.
+6. verificar a saude da aplicacao.
 
 Na inicializacao, a API testa a conexao com o MongoDB. Se a conexao falhar, a aplicacao nao sobe.
 
@@ -45,11 +45,11 @@ src/
 |-- routers/
 |   |-- preprocess.py    # POST /preprocess, GET /preprocess/{id}
 |   `-- fine_tunning.py  # POST /fine-tunning, GET /fine-tunning/{id}
-|   `-- rag_database.py  # POST /rag-database, GET /rag-database/{id}
+|   `-- rag_database.py  # POST /rag-database
 |-- services/
 |   |-- preprocess_data.py   # Logica de processamento em background
 |   |-- fine_tunning.py      # Logica de fine tuning em background
-|   `-- rag_database.py      # Logica de geracao da base RAG em background
+|   `-- rag_database.py      # Logica sincrona de geracao da base RAG
 |   `-- preprocess/
 |       `-- step_three_translation.py   # Traducao local dos QAs
 `-- infra/
@@ -107,6 +107,8 @@ Definidas em `pyproject.toml`:
 | `trl` | SFTTrainer para fine tuning |
 | `datasets` | Manipulacao de datasets para treinamento |
 | `bitsandbytes` | Quantizacao 4-bit (quando disponivel) |
+| `langchain-community` | Embeddings usados na geracao RAG quando disponivel |
+| `langchain-text-splitters` | Chunking recursivo para protocolos clinicos |
 
 Dependencias de desenvolvimento: `pytest`, `black`, `mypy`.
 
@@ -406,7 +408,7 @@ Consulta o status de um fine tuning em andamento ou concluido pelo ID.
 
 ### `POST /rag-database`
 
-Gera e persiste a base RAG a partir dos arquivos preprocessados existentes. O processo roda em background e a resposta retorna imediatamente com o documento de controle criado.
+Gera e persiste a base RAG a partir dos arquivos preprocessados existentes. A geracao agora e sincrona.
 
 **Regras principais:**
 
@@ -431,11 +433,11 @@ curl -X POST http://localhost:3000/rag-database/ \
   -d '{"preprocess_id":"<id>"}'
 ```
 
-**Resposta (documento criado):**
+**Resposta:**
 
 ```json
 {
-  "_id": "3c3efdbb-4f8e-4d1c-8f4a-0c8d5a8b5e0d",
+  "id": "3c3efdbb-4f8e-4d1c-8f4a-0c8d5a8b5e0d",
   "batch_id": "3c3efdbb-4f8e-4d1c-8f4a-0c8d5a8b5e0d",
   "preprocess_id": "<id>",
   "preprocess_snapshot": {
@@ -450,39 +452,10 @@ curl -X POST http://localhost:3000/rag-database/ \
   "splitter_name": "RecursiveCharacterTextSplitter",
   "splitter_chunk_size": 2400,
   "splitter_chunk_overlap": 200,
-  "status": "pendding",
-  "completion_percentage": 0,
-  "error_message": null,
-  "current_step": 0,
-  "estimated_total_steps": 2,
-  "qas_documents": 0,
-  "clinical_protocol_documents": 0,
-  "total_documents": 0
-}
-```
-
-### `GET /rag-database/{doc_id}`
-
-Consulta o status da geracao da base RAG pelo ID.
-
-**Resposta de exemplo (concluido):**
-
-```json
-{
-  "_id": "3c3efdbb-4f8e-4d1c-8f4a-0c8d5a8b5e0d",
-  "batch_id": "3c3efdbb-4f8e-4d1c-8f4a-0c8d5a8b5e0d",
-  "preprocess_id": "<id>",
-  "preprocess_snapshot": {
-    "_id": "<id>",
-    "status": "completed",
-    "rag_percent": 0.5,
-    "updated_date": "2026-08-13T10:00:00+00:00"
-  },
   "status": "completed",
-  "completion_percentage": 100,
   "error_message": null,
-  "current_step": 2,
-  "estimated_total_steps": 2,
+  "created_date": "2026-08-13T10:00:00+00:00",
+  "updated_date": "2026-08-13T10:00:02+00:00",
   "qas_documents": 8703,
   "clinical_protocol_documents": 42,
   "total_documents": 8745
@@ -498,24 +471,13 @@ Os documentos gravados em `rag_documents` seguem uma estrutura pensada para recu
 - `embedding`: vetor gerado para recuperar o documento no futuro;
 - `metadatas.source`: guarda a origem que o agente pode exibir ao responder.
 
-Para `qas`, `metadatas.source` replica o objeto `metadata` do dataset original. Para `clinical_protocols`, `metadatas.source` contem `name`, `url` e `source`.
+Para `qas`, `metadatas.source` replica o objeto `metadata` original do dataset. Para `clinical_protocols`, `metadatas.source` contem `name`, `url` e `source`.
 
-**Resposta de exemplo (erro):**
+Se um protocolo for dividido em varios chunks, todos os chunks herdam a mesma `metadatas.source`, preservando a citacao do documento original.
 
-```json
-{
-  "_id": "550e8400-e29b-41d4-a716-446655440000",
-  "preprocess_id": "<id>",
-  "base_model_name": "Qwen/Qwen2.5-1.5B-Instruct",
-  "status": "error",
-  "completion_percentage": 23.5,
-  "error_message": "CUDA out of memory",
-  "created_date": "2026-08-04T10:05:00.000000+00:00",
-  "updated_date": "2026-08-04T10:10:00.000000+00:00",
-  "started_date": "2026-08-04T10:05:05.000000+00:00",
-  "finished_date": "2026-08-04T10:10:00.000000+00:00"
-}
-```
+### Observacao sobre consulta de status do RAG
+
+O fluxo atual nao expoe mais `GET /rag-database/{doc_id}`. Como a geracao passou a ser sincrona, a resposta do `POST /rag-database/` ja traz o resumo final da execucao.
 
 ## Fluxo de fine tuning
 

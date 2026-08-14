@@ -171,3 +171,30 @@ frontend/
 |-- index.html
 `-- src/
 ```
+
+## RAG Generation
+
+O frontend tambem contem a tela de `RAG Generation`, que faz uma chamada sincrona para `POST /rag-database/`.
+
+### Fluxo
+
+```mermaid
+flowchart TD
+    A[Usuario informa preprocess_id] --> B[Clica em Gerar base RAG]
+    B --> C[POST /rag-database]
+    C --> D[Backend valida preprocess concluido]
+    D --> E[Lê os JSONs preprocessados]
+    E --> F[Normaliza metadados e gera embeddings]
+    F --> G[Persiste os documentos em MongoDB]
+    G --> H[Exibe resposta final na tela]
+```
+
+### Elementos da tela de RAG Generation
+
+| Elemento | Descricao |
+|----------|-----------|
+| Campo ID | Recebe o `preprocess_id` concluido |
+| Botao Gerar base RAG | Dispara a geracao sincrona |
+| Botao Limpar | Reseta o formulario e a resposta |
+| Resumo final | Mostra `batch_id`, contagens e modelo usado |
+| Resposta da API | JSON bruto retornado pelo backend |
