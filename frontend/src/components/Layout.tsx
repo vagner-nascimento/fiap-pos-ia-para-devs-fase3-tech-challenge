@@ -1,10 +1,12 @@
 import type { ReactNode } from "react";
 import "./Layout.css";
 
+export type ViewType = "preprocess" | "rag_generation" | "rag_query";
+
 interface LayoutProps {
   children: ReactNode;
-  activeView: "preprocess" | "rag_generation";
-  onNavigate: (view: "preprocess" | "rag_generation") => void;
+  activeView: ViewType;
+  onNavigate: (view: ViewType) => void;
 }
 
 export function Layout({ children, activeView, onNavigate }: LayoutProps) {
@@ -31,8 +33,16 @@ export function Layout({ children, activeView, onNavigate }: LayoutProps) {
           >
             RAG Generation
           </button>
+          <button
+            type="button"
+            className={`nav-item ${activeView === "rag_query" ? "active" : ""}`}
+            onClick={() => onNavigate("rag_query")}
+          >
+            RAG Query
+          </button>
         </nav>
       </aside>
+
 
       <main className="content">{children}</main>
     </div>

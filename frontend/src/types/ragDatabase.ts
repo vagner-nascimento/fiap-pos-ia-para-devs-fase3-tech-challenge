@@ -30,3 +30,29 @@ export interface RagGenerationDocument {
 export interface RagGenerationRequest {
   preprocess_id: string;
 }
+
+export interface RagQueryRequest {
+  query: string;
+  top_k?: number;
+  preprocess_id?: string | null;
+  similarity_threshold?: number | null;
+}
+
+export interface RagDocumentResult {
+  id: string;
+  preprocess_id: string;
+  dataset: string;
+  source_type: string;
+  content: string;
+  similarity_score: number;
+  metadatas: Record<string, any>;
+  chunk_index?: number | null;
+  chunk_total?: number | null;
+}
+
+export interface RagQueryResponse {
+  query: string;
+  total_results: number;
+  documents: RagDocumentResult[];
+}
+

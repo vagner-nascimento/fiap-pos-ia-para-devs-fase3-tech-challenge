@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { Layout } from "./components/Layout";
+import { Layout, type ViewType } from "./components/Layout";
 import { PreProcessingPage } from "./pages/PreProcessingPage";
 import { RagGenerationPage } from "./pages/RagGenerationPage";
-
-type View = "preprocess" | "rag_generation";
+import { RagQueryPage } from "./pages/RagQueryPage";
 
 function App() {
-  const [activeView, setActiveView] = useState<View>("preprocess");
+  const [activeView, setActiveView] = useState<ViewType>("preprocess");
   const [lastPreprocessId, setLastPreprocessId] = useState<string | null>(null);
 
   return (
@@ -18,8 +17,13 @@ function App() {
       {activeView === "rag_generation" && (
         <RagGenerationPage lastPreprocessId={lastPreprocessId} />
       )}
+
+      {activeView === "rag_query" && (
+        <RagQueryPage lastPreprocessId={lastPreprocessId} />
+      )}
     </Layout>
   );
 }
+
 
 export default App;
