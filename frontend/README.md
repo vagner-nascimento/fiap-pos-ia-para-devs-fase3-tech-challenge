@@ -20,7 +20,9 @@ O frontend permite:
 1. configurar o percentual RAG;
 2. iniciar o pre-processamento;
 3. acompanhar o progresso com polling a cada 5 segundos;
-4. visualizar os resultados separados para `QAs` e `clinical_protocols`.
+4. visualizar os resultados separados para `QAs` e `clinical_protocols`;
+5. gerar a base RAG a partir de um pré-processamento concluído;
+6. realizar consultas semânticas por similaridade na base RAG (RAG Query).
 
 A aplicacao e uma SPA servida pelo Vite em desenvolvimento e pelo nginx em producao.
 
@@ -33,15 +35,22 @@ src/
 |-- components/
 |   `-- Layout.tsx
 |-- pages/
-|   `-- PreProcessingPage.tsx
+|   |-- PreProcessingPage.tsx
+|   |-- RagGenerationPage.tsx
+|   `-- RagQueryPage.tsx
 |-- api/
 |   |-- client.ts
-|   `-- preprocess.ts
+|   |-- preprocess.ts
+|   |-- fineTuning.ts
+|   `-- ragDatabase.ts
 |-- hooks/
 |   `-- usePreprocessPolling.ts
 `-- types/
-    `-- preprocess.ts
+    |-- preprocess.ts
+    |-- fineTuning.ts
+    `-- ragDatabase.ts
 ```
+
 
 ## Pre-requisitos
 
@@ -146,8 +155,12 @@ O frontend consome os endpoints do backend:
 
 | Metodo | Endpoint | Uso |
 |--------|----------|-----|
-| `POST` | `/preprocess/` | Inicia a execucao |
-| `GET` | `/preprocess/{id}` | Faz polling de progresso |
+| `POST` | `/preprocess/` | Inicia a execucao do pre-processamento |
+| `GET` | `/preprocess/{id}` | Faz polling de progresso do pre-processamento |
+| `POST` | `/fine-tunning/` | Inicia a execucao do fine-tuning |
+| `GET` | `/fine-tunning/{id}` | Faz polling de progresso do fine-tuning |
+| `POST` | `/rag-database/` | Gera a base RAG de forma sincrona |
+| `POST` | `/rag-database/query` | Realiza consultas semanticas por similaridade vetorial |
 
 ### Status terminais
 
@@ -174,7 +187,7 @@ frontend/
 
 ## RAG Generation
 
-O frontend tambem contem a tela de `RAG Generation`, que faz uma chamada sincrona para `POST /rag-database/`.
+O frontend contem a tela de `RAG Generation`, que faz uma chamada sincrona para `POST /rag-database/`.
 
 ### Fluxo
 
@@ -198,3 +211,32 @@ flowchart TD
 | Botao Limpar | Reseta o formulario e a resposta |
 | Resumo final | Mostra `batch_id`, contagens e modelo usado |
 | Resposta da API | JSON bruto retornado pelo backend |
+
+## RAG Query
+
+O frontend inclui a tela de `RAG Query`, permitindo aos usuarios realizarem consultas semanticas por similaridade na base de conhecimento RAG via `POST /rag-database/query`.
+
+### Fluxo
+
+```mermaid
+flowchart TD
+    A[Usuario digita a consulta textual] --> B[Define top_k e filtros opcionais]
+    B --> C[Clica em Buscar no RAG]
+    C --> D[POST /rag-database/query]
+    D --> E[Backend gera embedding da query]
+    E --> F[Calcula Cosine Similarity / Hybrid Score]
+    F --> G[Retorna documentos ranqueados]
+    G --> H[Exibe cards com score %, origem e conteudo]
+```
+
+### Elementos da tela de RAG Query
+
+| Elemento | Descricao |
+|----------|-----------|
+| Campo Consulta | Recebe o texto da pergunta ou termo medico (obrigatorio) |
+| Seletor top_k | Quantidade maxima de documentos a retornar (padrao: 5) |
+| Filtro Preprocess ID | Limita a busca a um preprocessamento especifico (opcional) |
+| Filtro Threshold | Filtra documentos com score minimo de similaridade (opcional) |
+| Cards de Resultados | Exibe badges de dataset (`QAs` / `Protocolo`), score %, origem e texto completo |
+| Visualizador JSON | Bloco expansivel para inspecionar o JSON bruto devolvido pela API |
+
