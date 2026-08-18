@@ -100,3 +100,4 @@ O script [restart-app.sh](restart-app.sh) facilita a reinicialização completa 
 - Quando houver uma GPU Nvidia compatível e o runtime/driver estiverem instalados, o backend usa GPU automaticamente; caso contrário, ele faz fallback para CPU, o que deixa a tradução dos datasets bem mais lenta.
 - Uma execução pode terminar com status `error`; em cenários de falha de fallback interno, também pode aparecer `failed`.
 - Os datasets são baixados automaticamente na primeira execução, mas também podem ser tratados manualmente conforme descrito em [backend/datasets/README.md](backend/datasets/README.md).
+- Devido a restrições de hardware, o finetunning do modelo escolhido foi feito através de notebook no Google Colab. Os arquivos relacionados ao processo estão na pasta [backend/notebooks/](backend/notebooks/) e o modelo treinado foi disponibilizado como private no [HuggingFace](fiap-hospital-helper/hospital-helper-qwen2.5-1.5b).
