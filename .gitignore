@@ -2,5 +2,5 @@
 env
 venv
 plans
+analysis
 temp.*
-analysis/backend
