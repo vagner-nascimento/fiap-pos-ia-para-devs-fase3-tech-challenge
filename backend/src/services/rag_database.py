@@ -16,6 +16,7 @@ from infra.database.collections.preprocess import get_preprocess_document
 from infra.database.collections.rag_database import (
     get_rag_documents_for_search,
     insert_rag_documents,
+    get_text_search_scores,
 )
 
 
@@ -524,28 +525,32 @@ def query_rag_documents(
             "documents": [],
         }
 
-    is_fallback = isinstance(embedding_model, _FallbackEmbeddingModel)
+    # Obtem as pontuacoes da busca textual via indice nativo do MongoDB
+    text_scores = get_text_search_scores(normalized_query, preprocess_id=preprocess_id, limit=200)
+    max_text_score = max(text_scores.values()) if text_scores else 1.0
 
     scored_documents: List[Dict[str, Any]] = []
     for doc in raw_documents:
+        doc_id = str(doc.get("_id", ""))
         doc_content = doc.get("content", "")
         doc_embedding = doc.get("embedding")
 
         # Recalcular embedding caso os vetores não tenham a mesma dimensão
-        # (ex: documentos gravados anteriormente com sha256 16d ou modelo alternativo)
         if not isinstance(doc_embedding, list) or len(doc_embedding) != len(query_vector):
             doc_embedding = embedding_model.embed_query(doc_content)
 
         cos_sim = _cosine_similarity(query_vector, doc_embedding)
 
-        if is_fallback and query_tokens:
-            doc_tokens = set(_tokenize_pt(doc_content))
-            overlap = query_tokens.intersection(doc_tokens)
-            overlap_ratio = len(overlap) / len(query_tokens) if query_tokens else 0.0
-            # Combinação de similaridade vetorial com sobreposição de palavras-chave
-            final_score = round((cos_sim * 0.6) + (overlap_ratio * 0.4), 6)
-        else:
-            final_score = round(cos_sim, 6)
+        # Normaliza o score textual retornado pelo MongoDB [0, 1]
+        raw_text_score = text_scores.get(doc_id, 0.0)
+        norm_text_score = raw_text_score / max_text_score if max_text_score > 0 else 0.0
+
+        # Para busca hibrida: combinamos o score semantico (vetor) com o lexical (texto).
+        # A formula aditiva (60% vetor / 40% texto) permite que um documento com excelente match
+        # de palavra-chave (tuberculose) seja resgatado mesmo que seu embedding vetorial seja fraco (ex: < 0.3).
+        # Ao mesmo tempo, um documento que so tem "tratar" tera um norm_text_score muito baixo (~0.2),
+        # fazendo com que seu final_score desabe para baixo de 0.3.
+        final_score = round((cos_sim * 0.6) + (norm_text_score * 0.4), 6)
 
         if similarity_threshold is not None and final_score < similarity_threshold:
             continue

@@ -51,6 +51,43 @@ def insert_rag_documents(documents: List[Dict[str, Any]]) -> List[Dict[str, Any]
     return inserted_documents
 
 
+def get_text_search_scores(
+    text_query: str,
+    preprocess_id: Optional[str] = None,
+    limit: int = 100
+) -> Dict[str, float]:
+    """
+    Executa busca textual no MongoDB usando o indice de texto e retorna as pontuacoes.
+    """
+    collection = get_collection(RAG_DOCUMENTS_COLLECTION)
+    
+    # Garantir que o indice de texto exista
+    if hasattr(collection, "create_index"):
+        try:
+            collection.create_index([("content", "text")], name="content_text_idx", default_language="portuguese")
+        except Exception:
+            pass
+
+    filter_query: Dict[str, Any] = {"$text": {"$search": text_query}}
+    if preprocess_id:
+        filter_query["preprocess_id"] = preprocess_id
+
+    projection = {"_id": 1, "score": {"$meta": "textScore"}}
+    
+    try:
+        if hasattr(collection, "find"):
+            cursor = collection.find(filter_query, projection).sort([("score", {"$meta": "textScore"})]).limit(limit)
+            results = {}
+            for doc in cursor:
+                results[str(doc["_id"])] = doc.get("score", 0.0)
+            return results
+        else:
+            return {}
+    except Exception as e:
+        print(f"[RAG] Erro na busca textual do MongoDB: {e}")
+        return {}
+
+
 def get_rag_documents_for_search(preprocess_id: Optional[str] = None) -> List[Dict[str, Any]]:
     collection = get_collection(RAG_DOCUMENTS_COLLECTION)
     filter_query: Dict[str, Any] = {}
