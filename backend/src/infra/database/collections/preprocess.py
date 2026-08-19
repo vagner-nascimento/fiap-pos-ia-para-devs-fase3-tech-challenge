@@ -69,14 +69,11 @@ def _calculate_overall_completion(steps: Dict[str, Dict[str, Any]]) -> float:
     return min(100.0, round(total, 2))
 
 
-def create_preprocess_document(rag_percent: float = 0.5) -> Dict[str, Any]:
+def create_preprocess_document() -> Dict[str, Any]:
     """
     Cria um novo documento na collection preprocess.
     
     Gera um UUID único para o documento e cria a estrutura inicial com steps.
-    
-    Args:
-        rag_percent: Percentual de dados para RAG (0.0 a 1.0).
     
     Returns:
         Dict com o documento criado, incluindo o _id gerado.
@@ -88,7 +85,6 @@ def create_preprocess_document(rag_percent: float = 0.5) -> Dict[str, Any]:
     
     document = {
         "_id": doc_id,
-        "rag_percent": rag_percent,
         "steps": {
             "one_download_datasets": {
                 "status": "pending",
@@ -107,14 +103,11 @@ def create_preprocess_document(rag_percent: float = 0.5) -> Dict[str, Any]:
             }
         },
         "results": {
-            "QAs": {
-                "train_data": 0,
-                "rag_data": 0
-            },
-            "clinical_protocols": {
-                "train_data": 0,
-                "rag_data": 0
-            }
+            "qas_train_path": None,
+            "qas_train_pt_br_path": None,
+            "clinical_protocols_rag_path": None,
+            "qas_count": 0,
+            "clinical_protocols_count": 0
         },
         "status": "created",
         "error_message": None,
@@ -218,7 +211,7 @@ def update_step_status(
 
 def update_preprocess_document(
     doc_id: str,
-    results: Dict[str, Dict[str, int]],
+    results: Dict[str, Any],
     completion_percentage: float
 ) -> Optional[Dict[str, Any]]:
     """
@@ -226,13 +219,13 @@ def update_preprocess_document(
     
     Atualiza:
     - updated_date com o valor atual
-    - results com os dados passados
+    - results com os dados passados (file paths e counts)
     - completion_percentage com o valor passado
     - status geral (recalculado baseado nos steps)
     
     Args:
         doc_id: ID do documento a atualizar.
-        results: Dicionário com resultados (QAs e clinical_protocols).
+        results: Dicionário com resultados (file paths e data counts).
         completion_percentage: Percentual de conclusão (0 a 100).
         
     Returns:

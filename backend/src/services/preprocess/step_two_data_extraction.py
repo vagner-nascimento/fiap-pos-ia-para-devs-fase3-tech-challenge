@@ -14,19 +14,7 @@ _backend_dir = os.path.abspath(os.path.join(_script_dir, "..", "..", ".."))
 _datasets_dir = os.path.join(_backend_dir, "datasets")
 
 
-def _split_dataset_for_rag(
-    data: List[Dict[str, Any]], rag_percent: float
-) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
-    """
-    Split a dataset into RAG and train portions.
 
-    Returns (rag_data, train_data).
-    """
-    if not data:
-        return [], []
-
-    num_rag = int(len(data) * rag_percent)
-    return data[:num_rag], data[num_rag:]
 
 
 def _extract_text_from_pdf(pdf_path: Path) -> str:
@@ -55,11 +43,9 @@ def _extract_text_from_pdf(pdf_path: Path) -> str:
 def _extract_qas_data(
     doc_id: str,
     qas_paths: Dict[str, str],
-    rag_percent: float,
-) -> Tuple[str, str]:
+) -> Tuple[str, int]:
     """
-    Process QA datasets (PubMedQA and MedQuAD), split them into train and RAG
-    and persist the results as JSON files.
+    Process QA datasets (PubMedQA and MedQuAD) and persist all data as a single JSON file.
     """
     update_step_status(doc_id, "two_data_extraction", "in_progress", completion_percentage=0)
 
@@ -71,8 +57,7 @@ def _extract_qas_data(
     medquad_dir = qas_paths.get("MedQuAD", os.path.join(_datasets_dir, "files", "qas", "MedQuAD"))
     preprocessed_dir = os.path.join(_datasets_dir, "preprocessed", "qas")
 
-    train_path = os.path.join(preprocessed_dir, "train.json")
-    rag_path = os.path.join(preprocessed_dir, "rag.json")
+    train_path = os.path.join(preprocessed_dir, "qas_train.json")
 
     os.makedirs(preprocessed_dir, exist_ok=True)
 
@@ -175,44 +160,32 @@ def _extract_qas_data(
         print(f"Aviso: Diretório MedQuAD não encontrado em {medquad_dir}")
         update_step_status(doc_id, "two_data_extraction", "in_progress", completion_percentage=50)
 
-    pubmedqa_rag, pubmedqa_train = _split_dataset_for_rag(pubmedqa_entries, rag_percent)
-    medquad_rag, medquad_train = _split_dataset_for_rag(medquad_entries, rag_percent)
+    # Combine all data without splitting
+    all_data = pubmedqa_entries + medquad_entries
 
-    rag_data = pubmedqa_rag + medquad_rag
-    train_data = pubmedqa_train + medquad_train
-
-    print(f"Salvando {len(train_data)} registros em {train_path}...")
+    print(f"Salvando {len(all_data)} registros em {train_path}...")
     try:
         with open(train_path, "w", encoding="utf-8") as handle:
-            json.dump(train_data, handle, ensure_ascii=False, indent=4)
+            json.dump(all_data, handle, ensure_ascii=False, indent=4)
     except Exception as exc:
-        raise RuntimeError(f"Erro ao salvar arquivo train.json: {exc}") from exc
-
-    print(f"Salvando {len(rag_data)} registros em {rag_path}...")
-    try:
-        with open(rag_path, "w", encoding="utf-8") as handle:
-            json.dump(rag_data, handle, ensure_ascii=False, indent=4)
-    except Exception as exc:
-        raise RuntimeError(f"Erro ao salvar arquivo rag.json: {exc}") from exc
+        raise RuntimeError(f"Erro ao salvar arquivo qas_train.json: {exc}") from exc
 
     print("Extração de dados QA concluída com sucesso!")
-    return train_path, rag_path
+    return train_path, len(all_data)
 
 
 def _extract_clinical_protocols_data(
     doc_id: str,
     clinical_protocols_paths: Tuple[Path, Path],
-    rag_percent: float,
-) -> Tuple[str, str]:
+) -> Tuple[str, int]:
     """
-    Process clinical protocols by extracting PDF text and splitting into train and RAG.
+    Process clinical protocols by extracting PDF text and persist all data as a single JSON file.
     """
     json_path = Path(clinical_protocols_paths[0])
     pdfs_dir = Path(clinical_protocols_paths[1])
 
     preprocessed_dir = os.path.join(_datasets_dir, "preprocessed", "clinical_protocols")
-    train_path = os.path.join(preprocessed_dir, "train.json")
-    rag_path = os.path.join(preprocessed_dir, "rag.json")
+    rag_path = os.path.join(preprocessed_dir, "clinical_protocols_rag.json")
 
     os.makedirs(preprocessed_dir, exist_ok=True)
 
@@ -319,43 +292,33 @@ def _extract_clinical_protocols_data(
             completion_percentage=100,
         )
 
-    clinical_rag, clinical_train = _split_dataset_for_rag(clinical_entries, rag_percent)
-
-    print(f"Salvando {len(clinical_train)} registros em {train_path}...")
-    try:
-        with open(train_path, "w", encoding="utf-8") as handle:
-            json.dump(clinical_train, handle, ensure_ascii=False, indent=4)
-    except Exception as exc:
-        raise RuntimeError(f"Erro ao salvar arquivo train.json de protocolos clínicos: {exc}") from exc
-
-    print(f"Salvando {len(clinical_rag)} registros em {rag_path}...")
+    # Save all data without splitting
+    print(f"Salvando {len(clinical_entries)} registros em {rag_path}...")
     try:
         with open(rag_path, "w", encoding="utf-8") as handle:
-            json.dump(clinical_rag, handle, ensure_ascii=False, indent=4)
+            json.dump(clinical_entries, handle, ensure_ascii=False, indent=4)
     except Exception as exc:
-        raise RuntimeError(f"Erro ao salvar arquivo rag.json de protocolos clínicos: {exc}") from exc
+        raise RuntimeError(f"Erro ao salvar arquivo clinical_protocols_rag.json: {exc}") from exc
 
     print("Extração de dados de protocolos clínicos concluída com sucesso!")
-    return train_path, rag_path
+    return rag_path, len(clinical_entries)
 
 
 def extract_data(
     doc_id: str,
     qas_paths: Dict[str, str],
     clinical_protocols_paths: Tuple[Path, Path],
-    rag_percent: float,
-) -> Tuple[str, str, str, str]:
+) -> Tuple[str, int, str, int]:
     """
-    Process all datasets and generate train/RAG files for QA and clinical protocols.
+    Process all datasets and generate single files for QA and clinical protocols.
+    Returns (qas_train_path, qas_count, clinical_protocols_rag_path, clinical_protocols_count).
     """
-    qas_data_paths = _extract_qas_data(
+    qas_train_path, qas_count = _extract_qas_data(
         doc_id,
         qas_paths,
-        rag_percent,
     )
-    clinical_data_paths = _extract_clinical_protocols_data(
+    clinical_protocols_rag_path, clinical_protocols_count = _extract_clinical_protocols_data(
         doc_id,
         clinical_protocols_paths,
-        rag_percent,
     )
-    return (*qas_data_paths, *clinical_data_paths)
+    return qas_train_path, qas_count, clinical_protocols_rag_path, clinical_protocols_count

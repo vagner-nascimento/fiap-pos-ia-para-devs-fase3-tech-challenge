@@ -55,7 +55,7 @@ def test_translate_creates_translated_files(tmp_path, monkeypatch):
         }
     ]
 
-    input_file = tmp_path / "qa.json"
+    input_file = tmp_path / "qas_train.json"
     input_file.write_text(json.dumps(source_data, ensure_ascii=False), encoding="utf-8")
 
     translated_texts = {
@@ -76,9 +76,8 @@ def test_translate_creates_translated_files(tmp_path, monkeypatch):
     monkeypatch.setattr(step_three_translation, "_get_translator", lambda: FakePipeline())
     monkeypatch.setattr(step_three_translation, "update_step_status", lambda *args, **kwargs: None)
 
-    output_paths = step_three_translation.translate("doc-123", (input_file, input_file))
+    output_path = step_three_translation.translate("doc-123", input_file)
 
-    assert len(output_paths) == 2
     assert calls == [
         [
             source_data[0]["question"],
@@ -86,25 +85,18 @@ def test_translate_creates_translated_files(tmp_path, monkeypatch):
             source_data[0]["contexts"][1],
             source_data[0]["answer"],
         ],
-        [
-            source_data[0]["question"],
-            source_data[0]["contexts"][0],
-            source_data[0]["contexts"][1],
-            source_data[0]["answer"],
-        ],
     ]
-    for output_path in output_paths:
-        assert output_path.exists()
-        assert output_path.name == "qa_pt_br.json"
+    assert output_path.exists()
+    assert output_path.name == "qas_train_pt_br.json"
 
-        saved = json.loads(output_path.read_text(encoding="utf-8"))
-        assert saved[0]["question"] == translated_texts[source_data[0]["question"]]
-        assert saved[0]["contexts"] == [
-            translated_texts[source_data[0]["contexts"][0]],
-            translated_texts[source_data[0]["contexts"][1]],
-        ]
-        assert saved[0]["answer"] == translated_texts[source_data[0]["answer"]]
-        assert saved[0]["metadata"] == source_data[0]["metadata"]
+    saved = json.loads(output_path.read_text(encoding="utf-8"))
+    assert saved[0]["question"] == translated_texts[source_data[0]["question"]]
+    assert saved[0]["contexts"] == [
+        translated_texts[source_data[0]["contexts"][0]],
+        translated_texts[source_data[0]["contexts"][1]],
+    ]
+    assert saved[0]["answer"] == translated_texts[source_data[0]["answer"]]
+    assert saved[0]["metadata"] == source_data[0]["metadata"]
 
 
 def test_translate_preserves_non_string_contexts(tmp_path, monkeypatch):
@@ -120,7 +112,7 @@ def test_translate_preserves_non_string_contexts(tmp_path, monkeypatch):
         }
     ]
 
-    input_file = tmp_path / "qa.json"
+    input_file = tmp_path / "qas_train.json"
     input_file.write_text(json.dumps(source_data, ensure_ascii=False), encoding="utf-8")
 
     translated_texts = {
@@ -137,9 +129,9 @@ def test_translate_preserves_non_string_contexts(tmp_path, monkeypatch):
     monkeypatch.setattr(step_three_translation, "_get_translator", lambda: FakePipeline())
     monkeypatch.setattr(step_three_translation, "update_step_status", lambda *args, **kwargs: None)
 
-    output_paths = step_three_translation.translate("doc-123", (input_file, input_file))
+    output_path = step_three_translation.translate("doc-123", input_file)
 
-    saved = json.loads(output_paths[0].read_text(encoding="utf-8"))
+    saved = json.loads(output_path.read_text(encoding="utf-8"))
     assert saved[0]["contexts"] == [
         translated_texts[source_data[0]["contexts"][0]],
         {"source": "keep-me"},
@@ -166,10 +158,8 @@ def test_translate_updates_status_at_six_second_intervals(tmp_path, monkeypatch)
         translated_texts[context] = f"Contexto {index}."
         translated_texts[answer] = f"Resposta {index}."
 
-    input_file = tmp_path / "qa.json"
-    empty_file = tmp_path / "empty.json"
+    input_file = tmp_path / "qas_train.json"
     input_file.write_text(json.dumps(source_data, ensure_ascii=False), encoding="utf-8")
-    empty_file.write_text("[]", encoding="utf-8")
 
     status_calls = []
 
@@ -190,9 +180,8 @@ def test_translate_updates_status_at_six_second_intervals(tmp_path, monkeypatch)
     monotonic_values = iter([0.0, 5.0, 12.0])
     monkeypatch.setattr(step_three_translation.time, "monotonic", lambda: next(monotonic_values))
 
-    output_paths = step_three_translation.translate("doc-123", (input_file, empty_file))
+    output_path = step_three_translation.translate("doc-123", input_file)
 
-    assert len(output_paths) == 2
     assert status_calls == [
         ("in_progress", 0),
         ("in_progress", 100.0),
@@ -219,10 +208,8 @@ def test_translate_uses_larger_translation_batches(tmp_path, monkeypatch):
         translated_texts[context] = f"Contexto {index}."
         translated_texts[answer] = f"Resposta {index}."
 
-    input_file = tmp_path / "qa.json"
-    empty_file = tmp_path / "empty.json"
+    input_file = tmp_path / "qas_train.json"
     input_file.write_text(json.dumps(source_data, ensure_ascii=False), encoding="utf-8")
-    empty_file.write_text("[]", encoding="utf-8")
 
     batches = []
 
@@ -235,18 +222,19 @@ def test_translate_uses_larger_translation_batches(tmp_path, monkeypatch):
     monkeypatch.setattr(step_three_translation, "_get_translator", lambda: FakePipeline())
     monkeypatch.setattr(step_three_translation, "update_step_status", lambda *args, **kwargs: None)
 
-    output_paths = step_three_translation.translate("doc-123", (input_file, empty_file))
+    output_path = step_three_translation.translate("doc-123", input_file)
 
-    assert len(output_paths) == 2
-    assert len(batches) == 2
-    assert len(batches[0]) == 48
-    assert len(batches[1]) == 3
+    assert len(batches) == 4  # 51 items / 16 batch size = 4 batches (rounded up)
+    assert len(batches[0]) == 16
+    assert len(batches[1]) == 16
+    assert len(batches[2]) == 16
+    assert len(batches[3]) == 3
 
 
 def test_translate_raises_on_missing_file(tmp_path):
     missing_file = tmp_path / "missing.json"
     with pytest.raises(FileNotFoundError):
-        step_three_translation.translate("doc-123", (missing_file, missing_file))
+        step_three_translation.translate("doc-123", missing_file)
 
 
 def test_translate_raises_on_invalid_json(tmp_path):
@@ -254,7 +242,7 @@ def test_translate_raises_on_invalid_json(tmp_path):
     invalid_file.write_text("{ invalid json }", encoding="utf-8")
 
     with pytest.raises(json.JSONDecodeError):
-        step_three_translation.translate("doc-123", (invalid_file, invalid_file))
+        step_three_translation.translate("doc-123", invalid_file)
 
 
 def test_translate_raises_on_non_list_json(tmp_path):
@@ -262,4 +250,4 @@ def test_translate_raises_on_non_list_json(tmp_path):
     invalid_format.write_text(json.dumps({"question": "x"}), encoding="utf-8")
 
     with pytest.raises(ValueError):
-        step_three_translation.translate("doc-123", (invalid_format, invalid_format))
+        step_three_translation.translate("doc-123", invalid_format)

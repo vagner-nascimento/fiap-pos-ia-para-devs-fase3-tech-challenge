@@ -12,19 +12,16 @@ export interface StepInfo {
   completion_percentage?: number;
 }
 
-export interface ResultsData {
-  train_data: number;
-  rag_data: number;
-}
-
 export interface Results {
-  QAs: ResultsData;
-  clinical_protocols: ResultsData;
+  qas_train_path?: string;
+  qas_train_pt_br_path?: string;
+  clinical_protocols_rag_path?: string;
+  qas_count: number;
+  clinical_protocols_count: number;
 }
 
 export interface PreprocessDocument {
   id: string;
-  rag_percent: number;
   steps: Record<string, StepInfo>;
   results: Results;
   status: PreprocessStatus;
@@ -34,7 +31,7 @@ export interface PreprocessDocument {
 }
 
 export interface PreprocessRequest {
-  rag_percent?: number;
+  // No parameters needed
 }
 
 export const TERMINAL_STATUSES: PreprocessStatus[] = ["completed", "error"];

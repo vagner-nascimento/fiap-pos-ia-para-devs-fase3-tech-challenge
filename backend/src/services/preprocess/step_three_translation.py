@@ -1,9 +1,10 @@
 
 import json
+import re
 import time
 from contextlib import nullcontext
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Union
 
 _translator: Optional[Any] = None
 
@@ -11,7 +12,10 @@ from infra.database.collections.preprocess import update_step_status
 
 _TRANSLATION_BATCH_SIZE = 16
 _STATUS_UPDATE_INTERVAL_SECONDS = 10.0
-_MAX_NEW_TOKENS = 256
+_MAX_NEW_TOKENS = 512
+# Limite de caracteres por chunk para segmentação de textos longos.
+# Valor conservador para não exceder os 512 tokens do modelo Marian.
+_CHUNK_CHAR_LIMIT = 400
 
 
 def _get_translator() -> Any:
@@ -57,8 +61,9 @@ def _get_translator() -> Any:
                 generated_tokens = model.generate(
                     **inputs,
                     max_new_tokens=_MAX_NEW_TOKENS,
-                    num_beams=1,
+                    num_beams=4,
                     do_sample=False,
+                    no_repeat_ngram_size=4,
                 )
 
             translated_texts = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
@@ -68,13 +73,83 @@ def _get_translator() -> Any:
     return _translator
 
 
+def _split_into_sentences(text: str) -> List[str]:
+    """Divide texto em sentenças usando pontuação como delimitador."""
+    sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+    return [s for s in sentences if s.strip()]
+
+
+def _chunk_text(text: str) -> List[str]:
+    """Segmenta texto longo em chunks que cabem no limite do modelo.
+
+    Textos curtos (<=_CHUNK_CHAR_LIMIT) retornam como chunk único.
+    Textos longos são divididos em sentenças e agrupados em chunks
+    que não excedam _CHUNK_CHAR_LIMIT caracteres.
+    """
+    if len(text) <= _CHUNK_CHAR_LIMIT:
+        return [text]
+
+    sentences = _split_into_sentences(text)
+    if not sentences:
+        return [text]
+
+    chunks: List[str] = []
+    current_parts: List[str] = []
+    current_len = 0
+
+    for sentence in sentences:
+        # Se adicionar esta sentença excederia o limite E já temos conteúdo, fecha o chunk
+        if current_len + len(sentence) > _CHUNK_CHAR_LIMIT and current_parts:
+            chunks.append(" ".join(current_parts))
+            current_parts = []
+            current_len = 0
+
+        current_parts.append(sentence)
+        current_len += len(sentence) + 1  # +1 para o espaço
+
+    if current_parts:
+        chunks.append(" ".join(current_parts))
+
+    return chunks
+
+
 def _translate_texts(texts: Sequence[str]) -> List[str]:
+    """Traduz uma lista de textos, segmentando textos longos em chunks.
+
+    Textos longos são divididos em chunks menores, traduzidos
+    individualmente e remontados com espaço. Isso evita truncação
+    silenciosa pelo modelo Marian (max 512 tokens de entrada).
+    """
     if not texts:
         return []
 
-    result = _get_translator()(list(texts))
-    translated_texts = [item.get("translation_text", "") for item in result]
-    print(f"Translating batch of {len(texts)} texts")
+    translator = _get_translator()
+
+    # Mapeia cada texto original nos seus chunks
+    all_chunks: List[str] = []
+    chunk_map: List[Tuple[int, int]] = []  # (start_index, count) para cada texto original
+
+    for text in texts:
+        chunks = _chunk_text(text)
+        chunk_map.append((len(all_chunks), len(chunks)))
+        all_chunks.extend(chunks)
+
+    # Traduz todos os chunks em sub-batches
+    translated_chunks: List[str] = []
+    for batch_start in range(0, len(all_chunks), _TRANSLATION_BATCH_SIZE):
+        batch = all_chunks[batch_start:batch_start + _TRANSLATION_BATCH_SIZE]
+        result = translator(batch)
+        translated_chunks.extend(
+            item.get("translation_text", "") for item in result
+        )
+
+    # Remonta cada texto original a partir dos seus chunks traduzidos
+    translated_texts: List[str] = []
+    for start, count in chunk_map:
+        parts = translated_chunks[start:start + count]
+        translated_texts.append(" ".join(parts))
+
+    print(f"Translated {len(texts)} texts ({len(all_chunks)} chunks)")
     return translated_texts
 
 
@@ -168,54 +243,45 @@ def _maybe_update_progress(
 
 def translate(
     doc_id: str,
-    QA_PATHs: Tuple[Path, Path],
-) -> Tuple[Path, Path]:
-    """Translate two QA JSON files from English to Portuguese (pt-BR). Returns the paths of the translated files."""
-    output_paths: List[Path] = []
+    qa_train_path: Path,
+) -> Path:
+    """Translate a single QA JSON file from English to Portuguese (pt-BR). Returns the path of the translated file."""
+    input_path = Path(qa_train_path).resolve()
 
-    loaded_data: List[List[Dict[str, Any]]] = []
-    for input_path in QA_PATHs:
-        path = Path(input_path).resolve()
+    if not input_path.exists():
+        raise FileNotFoundError(f"Arquivo não encontrado: {input_path}")
 
-        if not path.exists():
-            raise FileNotFoundError(f"Arquivo não encontrado: {path}")
+    with input_path.open("r", encoding="utf-8") as handle:
+        data = json.load(handle)
 
-        with path.open("r", encoding="utf-8") as handle:
-            data = json.load(handle)
+    if not isinstance(data, list):
+        raise ValueError(f"Formato inválido para {input_path}: esperado uma lista de objetos JSON.")
 
-        if not isinstance(data, list):
-            raise ValueError(f"Formato inválido para {path}: esperado uma lista de objetos JSON.")
-
-        loaded_data.append(data)
-
-    total_items = sum(len(items) for items in loaded_data)
+    total_items = len(data)
     update_step_status(doc_id, "three_translating", "in_progress", completion_percentage=0)
 
     processed_items = 0
     last_update_at = time.monotonic()
-    for index, data in enumerate(loaded_data):
-        input_path = Path(QA_PATHs[index]).resolve()
-        translated_data: List[Dict[str, Any]] = []
+    translated_data: List[Dict[str, Any]] = []
 
-        for batch_start in range(0, len(data), _TRANSLATION_BATCH_SIZE):
-            batch = data[batch_start:batch_start + _TRANSLATION_BATCH_SIZE]
-            translated_batch = _translate_items_batch(batch)
-            translated_data.extend(translated_batch)
+    for batch_start in range(0, len(data), _TRANSLATION_BATCH_SIZE):
+        batch = data[batch_start:batch_start + _TRANSLATION_BATCH_SIZE]
+        translated_batch = _translate_items_batch(batch)
+        translated_data.extend(translated_batch)
 
-            processed_items += len(batch)
-            last_update_at = _maybe_update_progress(
-                doc_id,
-                processed_items,
-                total_items,
-                last_update_at,
-            )
+        processed_items += len(batch)
+        last_update_at = _maybe_update_progress(
+            doc_id,
+            processed_items,
+            total_items,
+            last_update_at,
+        )
 
-        output_path = input_path.with_name(f"{input_path.stem}_pt_br{input_path.suffix}")
-        with output_path.open("w", encoding="utf-8") as handle:
-            json.dump(translated_data, handle, ensure_ascii=False, indent=2)
-
-        output_paths.append(output_path)
+    # Change output filename to qas_train_pt_br.json
+    output_path = input_path.parent / "qas_train_pt_br.json"
+    with output_path.open("w", encoding="utf-8") as handle:
+        json.dump(translated_data, handle, ensure_ascii=False, indent=2)
 
     update_step_status(doc_id, "three_translating", "completed", completion_percentage=100)
 
-    return tuple(output_paths)
+    return output_path

@@ -8,7 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.services.preprocess import step_two_data_extraction as step_two
 
 
-def test_extract_clinical_protocols_data_creates_split_files(monkeypatch):
+def test_extract_clinical_protocols_data_creates_rag_file(monkeypatch):
     base_tmp_dir = Path(__file__).resolve().parents[1] / ".tmp-tests"
     base_tmp_dir.mkdir(parents=True, exist_ok=True)
 
@@ -37,20 +37,17 @@ def test_extract_clinical_protocols_data_creates_split_files(monkeypatch):
         lambda pdf_path: f"content for {Path(pdf_path).name}",
     )
 
-    train_path, rag_path = step_two._extract_clinical_protocols_data("doc-123", (json_path, pdfs_dir), 0.5)
+    rag_path, count = step_two._extract_clinical_protocols_data("doc-123", (json_path, pdfs_dir))
 
-    train_file = Path(train_path)
     rag_file = Path(rag_path)
 
-    assert train_file.exists()
     assert rag_file.exists()
+    assert count == 2
 
-    train_data = json.loads(train_file.read_text(encoding="utf-8"))
     rag_data = json.loads(rag_file.read_text(encoding="utf-8"))
 
-    assert len(train_data) == 1
-    assert len(rag_data) == 1
-    assert "content_text" in train_data[0]
+    assert len(rag_data) == 2
     assert "content_text" in rag_data[0]
-    assert train_data[0]["content_text"].startswith("content for")
+    assert "content_text" in rag_data[1]
     assert rag_data[0]["content_text"].startswith("content for")
+    assert rag_data[1]["content_text"].startswith("content for")

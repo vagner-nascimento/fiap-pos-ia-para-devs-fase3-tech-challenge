@@ -49,7 +49,6 @@ interface Props {
 }
 
 export function PreProcessingPage({ onPreprocessComplete }: Props) {
-  const [ragPercent, setRagPercent] = useState(0.5);
   const [document, setDocument] = useState<PreprocessDocument | null>(null);
   const [pollingDocId, setPollingDocId] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
@@ -61,7 +60,7 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
     setIsStarting(true);
 
     try {
-      const created = await startPreprocess({ rag_percent: ragPercent });
+      const created = await startPreprocess({});
       setDocument(created);
       setPollingDocId(created.id);
       setIsPolling(true);
@@ -110,27 +109,12 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
       <header className="page-header">
         <h1>Pre Processing</h1>
         <p>
-          Inicie o preprocessamento dos datasets PubMedQA e MedQuAD e acompanhe
-          o progresso em tempo real.
+          Inicie o preprocessamento dos datasets PubMedQA, MedQuAD e protocolos
+          clínicos da FHEMIG e acompanhe o progresso em tempo real.
         </p>
       </header>
 
       <section className="card">
-        <div className="form-row">
-          <label htmlFor="rag-percent">RAG percent</label>
-          <input
-            id="rag-percent"
-            type="range"
-            min={0}
-            max={1}
-            step={0.05}
-            value={ragPercent}
-            onChange={(event) => setRagPercent(Number(event.target.value))}
-            disabled={isStarting || isPolling}
-          />
-          <span className="rag-value">{ragPercent.toFixed(2)}</span>
-        </div>
-
         <div className="actions">
           <button
             type="button"
@@ -169,10 +153,6 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
                 <div className="status-item">
                   <span>ID</span>
                   <strong>{document.id}</strong>
-                </div>
-                <div className="status-item">
-                  <span>RAG Percent</span>
-                  <strong>{(document.rag_percent * 100).toFixed(0)}%</strong>
                 </div>
                 <div className="status-item">
                   <span>Status</span>
@@ -231,34 +211,38 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
                   <div className="result-group">
                     <h4>QAs</h4>
                     <div className="result-item">
-                      <span>Train data</span>
+                      <span>Total de registros</span>
                       <strong>
-                        {document.results.QAs.train_data.toLocaleString("pt-BR")}
+                        {document.results.qas_count.toLocaleString("pt-BR")}
                       </strong>
                     </div>
                     <div className="result-item">
-                      <span>RAG data</span>
+                      <span>Arquivo Train (EN)</span>
                       <strong>
-                        {document.results.QAs.rag_data.toLocaleString("pt-BR")}
+                        {document.results.qas_train_path || "Não gerado"}
+                      </strong>
+                    </div>
+                    <div className="result-item">
+                      <span>Arquivo Train (PT-BR)</span>
+                      <strong>
+                        {document.results.qas_train_pt_br_path || "Não gerado"}
                       </strong>
                     </div>
                   </div>
                   <div className="result-group">
                     <h4>Clinical Protocols</h4>
                     <div className="result-item">
-                      <span>Train data</span>
+                      <span>Total de registros</span>
                       <strong>
-                        {document.results.clinical_protocols.train_data.toLocaleString(
+                        {document.results.clinical_protocols_count.toLocaleString(
                           "pt-BR",
                         )}
                       </strong>
                     </div>
                     <div className="result-item">
-                      <span>RAG data</span>
+                      <span>Arquivo RAG</span>
                       <strong>
-                        {document.results.clinical_protocols.rag_data.toLocaleString(
-                          "pt-BR",
-                        )}
+                        {document.results.clinical_protocols_rag_path || "Não gerado"}
                       </strong>
                     </div>
                   </div>
