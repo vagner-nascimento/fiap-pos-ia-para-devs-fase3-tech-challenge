@@ -156,11 +156,11 @@ export function RagGenerationPage({ lastPreprocessId }: Props) {
                   value={String(document.splitter_chunk_overlap)}
                 />
                 <ResultCard
-                  label="QAs Documents"
-                  value={document.qas_documents.toLocaleString("pt-BR")}
+                  label="Arquivo de Protocolos Clínicos"
+                  value={document.clinical_protocols_rag_path}
                 />
                 <ResultCard
-                  label="Clinical Docs"
+                  label="Documentos Clínicos"
                   value={document.clinical_protocol_documents.toLocaleString("pt-BR")}
                 />
                 <ResultCard

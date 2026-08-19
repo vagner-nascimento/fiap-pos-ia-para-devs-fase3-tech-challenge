@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 
@@ -155,6 +156,19 @@ def test_update_preprocess_document_with_results(monkeypatch) -> None:
     assert updated["results"]["qas_count"] == 150
     assert updated["results"]["clinical_protocols_count"] == 120
     assert updated["completion_percentage"] == 50
+
+
+def test_get_relative_path_is_relative_to_backend_root(monkeypatch, tmp_path) -> None:
+    backend_root = tmp_path / "backend"
+    source_dir = backend_root / "src" / "services"
+    source_dir.mkdir(parents=True)
+    target_path = backend_root / "datasets" / "preprocessed" / "clinical.json"
+
+    monkeypatch.setattr(preprocess_data, "__file__", str(source_dir / "preprocess_data.py"))
+
+    assert preprocess_data._get_relative_path(str(target_path)) == (
+        os.path.join("datasets", "preprocessed", "clinical.json")
+    )
 
 
 def test_mark_preprocess_document_failed_stores_error_message(monkeypatch) -> None:

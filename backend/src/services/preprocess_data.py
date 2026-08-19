@@ -28,7 +28,7 @@ def _read_json_count(file_path: str) -> int:
 def _get_relative_path(absolute_path: str) -> str:
     """Convert absolute path to relative path from backend directory."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    backend_dir = os.path.abspath(os.path.join(script_dir, "..", "..", ".."))
+    backend_dir = os.path.abspath(os.path.join(script_dir, "..", ".."))
     try:
         return os.path.relpath(absolute_path, backend_dir)
     except ValueError:
