@@ -31,9 +31,9 @@ A solução é uma aplicação **full-stack** composta por três camadas princip
 
 O fluxo central da aplicação é:
 
-1. O usuário acessa o frontend e inicia o pré-processamento configurando o parâmetro `rag_percent`.
+1. O usuário acessa o frontend e inicia o pré-processamento sem parâmetros.
 2. O backend recebe a requisição, cria um documento de rastreamento no MongoDB e dispara a pipeline em background.
-3. A pipeline baixa os datasets (PubMedQA, MedQuAD, protocolos FHEMIG), extrai os dados, os separa entre conjuntos de treino e RAG, e os traduz para português.
+3. A pipeline baixa os datasets (PubMedQA, MedQuAD, protocolos FHEMIG), extrai cada família em um arquivo JSON e traduz os QAs para português.
 4. O usuário pode acompanhar o progresso em tempo real via polling do frontend.
 5. Com os dados pré-processados, é possível iniciar o fine-tuning do modelo Qwen2.5-1.5B-Instruct diretamente pela aplicação (com GPU) ou via Jupyter Notebooks no Google Colab.
 
@@ -119,8 +119,8 @@ C4Component
         Component(svc_finetuning, "services/fine_tunning.py", "Service", "Carrega modelo, aplica LoRA, executa SFTTrainer em background")
 
         Component(step1, "services/preprocess/step_one_download_datasets.py", "Step", "Baixa PubMedQA, MedQuAD e PDFs FHEMIG")
-        Component(step2, "services/preprocess/step_two_data_extraction.py", "Step", "Extrai e divide dados em train/RAG por rag_percent")
-        Component(step3, "services/preprocess/step_three_translation.py", "Step", "Traduz dados QA para pt-BR")
+        Component(step2, "services/preprocess/step_two_data_extraction.py", "Step", "Extrai QAs e protocolos em arquivos JSON únicos")
+        Component(step3, "services/preprocess/step_three_translation.py", "Step", "Traduz question, contexts e answer dos QAs para pt-BR")
 
         Component(infra_db, "infra/database/mongodb.py", "Infrastructure", "Gerencia conexão com MongoDB (pymongo)")
         Component(col_preprocess, "infra/database/collections/preprocess.py", "Repository", "CRUD da collection preprocess")
@@ -219,8 +219,8 @@ sequenceDiagram
     participant S3 as Step 3: Tradução
     participant DB as MongoDB
 
-    U->>FE: Clica em "Iniciar Processamento"\n(informa rag_percent)
-    FE->>API: POST /preprocess\n{ rag_percent: 0.5 }
+    U->>FE: Clica em "Iniciar Processamento"
+    FE->>API: POST /preprocess\n{}
     API->>DB: create_preprocess_document()
     DB-->>API: { _id, status: "pending", ... }
     API->>BG: background_tasks.add_task(preprocess_data_background)
@@ -243,13 +243,13 @@ sequenceDiagram
     BG->>DB: update_step_status("one_download_datasets", "completed")
 
     BG->>DB: update_step_status("two_data_extraction", "in_progress")
-    BG->>S2: extract_data(doc_id, qas_paths, clinical_protocols_paths, rag_percent)
-    S2-->>BG: train_qa_path, rag_qa_path, train_clinical_path, rag_clinical_path
+    BG->>S2: extract_data(doc_id, qas_paths, clinical_protocols_paths)
+    S2-->>BG: qas_train_path, qas_count, clinical_protocols_rag_path, clinical_protocols_count
     BG->>DB: update_step_status("two_data_extraction", "completed")
 
     BG->>DB: update_step_status("three_translating", "in_progress")
-    BG->>S3: translate(doc_id, (train_qa_path, rag_qa_path))
-    S3-->>BG: translated_train_path, translated_rag_path
+    BG->>S3: translate(doc_id, qas_train_path)
+    S3-->>BG: qas_train_pt_br_path
     BG->>DB: update_step_status("three_translating", "completed")
 
     BG->>DB: update_preprocess_document(doc_id, results, 100%)
@@ -287,7 +287,7 @@ sequenceDiagram
     Note over BG,FS: Execução em background (pode levar horas)
 
     BG->>SVC: _training_job(doc_id)
-    SVC->>FS: Lê train_pt_br.json e train.json (clinical_protocols)
+    SVC->>FS: Lê qas_train_pt_br.json e clinical_protocols_rag.json
     SVC->>SVC: _build_training_texts() — formata exemplos para SFTTrainer
     SVC->>HF: AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-1.5B-Instruct")
     HF-->>SVC: Modelo base carregado
@@ -321,7 +321,7 @@ As decisões técnicas que moldaram esta arquitetura estão documentadas como **
 | [ADR-004](adr/ADR-004-mongodb-estado.md) | MongoDB como banco de estado do processamento | ✅ Aceito |
 | [ADR-005](adr/ADR-005-background-tasks-fastapi.md) | Processamento assíncrono via FastAPI BackgroundTasks | ✅ Aceito |
 | [ADR-006](adr/ADR-006-finetuning-google-colab.md) | Fine-tuning executado no Google Colab | ✅ Aceito |
-| [ADR-007](adr/ADR-007-split-train-rag.md) | Split train/RAG configurável via rag_percent | ✅ Aceito |
+| [ADR-007](adr/ADR-007-split-train-rag.md) | Split train/RAG configurável via rag_percent | ⚠️ Substituído |
 | [ADR-008](adr/ADR-008-docker-compose.md) | Orquestração local via Docker Compose | ✅ Aceito |
 | [ADR-009](adr/ADR-009-deteccao-gpu-cpu.md) | Detecção automática GPU/CPU no backend | ✅ Aceito |
 | [ADR-010](adr/ADR-010-colab-ngrok-zerогpu.md) | Colab + ngrok e HuggingFace ZeroGPU para servir o modelo | ✅ Aceito |

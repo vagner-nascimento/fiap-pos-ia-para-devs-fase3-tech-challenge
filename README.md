@@ -11,10 +11,9 @@ Este repositório reúne uma aplicação full-stack para pré-processar datasets
 A aplicação permite:
 
 1. iniciar o pré-processamento dos datasets PubMedQA, MedQuAD e protocolos clínicos FHEMIG;
-2. definir o percentual de dados destinado ao conjunto RAG;
-3. acompanhar o progresso da execução em tempo real;
-4. consultar os arquivos gerados em formato estruturado para treino e recuperação;
-5. visualizar contagens separadas para `QAs` e `clinical_protocols`.
+2. acompanhar o progresso da execução em tempo real;
+3. consultar os arquivos gerados em formato estruturado para fine-tuning e recuperação;
+4. visualizar contagens separadas para `QAs` e `clinical_protocols`.
 
 O fluxo principal funciona assim:
 
@@ -35,14 +34,14 @@ O fluxo principal funciona assim:
 
 ### Fluxo de execução
 
-1. O usuário informa o percentual de dados que deve ir para o conjunto RAG.
-2. O frontend envia um pedido para o endpoint de preprocessamento no backend.
-3. O backend cria um documento de execução no MongoDB e retorna um identificador da tarefa.
-4. A tarefa em background:
+1. O frontend envia um pedido sem parâmetros para o endpoint de preprocessamento no backend.
+2. O backend cria um documento de execução no MongoDB e retorna um identificador da tarefa.
+3. A tarefa em background:
    - clona ou reutiliza os datasets necessários;
    - processa os dados de QA e protocolos clínicos;
    - extrai texto dos PDFs dos protocolos clínicos;
-   - gera os arquivos de saída para treino e RAG;
+   - gera um JSON único de QAs e um JSON único de protocolos clínicos;
+   - traduz os campos textuais dos QAs para pt-BR e grava uma cópia traduzida;
    - atualiza o status da execução.
 5. O frontend consulta periodicamente o estado da execução e exibe progresso, contadores e resultado final.
 
@@ -97,7 +96,7 @@ O script [restart-app.sh](restart-app.sh) facilita a reinicialização completa 
 
 - O backend depende do MongoDB para subir corretamente.
 - O processamento de datasets é feito em background, então a API responde rapidamente e o estado pode ser acompanhado depois.
-- Quando houver uma GPU Nvidia compatível e o runtime/driver estiverem instalados, o backend usa GPU automaticamente; caso contrário, ele faz fallback para CPU, o que deixa a tradução dos datasets bem mais lenta.
+- A tradução usa `Helsinki-NLP/opus-mt-tc-big-en-pt`, em lotes e com fragmentação de textos longos; quando houver uma GPU Nvidia compatível, o backend usa CUDA, caso contrário faz fallback para CPU.
 - Uma execução pode terminar com status `error`; em cenários de falha de fallback interno, também pode aparecer `failed`.
 - Os datasets são baixados automaticamente na primeira execução, mas também podem ser tratados manualmente conforme descrito em [backend/datasets/README.md](backend/datasets/README.md).
 - Devido a restrições de hardware, o finetunning do modelo escolhido foi feito através de notebook no Google Colab. Os arquivos relacionados ao processo estão na pasta [backend/notebooks/](backend/notebooks/) e o modelo treinado foi disponibilizado como private no [HuggingFace](fiap-hospital-helper/hospital-helper-qwen2.5-1.5b).

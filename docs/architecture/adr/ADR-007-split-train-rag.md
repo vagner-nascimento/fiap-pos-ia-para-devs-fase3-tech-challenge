@@ -1,13 +1,15 @@
 # ADR-007 — Split train/RAG configurável via parâmetro rag_percent
 
-**Status:** Aceito  
+**Status:** Substituído
 **Data:** 2026-08-18  
 **Contexto:** Projeto FIAP POS IA Fase 3 — Preparação de dados para fine-tuning e Retrieval-Augmented Generation  
 **Decisores:** Equipe do projeto  
 
 ---
 
-## Contexto
+> Esta decisão descreve uma implementação anterior. O pipeline atual não recebe `rag_percent`, não divide os datasets e gera arquivos únicos de QAs e protocolos clínicos. Consulte [docs/architecture/README.md](../README.md) e [backend/README.md](../../../backend/README.md) para o fluxo vigente.
+
+## Contexto histórico
 
 O projeto utiliza os datasets médicos (PubMedQA, MedQuAD e protocolos FHEMIG) para duas finalidades distintas e complementares:
 

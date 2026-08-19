@@ -29,8 +29,8 @@ async def preprocess_endpoint(
     request: PreprocessRequest,
     background_tasks: BackgroundTasks
 ):
-    document = create_preprocess_document(rag_percent=request.rag_percent)
-    background_tasks.add_task(preprocess_data_background, request.rag_percent, document["_id"])
+    document = create_preprocess_document()
+    background_tasks.add_task(preprocess_data_background, document["_id"])
     return document  # retorna imediatamente com status "pending"
 ```
 

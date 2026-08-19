@@ -65,4 +65,5 @@ backend/datasets/
 - O backend processa PubMedQA, MedQuAD e protocolos clinicos em etapas separadas.
 - PubMedQA e MedQuAD geram registros no formato de QA.
 - Os protocolos clinicos geram registros com o campo `content_text`, extraido dos PDFs.
-- O percentual informado no preprocessamento e aplicado ao split entre treino e RAG para MedQuAD e protocolos clinicos.
+- O pré-processamento atual não recebe percentual de split. PubMedQA e MedQuAD são normalizados em `preprocessed/qas/qas_train.json`; os protocolos clínicos são extraídos dos PDFs e salvos em `preprocessed/clinical_protocols/clinical_protocols_rag.json`.
+- A etapa seguinte traduz todos os QAs para pt-BR e grava `preprocessed/qas/qas_train_pt_br.json`. A tradução preserva `metadata` e traduz `question`, `contexts` textuais e `answer`.
