@@ -1,4 +1,5 @@
 import os
+from datetime import timezone
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
@@ -34,6 +35,8 @@ def get_mongo_client() -> MongoClient:
         
         _mongo_client = MongoClient(
             mongo_uri,
+            tz_aware=True,
+            tzinfo=timezone.utc,
             connectTimeoutMS=5000,
             serverSelectionTimeoutMS=5000,
             socketTimeoutMS=5000
