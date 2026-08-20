@@ -6,7 +6,7 @@ import { ProcessStatus } from "../components/preprocessing/ProcessStatus";
 import { ProcessSteps } from "../components/preprocessing/ProcessSteps";
 import { usePreprocessPolling } from "../hooks/usePreprocessPolling";
 import { preprocessStore, usePreprocessStore } from "../stores/preprocessStore";
-import type { PreprocessDocument, StepStatus } from "../types/preprocess";
+import type { PreprocessDocument } from "../types/preprocess";
 import "./PreProcessingPage.css";
 
 interface Props {
