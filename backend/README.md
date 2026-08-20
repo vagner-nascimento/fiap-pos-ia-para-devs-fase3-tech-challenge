@@ -131,6 +131,7 @@ cp .env.example .env
 | `DB_NAME` | Nome do banco de dados | `fiap_pos_ia_fase3` |
 | `FINE_TUNING_BASE_MODEL` | Modelo base para fine tuning | `Qwen/Qwen2.5-1.5B-Instruct` |
 | `RAG_EMBEDDING_MODEL` | Modelo de embeddings para a base RAG | `hkunlp/instructor-base` |
+| `HF_TOKEN` | Token opcional para autenticacao no Hugging Face | - |
 
 > Com Docker Compose, o host do MongoDB deve ser `mongodb`, nao `localhost`.
 
