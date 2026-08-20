@@ -1,6 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { startPreprocess } from "../api/preprocess";
 import { usePreprocessPolling } from "../hooks/usePreprocessPolling";
+import { preprocessStore, usePreprocessStore } from "../stores/preprocessStore";
 import type { PreprocessDocument, StepStatus } from "../types/preprocess";
 import "./PreProcessingPage.css";
 
@@ -49,52 +50,45 @@ interface Props {
 }
 
 export function PreProcessingPage({ onPreprocessComplete }: Props) {
-  const [document, setDocument] = useState<PreprocessDocument | null>(null);
-  const [pollingDocId, setPollingDocId] = useState<string | null>(null);
-  const [isStarting, setIsStarting] = useState(false);
-  const [isPolling, setIsPolling] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { document, pollingDocId, isStarting, isPolling, error } =
+    usePreprocessStore();
 
   const handleStart = async () => {
-    setError(null);
-    setIsStarting(true);
+    preprocessStore.setStarting(true);
 
     try {
       const created = await startPreprocess({});
-      setDocument(created);
-      setPollingDocId(created.id);
-      setIsPolling(true);
+      preprocessStore.setStarted(created);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Erro ao iniciar preprocessamento";
-      setError(message);
+      preprocessStore.setPollingError(message);
     } finally {
-      setIsStarting(false);
+      preprocessStore.setStarting(false);
     }
   };
 
   const handleReset = () => {
-    setDocument(null);
-    setPollingDocId(null);
-    setIsPolling(false);
-    setError(null);
+    preprocessStore.reset();
   };
 
   const handleUpdate = useCallback((updated: PreprocessDocument) => {
-    setDocument(updated);
+    preprocessStore.updateDocument(updated);
   }, []);
 
   const handlePollingError = useCallback((message: string) => {
-    setError(message);
+    preprocessStore.setPollingError(message);
   }, []);
 
-  const handlePollingComplete = useCallback(() => {
-    setIsPolling(false);
-    setPollingDocId(null);
-    if (document && document.status === "completed" && onPreprocessComplete) {
-      onPreprocessComplete(document.id);
-    }
-  }, [document, onPreprocessComplete]);
+  const handlePollingComplete = useCallback(
+    (completedDocument: PreprocessDocument | null) => {
+      preprocessStore.stopPolling();
+      if (completedDocument?.status === "completed" && onPreprocessComplete) {
+        onPreprocessComplete(completedDocument.id);
+      }
+    },
+    [onPreprocessComplete],
+  );
 
   usePreprocessPolling({
     docId: pollingDocId,
@@ -120,19 +114,19 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
             type="button"
             className="btn btn-primary"
             onClick={() => void handleStart()}
-            disabled={isStarting || isPolling}
+            disabled={isStarting || isPolling || document !== null}
           >
             {isStarting ? "Iniciando..." : "Iniciar preprocessamento"}
           </button>
 
-          {document && (
+          {document?.status === "completed" && (
             <button
               type="button"
               className="btn btn-secondary"
               onClick={handleReset}
               disabled={isStarting}
             >
-              Limpar
+              Iniciar Novo Processamento
             </button>
           )}
         </div>
