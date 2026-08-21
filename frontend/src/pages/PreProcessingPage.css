@@ -112,6 +112,31 @@
   font-size: 1rem;
 }
 
+.copy-id-button {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #3730a3;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.copy-id-button:hover {
+  color: #4f46e5;
+  text-decoration: underline;
+}
+
+.copy-id-button:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
+
 .status-badge {
   display: inline-block;
   padding: 0.2rem 0.55rem;
@@ -345,11 +370,17 @@
 }
 
 .result-item span {
+  min-width: 0;
   font-size: 0.85rem;
   color: #64748b;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .result-item strong {
+  min-width: 0;
   font-size: 0.95rem;
   color: #334155;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
