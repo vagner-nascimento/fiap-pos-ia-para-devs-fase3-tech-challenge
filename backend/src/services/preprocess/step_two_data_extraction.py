@@ -304,14 +304,149 @@ def _extract_clinical_protocols_data(
     return rag_path, len(clinical_entries)
 
 
+def _extract_pcdt_data(
+    doc_id: str,
+    pcdt_paths: Tuple[Path, Path],
+    clinical_protocols_rag_path: str,
+    starting_count: int,
+) -> int:
+    """
+    Extract text from PCDT PDFs and APPEND the resulting records to the
+    existing ``clinical_protocols_rag.json`` file. Returns the total number of
+    clinical protocol records after the append (FHEMIG + PCDT).
+    """
+    json_path = Path(pcdt_paths[0])
+    pdfs_dir = Path(pcdt_paths[1])
+
+    if not json_path.exists():
+        print(f"Aviso: Catálogo PCDT não encontrado em {json_path}")
+        return starting_count
+
+    try:
+        with json_path.open("r", encoding="utf-8") as handle:
+            protocols_data = json.load(handle)
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            f"Erro ao ler catálogo PCDT: formato JSON inválido - {exc}"
+        ) from exc
+
+    if not isinstance(protocols_data, list):
+        raise ValueError("Catálogo PCDT deve conter uma lista de registros")
+
+    print(f"Processando {len(protocols_data)} PDFs do PCDT...")
+    pcdt_entries: List[Dict[str, Any]] = []
+
+    for protocol in protocols_data:
+        pdf_name = (protocol.get("name") or "").strip()
+        if not pdf_name:
+            continue
+
+        pdf_path = pdfs_dir / pdf_name
+        if not pdf_path.exists():
+            # Fallback: try sanitized name
+            safe_name = re.sub(r"[^\w.-]+", "_", pdf_name, flags=re.UNICODE).strip("._-") or pdf_name
+            pdf_path = pdfs_dir / safe_name
+            if not pdf_path.exists():
+                print(f"Aviso: PDF PCDT não encontrado ({pdf_name}), pulando...")
+                continue
+
+        print(f"Extraindo texto de {pdf_path.name}...")
+        content_text = _extract_text_from_pdf(pdf_path)
+        if not content_text:
+            print(f"Aviso: Não foi possível extrair texto de {pdf_path.name}, pulando...")
+            continue
+
+        pcdt_entries.append(
+            {
+                "name": protocol.get("name", ""),
+                "url": protocol.get("url", ""),
+                "source": protocol.get("source", ""),
+                "content_text": content_text,
+            }
+        )
+
+    # Append to the existing clinical_protocols_rag.json produced for FHEMIG.
+    existing_entries: List[Dict[str, Any]] = []
+    rag_path = Path(clinical_protocols_rag_path)
+    if rag_path.exists():
+        try:
+            with rag_path.open("r", encoding="utf-8") as handle:
+                existing_entries = json.load(handle)
+            if not isinstance(existing_entries, list):
+                existing_entries = []
+        except Exception:
+            existing_entries = []
+
+    combined = existing_entries + pcdt_entries
+    print(f"Salvando {len(combined)} protocolos clínicos (FHEMIG + PCDT) em {rag_path}...")
+    with rag_path.open("w", encoding="utf-8") as handle:
+        json.dump(combined, handle, ensure_ascii=False, indent=4)
+
+    return len(combined)
+
+
+def _extract_laudos_medicos_data(
+    doc_id: str,
+    laudos_path: Path,
+) -> Tuple[str, int]:
+    """
+    Process the synthetic medical reports dataset (pt-BR). The dataset is
+    already in Portuguese and structured; here we normalize it into a stable
+    schema and copy it into ``preprocessed/laudos_medicos/laudos_medicos.json``
+    so downstream consumers can use it without touching source files.
+    """
+    output_dir = os.path.join(_datasets_dir, "preprocessed", "laudos_medicos")
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, "laudos_medicos.json")
+
+    print(f"Processando laudos médicos de {laudos_path}...")
+    try:
+        with Path(laudos_path).open("r", encoding="utf-8") as handle:
+            raw = json.load(handle)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Erro ao ler dataset de laudos: JSON inválido - {exc}") from exc
+
+    if not isinstance(raw, list):
+        raise ValueError("Dataset de laudos médicos deve conter uma lista de registros")
+
+    normalized: List[Dict[str, Any]] = []
+    for entry in raw:
+        if not isinstance(entry, dict):
+            continue
+        normalized.append(
+            {
+                "id_laudo": entry.get("id_laudo", ""),
+                "cabecalho_identificador": entry.get("cabecalho_identificador", {}),
+                "corpo_tecnico": entry.get("corpo_tecnico", {}),
+                "conclusao": entry.get("conclusao", {}),
+                "metadata": {
+                    "source": "laudos_medicos_sinteticos",
+                    "language": "pt-BR",
+                },
+            }
+        )
+
+    with open(output_path, "w", encoding="utf-8") as handle:
+        json.dump(normalized, handle, ensure_ascii=False, indent=4)
+
+    print(f"Laudos médicos processados: {len(normalized)} registros salvos em {output_path}")
+    return output_path, len(normalized)
+
+
 def extract_data(
     doc_id: str,
     qas_paths: Dict[str, str],
     clinical_protocols_paths: Tuple[Path, Path],
-) -> Tuple[str, int, str, int]:
+    pcdt_paths: Optional[Tuple[Path, Path]] = None,
+    laudos_path: Optional[Path] = None,
+) -> Dict[str, Any]:
     """
-    Process all datasets and generate single files for QA and clinical protocols.
-    Returns (qas_train_path, qas_count, clinical_protocols_rag_path, clinical_protocols_count).
+    Process all datasets and generate JSON files.
+
+    Returns a dict with keys:
+        - qas_train_path, qas_count
+        - clinical_protocols_rag_path, clinical_protocols_count
+        - laudos_medicos_path, laudos_medicos_count
     """
     qas_train_path, qas_count = _extract_qas_data(
         doc_id,
@@ -321,4 +456,29 @@ def extract_data(
         doc_id,
         clinical_protocols_paths,
     )
-    return qas_train_path, qas_count, clinical_protocols_rag_path, clinical_protocols_count
+
+    # Append PCDT PDFs into the same clinical_protocols_rag.json when available.
+    if pcdt_paths is not None:
+        clinical_protocols_count = _extract_pcdt_data(
+            doc_id,
+            pcdt_paths,
+            clinical_protocols_rag_path,
+            clinical_protocols_count,
+        )
+
+    laudos_medicos_path: str = ""
+    laudos_medicos_count: int = 0
+    if laudos_path is not None:
+        laudos_medicos_path, laudos_medicos_count = _extract_laudos_medicos_data(
+            doc_id,
+            laudos_path,
+        )
+
+    return {
+        "qas_train_path": qas_train_path,
+        "qas_count": qas_count,
+        "clinical_protocols_rag_path": clinical_protocols_rag_path,
+        "clinical_protocols_count": clinical_protocols_count,
+        "laudos_medicos_path": laudos_medicos_path,
+        "laudos_medicos_count": laudos_medicos_count,
+    }

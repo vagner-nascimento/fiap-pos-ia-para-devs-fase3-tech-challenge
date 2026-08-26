@@ -63,8 +63,10 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
             "qas_train_path": None,
             "qas_train_pt_br_path": None,
             "clinical_protocols_rag_path": None,
+            "laudos_medicos_path": None,
             "qas_count": 0,
-            "clinical_protocols_count": 0
+            "clinical_protocols_count": 0,
+            "laudos_medicos_count": 0
         }
 
         # Marcar início do processamento
@@ -85,6 +87,8 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
 
         qas_paths: Dict[str, str] = datasets["qas"]
         clinical_protocols_paths: Tuple[Path, Path] = datasets["clinical_protocols"]
+        pcdt_paths: Tuple[Path, Path] = datasets.get("pcdt")
+        laudos_path: Path = datasets.get("laudos_medicos")
 
         # ------------------------------------------------------------------
         # Step 2 — Extração e geração dos arquivos JSON
@@ -93,18 +97,30 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
         update_step_status(doc_id, "two_data_extraction", "in_progress", completion_percentage=0)
         
         try:
-            qas_train_path, qas_count, clinical_protocols_rag_path, clinical_protocols_count = step_two.extract_data(
+            extraction = step_two.extract_data(
                 doc_id,
                 qas_paths=qas_paths,
                 clinical_protocols_paths=clinical_protocols_paths,
+                pcdt_paths=pcdt_paths,
+                laudos_path=laudos_path,
             )
+
+            qas_train_path = extraction["qas_train_path"]
+            qas_count = extraction["qas_count"]
+            clinical_protocols_rag_path = extraction["clinical_protocols_rag_path"]
+            clinical_protocols_count = extraction["clinical_protocols_count"]
+            laudos_medicos_path = extraction["laudos_medicos_path"]
+            laudos_medicos_count = extraction["laudos_medicos_count"]
 
             # Atualizar resultados com paths e counts
             results["qas_train_path"] = _get_relative_path(qas_train_path)
             results["clinical_protocols_rag_path"] = _get_relative_path(clinical_protocols_rag_path)
             results["qas_count"] = qas_count
             results["clinical_protocols_count"] = clinical_protocols_count
-            
+            if laudos_medicos_path:
+                results["laudos_medicos_path"] = _get_relative_path(laudos_medicos_path)
+            results["laudos_medicos_count"] = laudos_medicos_count
+
             update_step_status(
                 doc_id,
                 "two_data_extraction",
@@ -155,7 +171,8 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
         print(
             f"Pipeline concluída com sucesso! "
             f"QAs: count={results['qas_count']} | "
-            f"Clinical Protocols: count={results['clinical_protocols_count']}"
+            f"Clinical Protocols: count={results['clinical_protocols_count']} | "
+            f"Laudos Médicos: count={results['laudos_medicos_count']}"
         )
 
     except Exception as e:

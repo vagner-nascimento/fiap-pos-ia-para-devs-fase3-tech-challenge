@@ -1,0 +1,1052 @@
+[
+  {
+    "id_laudo": "8c67207c-db14-4bd9-9ded-1b42e5513e0a",
+    "cabecalho_identificador": {
+      "nome_paciente": "Pedro Oliveira Pereira",
+      "data_exame": "2026-01-20",
+      "local_exame": "Clínica Mais Saúde",
+      "medico_solicitante": "Dr(a). Bruno Carvalho",
+      "crm_solicitante": "16511-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletroencefalograma (EEG)",
+      "descricao_tecnica": "Descargas epileptiformes generalizadas, do tipo ponta-onda a 3Hz, desencadeadas durante a hiperpneia.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Epilepsia generalizada idiopática",
+      "cid_10": "G40.3",
+      "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+      "tempo_repouso_estimado_dias": 5
+    }
+  },
+  {
+    "id_laudo": "40081c26-0e7d-4cbd-bffd-b242da4023d3",
+    "cabecalho_identificador": {
+      "nome_paciente": "Bruno Pereira Souza",
+      "data_exame": "2026-02-05",
+      "local_exame": "Centro Médico Avançado",
+      "medico_solicitante": "Dr(a). Fernanda Santos",
+      "crm_solicitante": "48369-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Raio-X de Tórax",
+      "descricao_tecnica": "Aumento global da área cardíaca. Congestão hilar bilateral. Linhas B de Kerley presentes.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Insuficiência cardíaca",
+      "cid_10": "I50.9",
+      "conduta_terapeutica": "Nenhuma conduta terapêutica específica necessária no momento.",
+      "tempo_repouso_estimado_dias": 5
+    }
+  },
+  {
+    "id_laudo": "0d025f32-1f72-4b12-8f86-bb96ecdee5ff",
+    "cabecalho_identificador": {
+      "nome_paciente": "Bruno Costa Alves",
+      "data_exame": "2025-12-10",
+      "local_exame": "Polo de Telemedicina",
+      "medico_solicitante": "Dr(a). Mariana Souza",
+      "crm_solicitante": "66936-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletroencefalograma (EEG)",
+      "descricao_tecnica": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+      "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+      "tempo_repouso_estimado_dias": 15
+    }
+  },
+  {
+    "id_laudo": "bf92fac6-621d-4543-a795-3f160b8cb373",
+    "cabecalho_identificador": {
+      "nome_paciente": "Patricia Silva Gomes",
+      "data_exame": "2026-06-16",
+      "local_exame": "Instituto de Diagnóstico",
+      "medico_solicitante": "Dr(a). Pedro Alves",
+      "crm_solicitante": "85331-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Espirometria",
+      "descricao_tecnica": "VEF1 reduzido, Relação VEF1/CVF < 0.70. Curva fluxo-volume com concavidade superior. Ausência de resposta significativa ao broncodilatador.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Doença pulmonar obstrutiva crônica",
+      "cid_10": "J44.9",
+      "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+      "tempo_repouso_estimado_dias": 5
+    }
+  },
+  {
+    "id_laudo": "291d2e12-dfbc-46fd-bce3-688fc3639178",
+    "cabecalho_identificador": {
+      "nome_paciente": "Bruno Costa Almeida",
+      "data_exame": "2026-08-11",
+      "local_exame": "Polo de Telemedicina",
+      "medico_solicitante": "Dr(a). Fernanda Carvalho",
+      "crm_solicitante": "43925-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletroencefalograma (EEG)",
+      "descricao_tecnica": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Transtorno não especificado do encéfalo",
+      "cid_10": "G93.9",
+      "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+      "tempo_repouso_estimado_dias": 2
+    }
+  },
+  {
+    "id_laudo": "77312c4e-012c-4a25-bcb3-a721443547a4",
+    "cabecalho_identificador": {
+      "nome_paciente": "Lucas Almeida Oliveira",
+      "data_exame": "2026-06-14",
+      "local_exame": "Clínica Mais Saúde",
+      "medico_solicitante": "Dr(a). Aline Almeida",
+      "crm_solicitante": "31952-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletroencefalograma (EEG)",
+      "descricao_tecnica": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Transtorno não especificado do encéfalo",
+      "cid_10": "G93.9",
+      "conduta_terapeutica": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+      "tempo_repouso_estimado_dias": 7
+    }
+  },
+  {
+    "id_laudo": "6bb7f22c-6d69-4793-a88a-69dc82423fe0",
+    "cabecalho_identificador": {
+      "nome_paciente": "Marcos Martins Oliveira",
+      "data_exame": "2026-05-22",
+      "local_exame": "Polo de Telemedicina",
+      "medico_solicitante": "Dr(a). Juliana Carvalho",
+      "crm_solicitante": "14467-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletrocardiograma (ECG)",
+      "descricao_tecnica": "Ritmo sinusal com extrassístoles ventriculares isoladas e frequentes.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Arritmia não especificada",
+      "cid_10": "I49.9",
+      "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "8629a6da-2a98-47f8-8a47-c7f9a5661e58",
+    "cabecalho_identificador": {
+      "nome_paciente": "Juliana Pereira Almeida",
+      "data_exame": "2025-10-26",
+      "local_exame": "Instituto de Diagnóstico",
+      "medico_solicitante": "Dr(a). Aline Ribeiro",
+      "crm_solicitante": "13307-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Ressonância Magnética do Crânio",
+      "descricao_tecnica": "Focos de hipersinal em T2/FLAIR na substância branca periventricular e subcortical, de aspecto microangiopático/desmielinizante.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Outras afecções desmielinizantes do sistema nervoso central",
+      "cid_10": "G37.9",
+      "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+      "tempo_repouso_estimado_dias": 5
+    }
+  },
+  {
+    "id_laudo": "953714a9-a9a9-40c6-ad12-c65e185aacad",
+    "cabecalho_identificador": {
+      "nome_paciente": "Carlos Almeida Gomes",
+      "data_exame": "2026-01-30",
+      "local_exame": "Clínica Mais Saúde",
+      "medico_solicitante": "Dr(a). Aline Martins",
+      "crm_solicitante": "63326-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Raio-X de Tórax",
+      "descricao_tecnica": "Aumento global da área cardíaca. Congestão hilar bilateral. Linhas B de Kerley presentes.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Insuficiência cardíaca",
+      "cid_10": "I50.9",
+      "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+      "tempo_repouso_estimado_dias": 7
+    }
+  },
+  {
+    "id_laudo": "80bd8722-a04f-40be-b4d2-5dde2ad4cb72",
+    "cabecalho_identificador": {
+      "nome_paciente": "Aline Almeida Souza",
+      "data_exame": "2026-03-27",
+      "local_exame": "Instituto de Diagnóstico",
+      "medico_solicitante": "Dr(a). Rafael Costa",
+      "crm_solicitante": "82083-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Espirometria",
+      "descricao_tecnica": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Doença pulmonar intersticial não especificada",
+      "cid_10": "J84.9",
+      "conduta_terapeutica": "Nenhuma conduta terapêutica específica necessária no momento.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "2faf842b-8436-4968-a747-9712f58f72f1",
+    "cabecalho_identificador": {
+      "nome_paciente": "Mariana Pereira Rodrigues",
+      "data_exame": "2025-10-16",
+      "local_exame": "Hospital Central",
+      "medico_solicitante": "Dr(a). Ana Santos",
+      "crm_solicitante": "30609-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletrocardiograma (ECG)",
+      "descricao_tecnica": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "bd54758a-5c49-4333-af0f-821900506c48",
+    "cabecalho_identificador": {
+      "nome_paciente": "Camila Ribeiro Carvalho",
+      "data_exame": "2026-01-26",
+      "local_exame": "Instituto de Diagnóstico",
+      "medico_solicitante": "Dr(a). Lucas Gomes",
+      "crm_solicitante": "22152-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Espirometria",
+      "descricao_tecnica": "Capacidade Vital Forçada (CVF) e Volume Expiratório Forçado no 1º segundo (VEF1) dentro dos limites previstos. Relação VEF1/CVF normal.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+      "tempo_repouso_estimado_dias": 5
+    }
+  },
+  {
+    "id_laudo": "62f85434-ec34-4930-83b3-26108eb7547c",
+    "cabecalho_identificador": {
+      "nome_paciente": "Camila Carvalho Carvalho",
+      "data_exame": "2025-12-20",
+      "local_exame": "Hospital da Cidade",
+      "medico_solicitante": "Dr(a). Carlos Souza",
+      "crm_solicitante": "84193-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletroencefalograma (EEG)",
+      "descricao_tecnica": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "4569b913-f8f1-4892-a2e9-44b2840c1bc1",
+    "cabecalho_identificador": {
+      "nome_paciente": "Lucas Lima Carvalho",
+      "data_exame": "2025-09-29",
+      "local_exame": "Centro Médico Avançado",
+      "medico_solicitante": "Dr(a). Aline Silva",
+      "crm_solicitante": "32784-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletroencefalograma (EEG)",
+      "descricao_tecnica": "Descargas epileptiformes generalizadas, do tipo ponta-onda a 3Hz, desencadeadas durante a hiperpneia.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Epilepsia generalizada idiopática",
+      "cid_10": "G40.3",
+      "conduta_terapeutica": "Acompanhamento ambulatorial de rotina.",
+      "tempo_repouso_estimado_dias": 5
+    }
+  },
+  {
+    "id_laudo": "17d78ed8-c596-42dd-90ff-1962b76561bd",
+    "cabecalho_identificador": {
+      "nome_paciente": "Juliana Ribeiro Gomes",
+      "data_exame": "2026-06-30",
+      "local_exame": "Centro Médico Avançado",
+      "medico_solicitante": "Dr(a). Felipe Souza",
+      "crm_solicitante": "34806-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Espirometria",
+      "descricao_tecnica": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Doença pulmonar intersticial não especificada",
+      "cid_10": "J84.9",
+      "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+      "tempo_repouso_estimado_dias": 5
+    }
+  },
+  {
+    "id_laudo": "b17a7388-2681-483f-afba-47b348cbba9a",
+    "cabecalho_identificador": {
+      "nome_paciente": "Camila Almeida Costa",
+      "data_exame": "2026-07-12",
+      "local_exame": "Instituto de Diagnóstico",
+      "medico_solicitante": "Dr(a). Bruno Gomes",
+      "crm_solicitante": "36880-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletrocardiograma (ECG)",
+      "descricao_tecnica": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "d52479b9-2ce1-48fe-8b6c-5de3292de85d",
+    "cabecalho_identificador": {
+      "nome_paciente": "Carlos Costa Pereira",
+      "data_exame": "2026-07-15",
+      "local_exame": "Clínica Mais Saúde",
+      "medico_solicitante": "Dr(a). Lucas Pereira",
+      "crm_solicitante": "31953-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Ressonância Magnética do Crânio",
+      "descricao_tecnica": "Focos de hipersinal em T2/FLAIR na substância branca periventricular e subcortical, de aspecto microangiopático/desmielinizante.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Outras afecções desmielinizantes do sistema nervoso central",
+      "cid_10": "G37.9",
+      "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+      "tempo_repouso_estimado_dias": 7
+    }
+  },
+  {
+    "id_laudo": "93f38a3d-ebed-477f-97d8-582cca44ef2d",
+    "cabecalho_identificador": {
+      "nome_paciente": "Pedro Costa Gomes",
+      "data_exame": "2026-06-01",
+      "local_exame": "Clínica Mais Saúde",
+      "medico_solicitante": "Dr(a). Marcos Oliveira",
+      "crm_solicitante": "43666-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Espirometria",
+      "descricao_tecnica": "VEF1 reduzido, Relação VEF1/CVF < 0.70. Curva fluxo-volume com concavidade superior. Ausência de resposta significativa ao broncodilatador.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Doença pulmonar obstrutiva crônica",
+      "cid_10": "J44.9",
+      "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "bfe8a565-7770-4fec-ae6b-20c883ab03f3",
+    "cabecalho_identificador": {
+      "nome_paciente": "Mariana Santos Alves",
+      "data_exame": "2025-10-03",
+      "local_exame": "Clínica Mais Saúde",
+      "medico_solicitante": "Dr(a). Marcos Silva",
+      "crm_solicitante": "53526-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Espirometria",
+      "descricao_tecnica": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Doença pulmonar intersticial não especificada",
+      "cid_10": "J84.9",
+      "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+      "tempo_repouso_estimado_dias": 7
+    }
+  },
+  {
+    "id_laudo": "6f3c7fd8-e4c1-4d7c-b70d-277e09df6629",
+    "cabecalho_identificador": {
+      "nome_paciente": "Fernanda Costa Ribeiro",
+      "data_exame": "2025-12-30",
+      "local_exame": "Clínica Mais Saúde",
+      "medico_solicitante": "Dr(a). Lucas Santos",
+      "crm_solicitante": "35597-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletrocardiograma (ECG)",
+      "descricao_tecnica": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+      "tempo_repouso_estimado_dias": 2
+    }
+  },
+  {
+    "id_laudo": "3d95171c-fdd1-478d-8263-4adbacda07c9",
+    "cabecalho_identificador": {
+      "nome_paciente": "Aline Martins Santos",
+      "data_exame": "2026-08-13",
+      "local_exame": "Centro Médico Avançado",
+      "medico_solicitante": "Dr(a). Felipe Pereira",
+      "crm_solicitante": "76711-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletrocardiograma (ECG)",
+      "descricao_tecnica": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+      "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+      "tempo_repouso_estimado_dias": 7
+    }
+  },
+  {
+    "id_laudo": "ba694375-118d-46a2-ac41-be9e804c7a23",
+    "cabecalho_identificador": {
+      "nome_paciente": "Patricia Pereira Silva",
+      "data_exame": "2026-03-16",
+      "local_exame": "Hospital da Cidade",
+      "medico_solicitante": "Dr(a). Pedro Pereira",
+      "crm_solicitante": "12579-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Ressonância Magnética do Crânio",
+      "descricao_tecnica": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+      "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+      "tempo_repouso_estimado_dias": 2
+    }
+  },
+  {
+    "id_laudo": "e4ba7de9-18b9-4ac9-8afa-2fea03c4da5f",
+    "cabecalho_identificador": {
+      "nome_paciente": "Maria Santos Almeida",
+      "data_exame": "2026-04-26",
+      "local_exame": "Instituto de Diagnóstico",
+      "medico_solicitante": "Dr(a). João Almeida",
+      "crm_solicitante": "23222-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Espirometria",
+      "descricao_tecnica": "VEF1 reduzido, Relação VEF1/CVF < 0.70. Curva fluxo-volume com concavidade superior. Ausência de resposta significativa ao broncodilatador.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Doença pulmonar obstrutiva crônica",
+      "cid_10": "J44.9",
+      "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "1d88207c-5468-49c7-9e5e-aeaf7f8c1ece",
+    "cabecalho_identificador": {
+      "nome_paciente": "Ana Souza Ferreira",
+      "data_exame": "2025-10-18",
+      "local_exame": "Centro Médico Avançado",
+      "medico_solicitante": "Dr(a). Juliana Gomes",
+      "crm_solicitante": "69745-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletrocardiograma (ECG)",
+      "descricao_tecnica": "Ritmo sinusal. Bloqueio de ramo direito incompleto. Alterações difusas da repolarização ventricular.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Bloqueio de ramo direito",
+      "cid_10": "I45.1",
+      "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+      "tempo_repouso_estimado_dias": 5
+    }
+  },
+  {
+    "id_laudo": "375b9c33-6932-47b6-b79f-05cddc0cb26a",
+    "cabecalho_identificador": {
+      "nome_paciente": "Juliana Lima Silva",
+      "data_exame": "2025-10-15",
+      "local_exame": "Instituto de Diagnóstico",
+      "medico_solicitante": "Dr(a). Carlos Martins",
+      "crm_solicitante": "11829-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Ressonância Magnética do Crânio",
+      "descricao_tecnica": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Nenhuma conduta terapêutica específica necessária no momento.",
+      "tempo_repouso_estimado_dias": 15
+    }
+  },
+  {
+    "id_laudo": "2cc8de62-6b5d-4b21-88e0-9414a60d6b87",
+    "cabecalho_identificador": {
+      "nome_paciente": "João Costa Gomes",
+      "data_exame": "2026-03-20",
+      "local_exame": "Hospital Central",
+      "medico_solicitante": "Dr(a). Juliana Lima",
+      "crm_solicitante": "89580-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletroencefalograma (EEG)",
+      "descricao_tecnica": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+      "tempo_repouso_estimado_dias": 5
+    }
+  },
+  {
+    "id_laudo": "69da841c-41ca-41ef-b30a-952baf5bcd74",
+    "cabecalho_identificador": {
+      "nome_paciente": "Ana Costa Ferreira",
+      "data_exame": "2026-04-10",
+      "local_exame": "Polo de Telemedicina",
+      "medico_solicitante": "Dr(a). Rafael Lima",
+      "crm_solicitante": "76285-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Espirometria",
+      "descricao_tecnica": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Doença pulmonar intersticial não especificada",
+      "cid_10": "J84.9",
+      "conduta_terapeutica": "Nenhuma conduta terapêutica específica necessária no momento.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "25743114-b95a-4562-bf3d-eae5bc540dd2",
+    "cabecalho_identificador": {
+      "nome_paciente": "Maria Silva Martins",
+      "data_exame": "2025-11-16",
+      "local_exame": "Clínica Mais Saúde",
+      "medico_solicitante": "Dr(a). Juliana Ribeiro",
+      "crm_solicitante": "55341-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Espirometria",
+      "descricao_tecnica": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Doença pulmonar intersticial não especificada",
+      "cid_10": "J84.9",
+      "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+      "tempo_repouso_estimado_dias": 7
+    }
+  },
+  {
+    "id_laudo": "bd721f2b-7ecf-4ad0-b58d-f03a2e475ae1",
+    "cabecalho_identificador": {
+      "nome_paciente": "Lucas Oliveira Souza",
+      "data_exame": "2026-06-19",
+      "local_exame": "Hospital Central",
+      "medico_solicitante": "Dr(a). Rafael Martins",
+      "crm_solicitante": "35736-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Ressonância Magnética do Crânio",
+      "descricao_tecnica": "Focos de hipersinal em T2/FLAIR na substância branca periventricular e subcortical, de aspecto microangiopático/desmielinizante.",
+      "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Outras afecções desmielinizantes do sistema nervoso central",
+      "cid_10": "G37.9",
+      "conduta_terapeutica": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "fcd71e16-3892-47b8-8639-53ad1cd78afd",
+    "cabecalho_identificador": {
+      "nome_paciente": "Mariana Almeida Costa",
+      "data_exame": "2025-12-14",
+      "local_exame": "Clínica Mais Saúde",
+      "medico_solicitante": "Dr(a). Marcos Ribeiro",
+      "crm_solicitante": "41691-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Raio-X de Tórax",
+      "descricao_tecnica": "Aumento global da área cardíaca. Congestão hilar bilateral. Linhas B de Kerley presentes.",
+      "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Insuficiência cardíaca",
+      "cid_10": "I50.9",
+      "conduta_terapeutica": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+      "tempo_repouso_estimado_dias": 7
+    }
+  },
+  {
+    "id_laudo": "54600471-5fcf-4a1a-94b0-0ce4c0e3a651",
+    "cabecalho_identificador": {
+      "nome_paciente": "Pedro Rodrigues Carvalho",
+      "data_exame": "2026-01-29",
+      "local_exame": "Centro Médico Avançado",
+      "medico_solicitante": "Dr(a). Felipe Souza",
+      "crm_solicitante": "86800-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Raio-X de Tórax",
+      "descricao_tecnica": "Hiperinsuflação pulmonar bilateral, retificação das cúpulas diafragmáticas e aumento do espaço retroesternal.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Doença pulmonar obstrutiva crônica",
+      "cid_10": "J44.9",
+      "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "b776defb-8620-4bd1-a674-9497e7757590",
+    "cabecalho_identificador": {
+      "nome_paciente": "Aline Silva Gomes",
+      "data_exame": "2025-12-29",
+      "local_exame": "Centro Médico Avançado",
+      "medico_solicitante": "Dr(a). Felipe Costa",
+      "crm_solicitante": "44296-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletroencefalograma (EEG)",
+      "descricao_tecnica": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+      "tempo_repouso_estimado_dias": 2
+    }
+  },
+  {
+    "id_laudo": "df24cc66-27c5-433a-a480-057b297976bf",
+    "cabecalho_identificador": {
+      "nome_paciente": "Lucas Pereira Pereira",
+      "data_exame": "2026-07-17",
+      "local_exame": "Instituto de Diagnóstico",
+      "medico_solicitante": "Dr(a). Fernanda Alves",
+      "crm_solicitante": "64659-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletrocardiograma (ECG)",
+      "descricao_tecnica": "Ritmo sinusal com extrassístoles ventriculares isoladas e frequentes.",
+      "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Arritmia não especificada",
+      "cid_10": "I49.9",
+      "conduta_terapeutica": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "f680d12e-0c4c-4de3-b1d3-33d29aa94033",
+    "cabecalho_identificador": {
+      "nome_paciente": "Mariana Lima Oliveira",
+      "data_exame": "2025-10-21",
+      "local_exame": "Hospital da Cidade",
+      "medico_solicitante": "Dr(a). Marcos Souza",
+      "crm_solicitante": "11809-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletrocardiograma (ECG)",
+      "descricao_tecnica": "Ritmo irregular. Fibrilação atrial com resposta ventricular controlada. Sobrecarga de átrio esquerdo.",
+      "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Fibrilação e *flutter* atriais",
+      "cid_10": "I48",
+      "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "59af8572-87db-47d8-8159-295e298c3e01",
+    "cabecalho_identificador": {
+      "nome_paciente": "Marcos Carvalho Pereira",
+      "data_exame": "2026-02-26",
+      "local_exame": "Hospital da Cidade",
+      "medico_solicitante": "Dr(a). Pedro Gomes",
+      "crm_solicitante": "23341-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletrocardiograma (ECG)",
+      "descricao_tecnica": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+      "tempo_repouso_estimado_dias": 2
+    }
+  },
+  {
+    "id_laudo": "17ed4955-2270-48be-bb4d-fa89be8551e2",
+    "cabecalho_identificador": {
+      "nome_paciente": "Bruno Carvalho Almeida",
+      "data_exame": "2026-05-27",
+      "local_exame": "Clínica Mais Saúde",
+      "medico_solicitante": "Dr(a). Rafael Martins",
+      "crm_solicitante": "93948-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Espirometria",
+      "descricao_tecnica": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Doença pulmonar intersticial não especificada",
+      "cid_10": "J84.9",
+      "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "f8295d6c-d7f1-4691-8412-cb0a71d673fc",
+    "cabecalho_identificador": {
+      "nome_paciente": "Fernanda Almeida Carvalho",
+      "data_exame": "2026-02-07",
+      "local_exame": "Hospital da Cidade",
+      "medico_solicitante": "Dr(a). Fernanda Almeida",
+      "crm_solicitante": "34422-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletroencefalograma (EEG)",
+      "descricao_tecnica": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Transtorno não especificado do encéfalo",
+      "cid_10": "G93.9",
+      "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+      "tempo_repouso_estimado_dias": 2
+    }
+  },
+  {
+    "id_laudo": "0e1a4356-e0e6-435d-81cf-ef252decd0c1",
+    "cabecalho_identificador": {
+      "nome_paciente": "Lucas Lima Santos",
+      "data_exame": "2026-07-01",
+      "local_exame": "Hospital Central",
+      "medico_solicitante": "Dr(a). Mariana Carvalho",
+      "crm_solicitante": "15137-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Raio-X de Tórax",
+      "descricao_tecnica": "Campos pulmonares com transparência normal. Seios costofrênicos livres. Área cardíaca dentro dos limites da normalidade.",
+      "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Acompanhamento ambulatorial de rotina.",
+      "tempo_repouso_estimado_dias": 2
+    }
+  },
+  {
+    "id_laudo": "61d5d785-e6a4-448a-a7f0-a12bd1f2579e",
+    "cabecalho_identificador": {
+      "nome_paciente": "João Silva Almeida",
+      "data_exame": "2025-12-23",
+      "local_exame": "Centro Médico Avançado",
+      "medico_solicitante": "Dr(a). Fernanda Silva",
+      "crm_solicitante": "93589-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Ressonância Magnética do Crânio",
+      "descricao_tecnica": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "9bd3f1b0-4343-44fe-bf38-281591fc107b",
+    "cabecalho_identificador": {
+      "nome_paciente": "Carlos Rodrigues Costa",
+      "data_exame": "2026-01-03",
+      "local_exame": "Clínica Mais Saúde",
+      "medico_solicitante": "Dr(a). Carlos Carvalho",
+      "crm_solicitante": "27276-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Ressonância Magnética do Crânio",
+      "descricao_tecnica": "Lesão expansiva frontoparietal direita, com captação anelar de contraste e edema vasogênico perilesional, exercendo efeito de massa.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Neoplasia de comportamento incerto ou desconhecido do encéfalo",
+      "cid_10": "D43.2",
+      "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "cf2982de-f537-45e9-9fad-aa29b2549ab3",
+    "cabecalho_identificador": {
+      "nome_paciente": "Mariana Silva Souza",
+      "data_exame": "2025-10-13",
+      "local_exame": "Instituto de Diagnóstico",
+      "medico_solicitante": "Dr(a). Maria Costa",
+      "crm_solicitante": "18516-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletroencefalograma (EEG)",
+      "descricao_tecnica": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+      "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "6a4c8bb5-8974-47e7-8ed4-6257db7863e0",
+    "cabecalho_identificador": {
+      "nome_paciente": "Fernanda Silva Oliveira",
+      "data_exame": "2026-06-11",
+      "local_exame": "Clínica Mais Saúde",
+      "medico_solicitante": "Dr(a). Mariana Ferreira",
+      "crm_solicitante": "96516-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Raio-X de Tórax",
+      "descricao_tecnica": "Hiperinsuflação pulmonar bilateral, retificação das cúpulas diafragmáticas e aumento do espaço retroesternal.",
+      "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Doença pulmonar obstrutiva crônica",
+      "cid_10": "J44.9",
+      "conduta_terapeutica": "Acompanhamento ambulatorial de rotina.",
+      "tempo_repouso_estimado_dias": 5
+    }
+  },
+  {
+    "id_laudo": "d60687ac-20a6-4b3f-ad7f-b40e8b77ec83",
+    "cabecalho_identificador": {
+      "nome_paciente": "Ana Souza Carvalho",
+      "data_exame": "2025-11-01",
+      "local_exame": "Instituto de Diagnóstico",
+      "medico_solicitante": "Dr(a). João Silva",
+      "crm_solicitante": "91229-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Raio-X de Tórax",
+      "descricao_tecnica": "Hiperinsuflação pulmonar bilateral, retificação das cúpulas diafragmáticas e aumento do espaço retroesternal.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Doença pulmonar obstrutiva crônica",
+      "cid_10": "J44.9",
+      "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "d845b388-57f4-4a6f-8a7c-8eb2e7419497",
+    "cabecalho_identificador": {
+      "nome_paciente": "Carlos Martins Pereira",
+      "data_exame": "2025-10-04",
+      "local_exame": "Hospital Central",
+      "medico_solicitante": "Dr(a). Patricia Silva",
+      "crm_solicitante": "92192-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Ressonância Magnética do Crânio",
+      "descricao_tecnica": "Focos de hipersinal em T2/FLAIR na substância branca periventricular e subcortical, de aspecto microangiopático/desmielinizante.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Outras afecções desmielinizantes do sistema nervoso central",
+      "cid_10": "G37.9",
+      "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+      "tempo_repouso_estimado_dias": 15
+    }
+  },
+  {
+    "id_laudo": "45e22e18-8845-4ad2-b5c1-56fbffb6934c",
+    "cabecalho_identificador": {
+      "nome_paciente": "Mariana Ferreira Ribeiro",
+      "data_exame": "2026-07-28",
+      "local_exame": "Instituto de Diagnóstico",
+      "medico_solicitante": "Dr(a). João Pereira",
+      "crm_solicitante": "28200-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Ressonância Magnética do Crânio",
+      "descricao_tecnica": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Nenhuma conduta terapêutica específica necessária no momento.",
+      "tempo_repouso_estimado_dias": 7
+    }
+  },
+  {
+    "id_laudo": "6aa03e90-7ff0-4681-83f8-0658a882697b",
+    "cabecalho_identificador": {
+      "nome_paciente": "Pedro Rodrigues Rodrigues",
+      "data_exame": "2026-06-07",
+      "local_exame": "Instituto de Diagnóstico",
+      "medico_solicitante": "Dr(a). Rafael Gomes",
+      "crm_solicitante": "31304-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Raio-X de Tórax",
+      "descricao_tecnica": "Campos pulmonares com transparência normal. Seios costofrênicos livres. Área cardíaca dentro dos limites da normalidade.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+      "tempo_repouso_estimado_dias": 15
+    }
+  },
+  {
+    "id_laudo": "ade88e99-1ca9-4959-b6ed-eb5c4f224e3c",
+    "cabecalho_identificador": {
+      "nome_paciente": "Fernanda Pereira Souza",
+      "data_exame": "2026-06-22",
+      "local_exame": "Hospital da Cidade",
+      "medico_solicitante": "Dr(a). Maria Alves",
+      "crm_solicitante": "30400-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Ressonância Magnética do Crânio",
+      "descricao_tecnica": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Exame normal",
+      "cid_10": "Z00.0",
+      "conduta_terapeutica": "Nenhuma conduta terapêutica específica necessária no momento.",
+      "tempo_repouso_estimado_dias": 7
+    }
+  },
+  {
+    "id_laudo": "c45253bb-421e-4917-8f88-8ff443bf061e",
+    "cabecalho_identificador": {
+      "nome_paciente": "Lucas Pereira Souza",
+      "data_exame": "2026-04-18",
+      "local_exame": "Centro Médico Avançado",
+      "medico_solicitante": "Dr(a). Pedro Alves",
+      "crm_solicitante": "21112-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletroencefalograma (EEG)",
+      "descricao_tecnica": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Transtorno não especificado do encéfalo",
+      "cid_10": "G93.9",
+      "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
+    "id_laudo": "fe57ce74-c7cc-4a07-9443-fb57463d742c",
+    "cabecalho_identificador": {
+      "nome_paciente": "Ana Ferreira Ferreira",
+      "data_exame": "2026-08-24",
+      "local_exame": "Centro Médico Avançado",
+      "medico_solicitante": "Dr(a). Bruno Rodrigues",
+      "crm_solicitante": "65520-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletrocardiograma (ECG)",
+      "descricao_tecnica": "Ritmo irregular. Fibrilação atrial com resposta ventricular controlada. Sobrecarga de átrio esquerdo.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Fibrilação e *flutter* atriais",
+      "cid_10": "I48",
+      "conduta_terapeutica": "Nenhuma conduta terapêutica específica necessária no momento.",
+      "tempo_repouso_estimado_dias": 2
+    }
+  },
+  {
+    "id_laudo": "fb8eb091-d873-4530-8ccb-d0b4cb63a94c",
+    "cabecalho_identificador": {
+      "nome_paciente": "Bruno Rodrigues Oliveira",
+      "data_exame": "2026-05-19",
+      "local_exame": "Hospital da Cidade",
+      "medico_solicitante": "Dr(a). Carlos Ferreira",
+      "crm_solicitante": "88458-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Eletroencefalograma (EEG)",
+      "descricao_tecnica": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+      "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Transtorno não especificado do encéfalo",
+      "cid_10": "G93.9",
+      "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+      "tempo_repouso_estimado_dias": 15
+    }
+  }
+]

@@ -12,6 +12,9 @@ from bs4 import BeautifulSoup
 SOURCE_NAME = "Fundação Hospitalar do Estado de Minas Gerais"
 FHEMIG_PROTOCOLS_URL = "https://www.fhemig.mg.gov.br/index.php/acesso-rapido/protocolos-clinicos"
 
+PCDT_SOURCE_NAME = "Ministério da Saúde - Protocolos Clínicos e Diretrizes Terapêuticas (PCDT)"
+LAUDOS_SOURCE_NAME = "Dataset sintético de laudos médicos (pt-BR)"
+
 
 def clone_qa_repositories() -> Dict[str, str]:
     # Caminho base para salvar os repositórios (backend/datasets/files/qas)
@@ -183,6 +186,105 @@ def download_fhemig_clinical_protocols(
     return output_file, download_dir
 
 
+def prepare_pcdt_protocols() -> Tuple[Path, Path]:
+    """
+    Prepare the local PCDT (Protocolos Clínicos e Diretrizes Terapêuticas) dataset.
+
+    The source PDFs are shipped **as a single ZIP** (`pcdt.zip`, tracked via
+    Git LFS) at ``backend/datasets/files/pcdt/``. On the first run this
+    function extracts the ZIP into ``backend/datasets/files/pcdt/data/`` and
+    then builds a catalog JSON describing each PDF (mirroring the FHEMIG
+    structure).
+
+    Returns ``(catalog_json_path, pdfs_dir)``.
+    """
+    script_dir = Path(__file__).resolve().parent
+    base_dir = script_dir / "files" / "pcdt"
+    pdfs_dir = base_dir / "data"
+    zip_path = base_dir / "pcdt.zip"
+    catalog_path = base_dir / "pcdt_protocols.json"
+
+    pdfs_dir.mkdir(parents=True, exist_ok=True)
+
+    # Extract the shipped ZIP on first run (or whenever data/ has no PDFs).
+    # Path traversal (CWE-22) is mitigated by rejecting any absolute member
+    # name or ".." segment before extraction.
+    existing_pdfs = list(pdfs_dir.glob("*.pdf"))
+    if not existing_pdfs and zip_path.exists():
+        import zipfile
+
+        print(f"Extraindo PCDTs a partir de {zip_path}...")
+        with zipfile.ZipFile(zip_path, "r") as archive:
+            for member in archive.infolist():
+                member_name = member.filename
+                if not member_name.lower().endswith(".pdf"):
+                    continue
+                # Skip macOS metadata artifacts and dotfiles.
+                base_name = Path(member_name).name
+                if base_name.startswith("._") or "__MACOSX" in member_name:
+                    continue
+                # Reject any path traversal attempts.
+                if member_name.startswith("/") or ".." in Path(member_name).parts:
+                    print(f"Aviso: entrada de ZIP ignorada por seguranca: {member_name}")
+                    continue
+
+                target_path = pdfs_dir / base_name
+                if target_path.exists():
+                    continue
+                with archive.open(member) as source, target_path.open("wb") as sink:
+                    sink.write(source.read())
+
+        existing_pdfs = list(pdfs_dir.glob("*.pdf"))
+        print(f"{len(existing_pdfs)} PDFs extraidos em {pdfs_dir}")
+
+    if not pdfs_dir.exists() or not existing_pdfs:
+        raise FileNotFoundError(
+            f"Nenhum PDF do PCDT encontrado em {pdfs_dir} e nenhum ZIP disponivel em {zip_path}. "
+            "Faca git-lfs pull ou baixe o ZIP manualmente."
+        )
+
+    protocols: List[Dict[str, str]] = []
+    for pdf_path in sorted(pdfs_dir.glob("*.pdf")):
+        protocols.append(
+            {
+                "name": pdf_path.name,
+                # Local file — no remote URL. Keep field for schema compatibility.
+                "url": "",
+                "source": PCDT_SOURCE_NAME,
+            }
+        )
+
+    if not protocols:
+        raise ValueError(f"Nenhum PDF encontrado em {pdfs_dir}")
+
+    with catalog_path.open("w", encoding="utf-8") as handle:
+        json.dump(protocols, handle, indent=2, ensure_ascii=False)
+
+    print(f"{len(protocols)} PCDTs catalogados em {catalog_path}")
+    return catalog_path, pdfs_dir
+
+
+def prepare_laudos_medicos_dataset() -> Path:
+    """
+    Return the path to the local synthetic medical reports dataset (pt-BR).
+
+    The JSON file is shipped with the repository under
+    ``backend/datasets/files/laudos_medicos/dataset_laudos_medicos.json``.
+    """
+    script_dir = Path(__file__).resolve().parent
+    dataset_path = script_dir / "files" / "laudos_medicos" / "dataset_laudos_medicos.json"
+
+    if not dataset_path.exists():
+        raise FileNotFoundError(
+            f"Dataset de laudos médicos não encontrado em {dataset_path}."
+        )
+
+    print(f"Dataset de laudos médicos disponível em {dataset_path}")
+    return dataset_path
+
+
 if __name__ == "__main__":
     print(clone_qa_repositories())
     print(download_fhemig_clinical_protocols())
+    print(prepare_pcdt_protocols())
+    print(prepare_laudos_medicos_dataset())
