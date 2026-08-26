@@ -15,7 +15,7 @@ from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Frame, Paragraph
 
-OUTPUT_DIR = Path(__file__).resolve().parent / "medical_report"
+OUTPUT_DIR = Path(__file__).resolve().parent / "medical_reports"
 COUNT = 500
 SEED = 20260826
 
