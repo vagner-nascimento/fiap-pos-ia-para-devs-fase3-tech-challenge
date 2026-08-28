@@ -2,7 +2,8 @@ export type PreprocessStatus =
   | "created"
   | "in_progress"
   | "completed"
-  | "error";
+  | "error"
+  | "failed";
 
 export type StepStatus = "pending" | "in_progress" | "completed" | "error";
 
@@ -34,7 +35,7 @@ export interface PreprocessRequest {
   skip_translation?: boolean;
 }
 
-export const TERMINAL_STATUSES: PreprocessStatus[] = ["completed", "error"];
+export const TERMINAL_STATUSES: PreprocessStatus[] = ["completed", "error", "failed"];
 
 export function isTerminalStatus(status: string): boolean {
   return TERMINAL_STATUSES.includes(status as PreprocessStatus);
