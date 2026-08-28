@@ -12,9 +12,11 @@ from infra.database.collections.preprocess import update_step_status
 
 _TRANSLATION_BATCH_SIZE = 16
 _STATUS_UPDATE_INTERVAL_SECONDS = 10.0
-_MAX_NEW_TOKENS = 512
+# Reduzido para evitar inferência excessivamente lenta no CPU,
+# que era a causa principal do "pendurado" na etapa de tradução.
+_MAX_NEW_TOKENS = 256
 # Limite de caracteres por chunk para segmentação de textos longos.
-# Valor conservador para não exceder os 512 tokens do modelo Marian.
+# Valor conservador para não exceder os 256 tokens de geração do modelo Marian.
 _CHUNK_CHAR_LIMIT = 400
 
 
@@ -61,7 +63,7 @@ def _get_translator() -> Any:
                 generated_tokens = model.generate(
                     **inputs,
                     max_new_tokens=_MAX_NEW_TOKENS,
-                    num_beams=4,
+                    num_beams=1,
                     do_sample=False,
                     no_repeat_ngram_size=4,
                 )
@@ -231,6 +233,10 @@ def _maybe_update_progress(
             100.0,
             round(processed_items / total_items * 100.0, 2),
         )
+        print(
+            f"Tradução em progresso: {processed_items}/{total_items} "
+            f"itens processados ({completion_percentage:.2f}%)"
+        )
         update_step_status(
             doc_id,
             "three_translating",
@@ -258,6 +264,7 @@ def translate(
         raise ValueError(f"Formato inválido para {input_path}: esperado uma lista de objetos JSON.")
 
     total_items = len(data)
+    print(f"Iniciando tradução de {total_items} itens QA...")
     update_step_status(doc_id, "three_translating", "in_progress", completion_percentage=0)
 
     processed_items = 0
@@ -266,6 +273,10 @@ def translate(
 
     for batch_start in range(0, len(data), _TRANSLATION_BATCH_SIZE):
         batch = data[batch_start:batch_start + _TRANSLATION_BATCH_SIZE]
+        print(
+            f"Traduzindo lote {batch_start // _TRANSLATION_BATCH_SIZE + 1} "
+            f"({len(batch)} itens)"
+        )
         translated_batch = _translate_items_batch(batch)
         translated_data.extend(translated_batch)
 

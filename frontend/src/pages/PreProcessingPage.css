@@ -100,6 +100,12 @@
   gap: 1rem;
 }
 
+.status-section > * {
+  max-width: 100%;
+  overflow: hidden;       /* corta o excesso */
+  text-overflow: ellipsis; /* adiciona "..." se for texto */
+}
+
 .status-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));

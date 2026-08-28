@@ -1,3 +1,4 @@
+from __future__ import annotations
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Dict, Any, Optional
@@ -44,7 +45,7 @@ class PreprocessResponse(BaseModel):
 
 
 @router.post("/", response_model=PreprocessResponse)
-async def preprocess_endpoint(request: PreprocessRequest, background_tasks: BackgroundTasks) -> Dict[str, Any]:
+async def preprocess_endpoint(background_tasks: BackgroundTasks) -> Dict[str, Any]:
     """
     Processa os dados de PubMedQA e MedQuAD.
     
