@@ -1,9 +1,10 @@
 # FIAP POS IA - Backend
 
-API REST em FastAPI responsavel pelo pre-processamento dos datasets medicos e fine tuning de modelos de linguagem. Hoje o fluxo trata duas familias de dados e uma etapa adicional de traducao local:
+API REST em FastAPI responsavel pelo pre-processamento dos datasets medicos, geracao da base RAG e fine tuning de modelos de linguagem. Hoje o fluxo trata varias fontes de dados e uma etapa adicional de traducao local:
 
 - QAs, a partir de PubMedQA e MedQuAD;
-- protocolos clinicos FHEMIG, com extracao de texto dos PDFs;
+- protocolos clinicos FHEMIG e PCDT, com extracao de texto dos PDFs;
+- laudos medicos estruturados e sintaticos, usados como base de conhecimento ou fine-tuning;
 - traducao dos QAs para pt-BR com um modelo local de machine translation;
 - fine tuning do modelo hospital helper com os dados processados.
 
