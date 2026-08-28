@@ -47,6 +47,13 @@ O arquivo [app-docker-compose.yaml](app-docker-compose.yaml) sobe a aplicação 
 docker compose -f app-docker-compose.yaml up --build -d
 ```
 
+Para atualizar somente o backend ou frontend pós correção, use:
+
+```bash
+docker compose -f app-docker-compose.yaml up --build -d backend
+docker compose -f app-docker-compose.yaml up --build -d frontend
+```
+
 Observação: o primeiro build pode demorar bastante, principalmente por causa do backend, que baixa dependências grandes de IA e pacotes de suporte à execução em GPU Nvidia.
 
 Depois de subir a aplicação, acompanhe os logs em tempo real com `docker compose logs -f` ou, usando o arquivo deste projeto, `docker compose -f app-docker-compose.yaml logs -f`:

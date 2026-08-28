@@ -3,7 +3,7 @@ import os
 import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Optional
 
 import pdfplumber
 
@@ -212,10 +212,10 @@ def _extract_clinical_protocols_data(
         protocol_progress = 0
         per_protocol_progress = 50.0 / total_protocols if total_protocols > 0 else 0.0
 
-        for protocol in protocols_data:
+        for idx, protocol in enumerate(protocols_data, start=1):
             pdf_name = (protocol.get("name") or "").strip()
             if not pdf_name:
-                print("Aviso: Protocolo sem nome, pulando...")
+                print(f"Aviso: Protocolo sem nome, pulando... ({idx}/{total_protocols})")
                 protocol_progress += 1
                 update_step_status(
                     doc_id,
@@ -233,7 +233,7 @@ def _extract_clinical_protocols_data(
             pdf_path = pdfs_dir / safe_name
 
             if not pdf_path.exists():
-                print(f"Aviso: PDF não encontrado em {pdf_path}, pulando protocolo...")
+                print(f"Aviso: PDF não encontrado em {pdf_path}, pulando protocolo... ({idx}/{total_protocols})")
                 protocol_progress += 1
                 update_step_status(
                     doc_id,
@@ -243,11 +243,11 @@ def _extract_clinical_protocols_data(
                 )
                 continue
 
-            print(f"Extraindo texto de {pdf_path.name}...")
+            print(f"Extraindo texto de {pdf_path.name}... ({idx}/{total_protocols})")
             content_text = _extract_text_from_pdf(pdf_path)
 
             if not content_text:
-                print(f"Aviso: Não foi possível extrair texto de {pdf_path.name}, pulando...")
+                print(f"Aviso: Não foi possível extrair texto de {pdf_path.name}, pulando... ({idx}/{total_protocols})")
                 protocol_progress += 1
                 update_step_status(
                     doc_id,
@@ -265,7 +265,8 @@ def _extract_clinical_protocols_data(
                     "content_text": content_text,
                 }
             )
-            print(f"Texto extraído com sucesso: {len(content_text)} caracteres")
+            percent = (idx / total_protocols) * 100 if total_protocols > 0 else 0.0
+            print(f"Texto extraído com sucesso: {len(content_text)} caracteres ({idx}/{total_protocols} — {percent:.2f}%)")
             protocol_progress += 1
             update_step_status(
                 doc_id,
@@ -333,12 +334,14 @@ def _extract_pcdt_data(
     if not isinstance(protocols_data, list):
         raise ValueError("Catálogo PCDT deve conter uma lista de registros")
 
-    print(f"Processando {len(protocols_data)} PDFs do PCDT...")
+    total_pcdt = len(protocols_data)
+    print(f"Processando {total_pcdt} PDFs do PCDT...")
     pcdt_entries: List[Dict[str, Any]] = []
 
-    for protocol in protocols_data:
+    for idx, protocol in enumerate(protocols_data, start=1):
         pdf_name = (protocol.get("name") or "").strip()
         if not pdf_name:
+            print(f"Aviso: Entrada PCDT sem nome, pulando... ({idx}/{total_pcdt})")
             continue
 
         pdf_path = pdfs_dir / pdf_name
@@ -347,13 +350,13 @@ def _extract_pcdt_data(
             safe_name = re.sub(r"[^\w.-]+", "_", pdf_name, flags=re.UNICODE).strip("._-") or pdf_name
             pdf_path = pdfs_dir / safe_name
             if not pdf_path.exists():
-                print(f"Aviso: PDF PCDT não encontrado ({pdf_name}), pulando...")
+                print(f"Aviso: PDF PCDT não encontrado ({pdf_name}), pulando... ({idx}/{total_pcdt})")
                 continue
 
-        print(f"Extraindo texto de {pdf_path.name}...")
+        print(f"Extraindo texto de {pdf_path.name}... ({idx}/{total_pcdt})")
         content_text = _extract_text_from_pdf(pdf_path)
         if not content_text:
-            print(f"Aviso: Não foi possível extrair texto de {pdf_path.name}, pulando...")
+            print(f"Aviso: Não foi possível extrair texto de {pdf_path.name}, pulando... ({idx}/{total_pcdt})")
             continue
 
         pcdt_entries.append(
