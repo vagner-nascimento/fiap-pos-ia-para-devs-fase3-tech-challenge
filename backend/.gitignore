@@ -220,7 +220,8 @@ __marimo__/
 
 # Dataset files
 datasets/files
-datasets/preprocessed
+datasets/preprocessed/clinical_protocols
+datasets/preprocessed/qas
 
 # Codex tests
 .tmp-tests
