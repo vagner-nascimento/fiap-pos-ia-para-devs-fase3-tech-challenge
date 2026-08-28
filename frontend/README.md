@@ -141,10 +141,13 @@ flowchart TD
 |----------|-----------|
 | Botao Iniciar | Dispara o preprocessamento |
 | Botao Limpar | Reseta o estado da tela |
+| Checkbox Pular Tradução | Envia `skip_translation: true` para a API, pulando a etapa demorada de tradução |
 | Status badge | Mostra o status atual da execucao |
 | Contadores | Exibe `qas_count` e `clinical_protocols_count` em pt-BR |
 | Barra de progresso | Mostra `completion_percentage` |
 | Resposta da API | JSON bruto retornado pelo backend |
+
+**Aviso sobre a Tradução de QAs**: A tradução dos dados de QAs é extremamente demorada e não roda em todos os hardwares que temos. Por isso, foi implementada a opção de pular essa etapa na interface, utilizando o dataset já traduzido que está fixado na pasta `backend/datasets/preprocessed/fixed/qas`.
 
 ## Integracao com a API
 

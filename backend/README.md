@@ -201,14 +201,18 @@ Health check da aplicacao.
 
 Inicia o pre-processamento dos datasets. O processamento roda em background; a resposta traz o documento criado no MongoDB.
 
-**Body:** objeto vazio. O endpoint não recebe `rag_percent` nem outro parâmetro.
+**Body:**
+
+| Campo | Tipo | Obrigatorio | Descricao |
+|-------|------|-------------|-----------|
+| `skip_translation` | `bool` | Nao | Pula a etapa de tradução usando dataset já traduzido e fixado (padrao: false) |
 
 **Exemplo:**
 
 ```bash
 curl -X POST http://localhost:3000/preprocess/ \
   -H "Content-Type: application/json" \
-  -d '{}'
+  -d '{"skip_translation": true}'
 ```
 
 **Resposta:**
@@ -637,6 +641,7 @@ A etapa de traducao usa localmente o modelo `Helsinki-NLP/opus-mt-tc-big-en-pt`,
 - Se o backend encontrar uma GPU Nvidia disponivel, a inferencia roda em CUDA.
 - Se nao encontrar GPU, o modelo roda em CPU, o que aumenta bastante o tempo de execucao.
 - A tradução cobre `question`, todos os `contexts` textuais e `answer`; campos não textuais e `metadata` são preservados.
+- **Aviso sobre a Tradução de QAs**: A tradução dos dados de QAs é extremamente demorada e não roda em todos os hardwares. Por isso, foi implementada a opção (`skip_translation`) de pular essa etapa e utilizar o dataset já traduzido que está fixado na pasta `backend/datasets/preprocessed/fixed/qas`.
 
 ## Estrutura do projeto
 
