@@ -23,19 +23,19 @@ Este documento descreve a arquitetura do sistema desenvolvido para o Tech Challe
 
 A solução é uma aplicação **full-stack** composta por quatro camadas principais:
 
-| Camada | Tecnologia | Responsabilidade |
-|---|---|---|
-| **Frontend** | React + TypeScript + Vite | Interface web para iniciar e monitorar o processamento |
-| **Backend** | Python + FastAPI | API REST, orquestração das pipelines de dados e fine-tuning |
-| **Agente Médico** | Python + FastAPI + LangGraph | Assistente médico com RAG, guardrails de segurança e auditoria |
-| **Banco de dados** | MongoDB | Persistência do estado das execuções e logs de auditoria |
+| Camada             | Tecnologia                   | Responsabilidade                                                                   |
+|--------------------|------------------------------|------------------------------------------------------------------------------------|
+| **Frontend**       | React + TypeScript + Vite    | Interface web para iniciar, monitorar e consultar o pipeline de dados e a base RAG |
+| **Backend**        | Python + FastAPI             | API REST, orquestração das pipelines de dados, RAG e fine-tuning                   |
+| **Agente Médico**  | Python + FastAPI + LangGraph | Assistente médico com RAG, guardrails de segurança e auditoria                     |
+| **Banco de dados** | MongoDB                      | Persistência do estado das execuções e logs de auditoria                           |
 
 O fluxo central da aplicação é:
 
 1. O usuário acessa o frontend e inicia o pré-processamento sem parâmetros.
 2. O backend recebe a requisição, cria um documento de rastreamento no MongoDB e dispara a pipeline em background.
-3. A pipeline baixa os datasets (PubMedQA, MedQuAD, protocolos FHEMIG), extrai cada família em um arquivo JSON e traduz os QAs para português.
-4. O usuário pode acompanhar o progresso em tempo real via polling do frontend.
+3. A pipeline baixa ou reutiliza os datasets (PubMedQA, MedQuAD, protocolos FHEMIG, PCDT e laudos médicos), extrai cada família em artefatos JSON/PDF e traduz os QAs para português quando necessário.
+4. O usuário pode acompanhar o progresso em tempo real via polling do frontend e, em seguida, gerar e consultar a base RAG.
 5. Com os dados pré-processados, é possível iniciar o fine-tuning do modelo Qwen2.5-1.5B-Instruct diretamente pela aplicação (com GPU) ou via Jupyter Notebooks no Google Colab.
 
 > **Nota sobre fine-tuning:** Devido a restrições de hardware local, o fine-tuning do modelo foi executado no Google Colab. O modelo treinado está disponível como repositório privado no HuggingFace. Para servir o modelo em produção, utiliza-se HuggingFace Spaces com ZeroGPU.
@@ -366,19 +366,19 @@ sequenceDiagram
 
 As decisões técnicas que moldaram esta arquitetura estão documentadas como **ADRs (Architecture Decision Records)** no formato MADR:
 
-| # | Título | Status |
-|---|---|---|
-| [ADR-001](adr/ADR-001-modelo-base-qwen.md) | Escolha do modelo base Qwen2.5-1.5B-Instruct | ✅ Aceito |
-| [ADR-002](adr/ADR-002-lora-peft-finetuning.md) | Uso de LoRA/PEFT para fine-tuning eficiente | ✅ Aceito |
-| [ADR-003](adr/ADR-003-qlora-4bit-fallback-cpu.md) | QLoRA (quantização 4-bit) com fallback para CPU | ✅ Aceito |
-| [ADR-004](adr/ADR-004-mongodb-estado.md) | MongoDB como banco de estado do processamento | ✅ Aceito |
-| [ADR-005](adr/ADR-005-background-tasks-fastapi.md) | Processamento assíncrono via FastAPI BackgroundTasks | ✅ Aceito |
-| [ADR-006](adr/ADR-006-finetuning-google-colab.md) | Fine-tuning executado no Google Colab | ✅ Aceito |
-| [ADR-007](adr/ADR-007-split-train-rag.md) | Split train/RAG configurável via rag_percent | ⚠️ Substituído |
-| [ADR-008](adr/ADR-008-docker-compose.md) | Orquestração local via Docker Compose | ✅ Aceito |
-| [ADR-009](adr/ADR-009-deteccao-gpu-cpu.md) | Detecção automática GPU/CPU no backend | ✅ Aceito |
-| [ADR-010](adr/ADR-010-colab-ngrok-zerogpu.md) | Colab + ngrok e HuggingFace ZeroGPU para servir o modelo | ✅ Aceito |
-| [ADR-011](adr/ADR-011-langgraph-medical-agent.md) | LangGraph como orquestrador do agente médico | ✅ Aceito |
-| [ADR-012](adr/ADR-012-arquitetura-hibrida-inferencia-llm.md) | Arquitetura híbrida de inferência LLM (HF Spaces / ngrok) | ✅ Aceito |
-| [ADR-013](adr/ADR-013-desacoplamento-guardrails-template-sft.md) | Desacoplamento de guardrails e preservação do template SFT | ✅ Aceito |
-| [ADR-014](adr/ADR-011-skip-preprocess-translation.md) | Opção de pular a tradução no pré-processamento | ✅ Aceito |
+| #                                                                | Título                                                     | Status        |
+|------------------------------------------------------------------|------------------------------------------------------------|---------------|
+| [ADR-001](adr/ADR-001-modelo-base-qwen.md)                       | Escolha do modelo base Qwen2.5-1.5B-Instruct               | ✅ Aceito     |
+| [ADR-002](adr/ADR-002-lora-peft-finetuning.md)                   | Uso de LoRA/PEFT para fine-tuning eficiente                | ✅ Aceito     |
+| [ADR-003](adr/ADR-003-qlora-4bit-fallback-cpu.md)                | QLoRA (quantização 4-bit) com fallback para CPU            | ✅ Aceito     |
+| [ADR-004](adr/ADR-004-mongodb-estado.md)                         | MongoDB como banco de estado do processamento              | ✅ Aceito     |
+| [ADR-005](adr/ADR-005-background-tasks-fastapi.md)               | Processamento assíncrono via FastAPI BackgroundTasks       | ✅ Aceito     |
+| [ADR-006](adr/ADR-006-finetuning-google-colab.md)                | Fine-tuning executado no Google Colab                      | ✅ Aceito     |
+| [ADR-007](adr/ADR-007-split-train-rag.md)                        | Split train/RAG configurável via rag_percent               | ⚠️Substituído |
+| [ADR-008](adr/ADR-008-docker-compose.md)                         | Orquestração local via Docker Compose                      | ✅ Aceito     |
+| [ADR-009](adr/ADR-009-deteccao-gpu-cpu.md)                       | Detecção automática GPU/CPU no backend                     | ✅ Aceito     |
+| [ADR-010](adr/ADR-010-colab-ngrok-zerogpu.md)                    | Colab + ngrok e HuggingFace ZeroGPU para servir o modelo   | ✅ Aceito     |
+| [ADR-011](adr/ADR-011-langgraph-medical-agent.md)                | LangGraph como orquestrador do agente médico               | ✅ Aceito     |
+| [ADR-012](adr/ADR-012-arquitetura-hibrida-inferencia-llm.md)     | Arquitetura híbrida de inferência LLM (HF Spaces / ngrok)  | ✅ Aceito     |
+| [ADR-013](adr/ADR-013-desacoplamento-guardrails-template-sft.md) | Desacoplamento de guardrails e preservação do template SFT | ✅ Aceito     |
+| [ADR-014](adr/ADR-011-skip-preprocess-translation.md)            | Opção de pular a tradução no pré-processamento             | ✅ Aceito     |
