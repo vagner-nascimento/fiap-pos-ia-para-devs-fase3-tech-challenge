@@ -45,14 +45,17 @@ class PreprocessResponse(BaseModel):
 
 
 @router.post("/", response_model=PreprocessResponse)
-async def preprocess_endpoint(background_tasks: BackgroundTasks) -> Dict[str, Any]:
+async def preprocess_endpoint(
+    request: PreprocessRequest,
+    background_tasks: BackgroundTasks,
+) -> Dict[str, Any]:
     """
     Processa os dados de PubMedQA e MedQuAD.
     
     O processamento é executado em background e retorna imediatamente o documento criado.
     
     Args:
-        request: Objeto vazio (nenhum parâmetro necessário).
+        request: Payload do preprocessamento, incluindo flag de pular tradução.
         background_tasks: Instância de BackgroundTasks do FastAPI.
         
     Returns:
@@ -65,7 +68,7 @@ async def preprocess_endpoint(background_tasks: BackgroundTasks) -> Dict[str, An
         document = preprocess_data(
             background_tasks=background_tasks,
             skip_translation=request.skip_translation,
-        )        
+        )
         return document
         
     except FileNotFoundError as e:

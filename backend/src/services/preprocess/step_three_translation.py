@@ -286,6 +286,11 @@ def translate(
             processed_items,
             total_items,
             last_update_at,
+            force=True,
+        )
+        print(
+            f"Lote concluído: {processed_items}/{total_items} itens traduzidos "
+            f"({(processed_items / total_items) * 100:.2f}%)"
         )
 
     # Change output filename to qas_train_pt_br.json

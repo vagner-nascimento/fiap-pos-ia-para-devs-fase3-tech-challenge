@@ -184,6 +184,7 @@ def test_translate_updates_status_at_six_second_intervals(tmp_path, monkeypatch)
 
     assert status_calls == [
         ("in_progress", 0),
+        ("in_progress", 94.12),
         ("in_progress", 100.0),
         ("completed", 100),
     ]
