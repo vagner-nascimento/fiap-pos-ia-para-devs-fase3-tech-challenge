@@ -17,9 +17,9 @@ Interface web em React + TypeScript (Vite) para iniciar e acompanhar o pre-proce
 
 O frontend permite:
 
-1. iniciar o pré-processamento;
+1. iniciar o pré-processamento de QAs (PubMedQA, MedQuAD), protocolos clínicos (FHEMIG e PCDT) e dados médicos estruturados;
 2. acompanhar o progresso com polling a cada 5 segundos;
-3. visualizar os resultados separados para `QAs` e `clinical_protocols`;
+3. visualizar os resultados separados para `QAs`, `clinical_protocols` e `laudos_medicos` quando disponíveis;
 4. gerar a base RAG a partir de um pré-processamento concluído;
 5. realizar consultas semânticas por similaridade na base RAG (RAG Query).
 

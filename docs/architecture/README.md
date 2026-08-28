@@ -25,16 +25,16 @@ A solução é uma aplicação **full-stack** composta por três camadas princip
 
 | Camada | Tecnologia | Responsabilidade |
 |---|---|---|
-| **Frontend** | React + TypeScript + Vite | Interface web para iniciar e monitorar o processamento |
-| **Backend** | Python + FastAPI | API REST, orquestração das pipelines de dados e fine-tuning |
+| **Frontend** | React + TypeScript + Vite | Interface web para iniciar, monitorar e consultar o pipeline de dados e a base RAG |
+| **Backend** | Python + FastAPI | API REST, orquestração das pipelines de dados, RAG e fine-tuning |
 | **Banco de dados** | MongoDB | Persistência do estado das execuções |
 
 O fluxo central da aplicação é:
 
 1. O usuário acessa o frontend e inicia o pré-processamento sem parâmetros.
 2. O backend recebe a requisição, cria um documento de rastreamento no MongoDB e dispara a pipeline em background.
-3. A pipeline baixa os datasets (PubMedQA, MedQuAD, protocolos FHEMIG), extrai cada família em um arquivo JSON e traduz os QAs para português.
-4. O usuário pode acompanhar o progresso em tempo real via polling do frontend.
+3. A pipeline baixa ou reutiliza os datasets (PubMedQA, MedQuAD, protocolos FHEMIG, PCDT e laudos médicos), extrai cada família em artefatos JSON/PDF e traduz os QAs para português quando necessário.
+4. O usuário pode acompanhar o progresso em tempo real via polling do frontend e, em seguida, gerar e consultar a base RAG.
 5. Com os dados pré-processados, é possível iniciar o fine-tuning do modelo Qwen2.5-1.5B-Instruct diretamente pela aplicação (com GPU) ou via Jupyter Notebooks no Google Colab.
 
 > **Nota sobre fine-tuning:** Devido a restrições de hardware local, o fine-tuning do modelo foi executado no Google Colab. O modelo treinado está disponível como repositório privado no HuggingFace. Para servir o modelo em produção, utiliza-se HuggingFace Spaces com ZeroGPU.
