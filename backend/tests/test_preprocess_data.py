@@ -1,5 +1,7 @@
+import json
 import os
 import sys
+import uuid
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -253,3 +255,135 @@ def test_preprocess_data_background_runs_translation_for_qa_only(monkeypatch, tm
         and call[1][4] == 100
         for call in calls
     )
+
+
+def test_preprocess_data_background_reuses_valid_preprocessed_cache(monkeypatch, tmp_path) -> None:
+    calls: list[tuple[str, object]] = []
+
+    qas_path = tmp_path / "qas_train.json"
+    clinical_path = tmp_path / "clinical_protocols_rag.json"
+    laudos_path = tmp_path / "laudos_medicos.json"
+    qas_path.write_text(json.dumps([{"question": "Pergunta", "answer": "Resposta"}]), encoding="utf-8")
+    clinical_path.write_text(json.dumps([{"name": "protocolo", "content_text": "conteudo"}]), encoding="utf-8")
+    laudos_path.write_text(json.dumps([{"id_laudo": "123"}]), encoding="utf-8")
+
+    monkeypatch.setattr(
+        preprocess_data,
+        "_get_preprocessed_paths",
+        lambda: {"qas": str(qas_path), "clinical": str(clinical_path), "laudos": str(laudos_path)},
+    )
+
+    def fake_update_preprocess_document(doc_id: str, results: dict, percentage: int) -> None:
+        calls.append(("update_preprocess_document", (doc_id, results, percentage)))
+
+    def fake_update_step_status(
+        doc_id: str,
+        step_name: str,
+        status: str,
+        error_message: str | None = None,
+        completion_percentage: float | None = None,
+    ) -> None:
+        calls.append((
+            "update_step_status",
+            (doc_id, step_name, status, error_message, completion_percentage),
+        ))
+
+    def fake_download_datasets(doc_id: str) -> dict:
+        return {
+            "qas": {"pubmedqa": str(tmp_path / "qa_repo")},
+            "clinical_protocols": (tmp_path / "protocols.json", tmp_path / "pdfs"),
+            "laudos_medicos": laudos_path,
+        }
+
+    def fake_extract_data(*args, **kwargs):
+        raise AssertionError("extract_data should not run when cache is valid")
+
+    def fake_translate(doc_id: str, qa_train_path: str) -> object:
+        calls.append(("translate", doc_id, qa_train_path))
+        return tmp_path / "qas_train_pt_br.json"
+
+    monkeypatch.setattr(preprocess_data, "update_preprocess_document", fake_update_preprocess_document)
+    monkeypatch.setattr(preprocess_data, "update_step_status", fake_update_step_status)
+    monkeypatch.setattr(preprocess_data.step_one, "download_datasets", fake_download_datasets)
+    monkeypatch.setattr(preprocess_data.step_two, "extract_data", fake_extract_data)
+    monkeypatch.setattr(preprocess_data.step_three, "translate", fake_translate)
+
+    preprocess_data.preprocess_data_background("doc-cache")
+
+    assert any(call[0] == "translate" for call in calls)
+    assert any(
+        call[0] == "update_step_status"
+        and call[1][1] == "two_data_extraction"
+        and call[1][2] == "completed"
+        for call in calls
+    )
+
+
+def test_preprocess_data_background_rebuilds_when_cache_is_incomplete(monkeypatch, tmp_path) -> None:
+    qas_path = tmp_path / "qas_train.json"
+    qas_path.write_text(json.dumps([{"question": "Pergunta", "answer": "Resposta"}]), encoding="utf-8")
+    clinical_path = tmp_path / "clinical_protocols_rag.json"
+
+    monkeypatch.setattr(
+        preprocess_data,
+        "_get_preprocessed_paths",
+        lambda: {"qas": str(qas_path), "clinical": str(clinical_path), "laudos": str(tmp_path / "laudos_medicos.json")},
+    )
+
+    def fake_download_datasets(doc_id: str) -> dict:
+        return {
+            "qas": {"pubmedqa": str(tmp_path / "qa_repo")},
+            "clinical_protocols": (tmp_path / "protocols.json", tmp_path / "pdfs"),
+        }
+
+    def fake_extract_data(*args, **kwargs):
+        extracted_qas = tmp_path / "qas_train.json"
+        extracted_clinical = tmp_path / "clinical_protocols_rag.json"
+        extracted_qas.write_text(json.dumps([{"question": "Nova", "answer": "Resposta"}]), encoding="utf-8")
+        extracted_clinical.write_text(json.dumps([{"name": "novo", "content_text": "texto"}]), encoding="utf-8")
+        return {
+            "qas_train_path": str(extracted_qas),
+            "qas_count": 1,
+            "clinical_protocols_rag_path": str(extracted_clinical),
+            "clinical_protocols_count": 1,
+            "laudos_medicos_path": "",
+            "laudos_medicos_count": 0,
+        }
+
+    def fake_translate(doc_id: str, qa_train_path: str):
+        return tmp_path / "qas_train_pt_br.json"
+
+    monkeypatch.setattr(preprocess_data.step_one, "download_datasets", fake_download_datasets)
+    monkeypatch.setattr(preprocess_data.step_two, "extract_data", fake_extract_data)
+    monkeypatch.setattr(preprocess_data.step_three, "translate", fake_translate)
+    monkeypatch.setattr(preprocess_data, "update_preprocess_document", lambda *args, **kwargs: None)
+    monkeypatch.setattr(preprocess_data, "update_step_status", lambda *args, **kwargs: None)
+
+    preprocess_data.preprocess_data_background("doc-rebuild")
+
+    assert (tmp_path / "clinical_protocols_rag.json").exists()
+
+
+def test_create_fine_tunning_document_initializes_pending_status(monkeypatch) -> None:
+    class FakeCollection:
+        def __init__(self) -> None:
+            self.documents = {}
+
+        def insert_one(self, document: dict) -> object:
+            document_id = str(uuid.uuid4())
+            document["_id"] = document_id
+            self.documents[document_id] = document.copy()
+            return type("Result", (), {"inserted_id": document_id})()
+
+        def find_one(self, query: dict) -> dict | None:
+            return self.documents.get(query.get("_id"))
+
+    fake_collection = FakeCollection()
+
+    from src.infra.database.collections import fine_tunning as fine_tunning_collection
+
+    monkeypatch.setattr(fine_tunning_collection, "get_collection", lambda _: fake_collection)
+
+    document = fine_tunning_collection.create_fine_tunning_document({"preprocess_id": "pre-123"})
+
+    assert document["status"] == "pending"
