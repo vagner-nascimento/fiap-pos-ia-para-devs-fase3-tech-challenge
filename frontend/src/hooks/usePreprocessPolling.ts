@@ -58,7 +58,9 @@ export function usePreprocessPolling({
         const message =
           error instanceof Error ? error.message : "Erro ao consultar status";
         callbacksRef.current.onError(message);
-        callbacksRef.current.onComplete(null);
+        // Retry after a delay instead of stopping the polling so transient
+        // network errors don't abort the entire flow.
+        timeoutId = setTimeout(poll, POLL_INTERVAL_MS);
         return;
       }
 

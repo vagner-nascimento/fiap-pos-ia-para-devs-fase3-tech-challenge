@@ -335,13 +335,28 @@ def _extract_pcdt_data(
         raise ValueError("Catálogo PCDT deve conter uma lista de registros")
 
     total_pcdt = len(protocols_data)
-    print(f"Processando {total_pcdt} PDFs do PCDT...")
+    # combined_total is the number of clinical protocol items already processed
+    # (starting_count) plus the PCDT PDFs to process. Use this to produce a
+    # continuous progress bar that spans the clinical protocols phase (which
+    # already covers 50% of the step range) and the PCDT append phase.
+    combined_total = (starting_count or 0) + total_pcdt
+    combined_total = max(1, combined_total)
+
+    print(f"Processando {total_pcdt} PDFs do PCDT (combined total: {combined_total})...")
     pcdt_entries: List[Dict[str, Any]] = []
 
+    processed_pcdt = 0
     for idx, protocol in enumerate(protocols_data, start=1):
         pdf_name = (protocol.get("name") or "").strip()
         if not pdf_name:
             print(f"Aviso: Entrada PCDT sem nome, pulando... ({idx}/{total_pcdt})")
+            processed_pcdt += 1
+            update_step_status(
+                doc_id,
+                "two_data_extraction",
+                "in_progress",
+                completion_percentage=min(100.0, 50.0 + (50.0 / combined_total) * ( (starting_count or 0) + processed_pcdt )),
+            )
             continue
 
         pdf_path = pdfs_dir / pdf_name
@@ -351,12 +366,26 @@ def _extract_pcdt_data(
             pdf_path = pdfs_dir / safe_name
             if not pdf_path.exists():
                 print(f"Aviso: PDF PCDT não encontrado ({pdf_name}), pulando... ({idx}/{total_pcdt})")
+                processed_pcdt += 1
+                update_step_status(
+                    doc_id,
+                    "two_data_extraction",
+                    "in_progress",
+                    completion_percentage=min(100.0, 50.0 + (50.0 / combined_total) * ( (starting_count or 0) + processed_pcdt )),
+                )
                 continue
 
         print(f"Extraindo texto de {pdf_path.name}... ({idx}/{total_pcdt})")
         content_text = _extract_text_from_pdf(pdf_path)
         if not content_text:
             print(f"Aviso: Não foi possível extrair texto de {pdf_path.name}, pulando... ({idx}/{total_pcdt})")
+            processed_pcdt += 1
+            update_step_status(
+                doc_id,
+                "two_data_extraction",
+                "in_progress",
+                completion_percentage=min(100.0, 50.0 + (50.0 / combined_total) * ( (starting_count or 0) + processed_pcdt )),
+            )
             continue
 
         pcdt_entries.append(
@@ -366,6 +395,13 @@ def _extract_pcdt_data(
                 "source": protocol.get("source", ""),
                 "content_text": content_text,
             }
+        )
+        processed_pcdt += 1
+        update_step_status(
+            doc_id,
+            "two_data_extraction",
+            "in_progress",
+            completion_percentage=min(100.0, 50.0 + (50.0 / combined_total) * ( (starting_count or 0) + processed_pcdt )),
         )
 
     # Append to the existing clinical_protocols_rag.json produced for FHEMIG.
