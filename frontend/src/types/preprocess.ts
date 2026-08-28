@@ -31,7 +31,7 @@ export interface PreprocessDocument {
 }
 
 export interface PreprocessRequest {
-  // No parameters needed
+  skip_translation?: boolean;
 }
 
 export const TERMINAL_STATUSES: PreprocessStatus[] = ["completed", "error"];

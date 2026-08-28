@@ -10,7 +10,7 @@ router = APIRouter(prefix="/preprocess", tags=["preprocess"])
 
 class PreprocessRequest(BaseModel):
     """Modelo para o request de preprocessamento."""
-    pass
+    skip_translation: bool = False
 
 
 class StepInfo(BaseModel):
@@ -61,7 +61,10 @@ async def preprocess_endpoint(request: PreprocessRequest, background_tasks: Back
         HTTPException: Em caso de erro no processamento.
     """
     try:
-        document = preprocess_data(background_tasks=background_tasks)        
+        document = preprocess_data(
+            background_tasks=background_tasks,
+            skip_translation=request.skip_translation,
+        )        
         return document
         
     except FileNotFoundError as e:

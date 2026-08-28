@@ -36,7 +36,7 @@ def _get_relative_path(absolute_path: str) -> str:
         return absolute_path
 
 
-def preprocess_data_background(doc_id: str) -> None:
+def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> None:
     """
     Pipeline de pré-processamento executada em background.
 
@@ -125,12 +125,16 @@ def preprocess_data_background(doc_id: str) -> None:
         update_step_status(doc_id, "three_translating", "in_progress", completion_percentage=0)
 
         try:
-            translated_train_path = step_three.translate(
-                doc_id,
-                qas_train_path,
-            )
-
-            results["qas_train_pt_br_path"] = _get_relative_path(str(translated_train_path))
+            if skip_translation:
+                print("Step 3: Pulando tradução (utilizando dados fixos)...")
+                fixed_path = os.path.join("datasets", "preprocessed", "fixed", "qas", "qas_train_pt_br.json")
+                results["qas_train_pt_br_path"] = fixed_path
+            else:
+                translated_train_path = step_three.translate(
+                    doc_id,
+                    qas_train_path,
+                )
+                results["qas_train_pt_br_path"] = _get_relative_path(str(translated_train_path))
 
             update_step_status(
                 doc_id,
@@ -177,6 +181,7 @@ def preprocess_data_background(doc_id: str) -> None:
 
 def preprocess_data(
     background_tasks: BackgroundTasks = None,
+    skip_translation: bool = False,
 ) -> Dict[str, Any]:
     """
     Inicia a pipeline de pré-processamento de dados.
@@ -197,10 +202,10 @@ def preprocess_data(
     doc_id = document["_id"]
 
     if background_tasks:
-        background_tasks.add_task(preprocess_data_background, doc_id)
+        background_tasks.add_task(preprocess_data_background, doc_id, skip_translation)
     else:
         # Execução síncrona (testes / linha de comando)
-        preprocess_data_background(doc_id)
+        preprocess_data_background(doc_id, skip_translation)
 
     return document
 

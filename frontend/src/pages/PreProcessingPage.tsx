@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { startPreprocess } from "../api/preprocess";
 import { ApiResponseBlock } from "../components/preprocessing/ApiResponseBlock";
 import { ProcessResults } from "../components/preprocessing/ProcessResults";
@@ -16,12 +16,13 @@ interface Props {
 export function PreProcessingPage({ onPreprocessComplete }: Props) {
   const { document, pollingDocId, isStarting, isPolling, error } =
     usePreprocessStore();
+  const [skipTranslation, setSkipTranslation] = useState(false);
 
   const handleStart = async () => {
     preprocessStore.setStarting(true);
 
     try {
-      const created = await startPreprocess({});
+      const created = await startPreprocess({ skip_translation: skipTranslation });
       preprocessStore.setStarted(created);
     } catch (err) {
       const message =
@@ -74,14 +75,27 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
 
       <section className="card">
         <div className="actions">
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => void handleStart()}
-            disabled={isStarting || isPolling || document !== null}
-          >
-            {isStarting ? "Iniciando..." : "Iniciar preprocessamento"}
-          </button>
+          <div className="start-actions">
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => void handleStart()}
+              disabled={isStarting || isPolling || document !== null}
+            >
+              {isStarting ? "Iniciando..." : "Iniciar preprocessamento"}
+            </button>
+            {!document && (
+              <label className="skip-translation-label">
+                <input
+                  type="checkbox"
+                  checked={skipTranslation}
+                  onChange={(e) => setSkipTranslation(e.target.checked)}
+                  disabled={isStarting || isPolling}
+                />
+                Pular etapa de tradução (utilizar dados fixos)
+              </label>
+            )}
+          </div>
 
           {document?.status === "completed" && (
             <button
