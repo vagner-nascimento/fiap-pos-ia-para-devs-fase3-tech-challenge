@@ -28,7 +28,7 @@ def create_fine_tunning_document(payload: Dict[str, Any]) -> Dict[str, Any]:
     now = datetime.now(timezone.utc)
 
     document = {
-        "status": "pendding",
+        "status": "pending",
         "completion_percentage": 0,
         "error_message": None,
         "created_date": now,
