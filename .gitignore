@@ -4,3 +4,4 @@ venv
 plans
 analysis
 temp.*
+.idea/
