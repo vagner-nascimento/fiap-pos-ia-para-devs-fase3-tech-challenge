@@ -26,7 +26,7 @@ export interface FineTuningDocument {
   include_clinical_protocols: boolean;
   use_4bit_requested: boolean;
   use_4bit_effective: boolean | null;
-  status: "pendding" | "in_progress" | "completed" | "error";
+  status: "pending" | "in_progress" | "completed" | "error" | "failed";
   completion_percentage: number;
   error_message: string | null;
   created_date: string;

@@ -317,7 +317,7 @@ curl -X POST http://localhost:3000/fine-tunning/ \
     "updated_date": "2026-08-04T10:00:00.000000+00:00"
   },
   "base_model_name": "Qwen/Qwen2.5-1.5B-Instruct",
-  "status": "pendding",
+  "status": "pending",
   "completion_percentage": 0,
   "error_message": null,
   "created_date": "2026-08-04T10:05:00.000000+00:00",
@@ -568,7 +568,7 @@ Para garantir a precisao da busca vetorial e contornar limitacoes de ambiente se
 O fluxo de fine tuning segue estes passos:
 
 1. **Validacao**: Verifica se o `preprocess_id` existe e esta com status `completed`
-2. **Criacao do documento**: Cria um documento na collection `fine_tunning` com status `pendding`
+2. **Criacao do documento**: Cria um documento na collection `fine_tunning` com status `pending`
 3. **Retorno imediato**: Retorna o documento criado com ID para o cliente
 4. **Treinamento em background**: Inicia o treinamento em background task
 5. **Atualizacao de progresso**: Callback do Trainer atualiza status, completion_percentage e loss_history a cada 5 segundos
@@ -598,7 +598,7 @@ flowchart TD
 
 **Campos de progresso monitorados:**
 
-- `status`: `pendding` → `in_progress` → `completed` ou `error`
+- `status`: `pending` → `in_progress` → `completed` ou `error`
 - `completion_percentage`: 0 a 100, calculado baseado em `current_step / estimated_total_steps`
 - `current_loss`: Loss atual do treinamento
 - `loss_history`: Array com historico de loss por step/epoch para acompanhar eficiencia

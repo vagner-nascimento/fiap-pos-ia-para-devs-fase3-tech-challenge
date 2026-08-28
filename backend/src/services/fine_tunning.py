@@ -253,7 +253,7 @@ def _build_training_payload(
         "include_clinical_protocols": include_clinical_protocols,
         "use_4bit_requested": use_4bit,
         "use_4bit_effective": None,
-        "status": "pendding",
+        "status": "pending",
         "completion_percentage": 0,
         "error_message": None,
         "created_date": datetime.now(timezone.utc),
