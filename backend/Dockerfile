@@ -28,8 +28,7 @@ RUN ln -sf /usr/bin/python3.10 /usr/local/bin/python && \
 COPY pyproject.toml uv.lock ./
 
 # Criar ambiente virtual e instalar dependências
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv venv /app/.venv --python /usr/bin/python3.10 && \
+RUN uv venv /app/.venv --python /usr/bin/python3.10 && \
     uv sync --frozen --no-dev
 
 # Copiar código fonte

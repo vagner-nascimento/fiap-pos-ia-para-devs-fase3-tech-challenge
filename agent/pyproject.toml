@@ -1,0 +1,48 @@
+[project]
+name = "fiap-pos-ia-agent"
+version = "0.1.0"
+description = "Agente médico com LangChain/LangGraph para o projeto FIAP POS IA Fase 3"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "pymongo>=4.0.0",
+    "langchain>=0.2.0",
+    "langchain-community>=0.2.0",
+    "langchain-mongodb>=0.1.0",
+    "langchain-text-splitters>=0.2.0",
+    "langgraph>=0.1.0",
+    "sentence-transformers>=3.0.0",
+    "InstructorEmbedding>=1.0.1",
+    "requests>=2.31.0",
+    "huggingface-hub>=0.23.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.23.0",
+    "black>=23.0.0",
+    "mypy>=1.5.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
