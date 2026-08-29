@@ -9,7 +9,7 @@ interface UsePreprocessPollingOptions {
   enabled: boolean;
   onUpdate: (document: PreprocessDocument) => void;
   onError: (message: string) => void;
-  onComplete: () => void;
+  onComplete: (document: PreprocessDocument | null) => void;
 }
 
 export function usePreprocessPolling({
@@ -47,7 +47,7 @@ export function usePreprocessPolling({
         callbacksRef.current.onUpdate(document);
 
         if (isTerminalStatus(document.status)) {
-          callbacksRef.current.onComplete();
+          callbacksRef.current.onComplete(document);
           return;
         }
       } catch (error) {
@@ -58,7 +58,7 @@ export function usePreprocessPolling({
         const message =
           error instanceof Error ? error.message : "Erro ao consultar status";
         callbacksRef.current.onError(message);
-        callbacksRef.current.onComplete();
+        callbacksRef.current.onComplete(null);
         return;
       }
 

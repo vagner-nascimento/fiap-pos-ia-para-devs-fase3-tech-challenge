@@ -12,7 +12,6 @@ export interface RagGenerationDocument {
   batch_id: string;
   preprocess_id: string;
   preprocess_snapshot: RagGenerationPreprocessSnapshot;
-  qas_rag_path: string;
   clinical_protocols_rag_path: string;
   embedding_model: string;
   splitter_name: string;
@@ -22,7 +21,6 @@ export interface RagGenerationDocument {
   error_message: string | null;
   created_date: string;
   updated_date: string;
-  qas_documents: number;
   clinical_protocol_documents: number;
   total_documents: number;
 }

@@ -18,7 +18,6 @@ class RagDatabaseResponse(BaseModel):
     batch_id: str
     preprocess_id: str
     preprocess_snapshot: Dict[str, Any]
-    qas_rag_path: str
     clinical_protocols_rag_path: str
     embedding_model: str
     splitter_name: str
@@ -28,7 +27,6 @@ class RagDatabaseResponse(BaseModel):
     error_message: Optional[str] = None
     created_date: str
     updated_date: str
-    qas_documents: int
     clinical_protocol_documents: int
     total_documents: int
 

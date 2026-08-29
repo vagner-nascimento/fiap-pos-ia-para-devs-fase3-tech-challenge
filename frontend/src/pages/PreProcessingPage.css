@@ -79,6 +79,21 @@
   color: #334155;
 }
 
+.start-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skip-translation-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #475569;
+  cursor: pointer;
+}
+
 .status-section {
   margin-top: 1.5rem;
   display: grid;
@@ -110,6 +125,31 @@
   display: block;
   margin-top: 0.25rem;
   font-size: 1rem;
+}
+
+.copy-id-button {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #3730a3;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.copy-id-button:hover {
+  color: #4f46e5;
+  text-decoration: underline;
+}
+
+.copy-id-button:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
 }
 
 .status-badge {
@@ -345,11 +385,17 @@
 }
 
 .result-item span {
+  min-width: 0;
   font-size: 0.85rem;
   color: #64748b;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .result-item strong {
+  min-width: 0;
   font-size: 0.95rem;
   color: #334155;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }

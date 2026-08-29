@@ -1,101 +1,59 @@
 import { useCallback, useState } from "react";
 import { startPreprocess } from "../api/preprocess";
+import { ApiResponseBlock } from "../components/preprocessing/ApiResponseBlock";
+import { ProcessResults } from "../components/preprocessing/ProcessResults";
+import { ProcessStatus } from "../components/preprocessing/ProcessStatus";
+import { ProcessSteps } from "../components/preprocessing/ProcessSteps";
 import { usePreprocessPolling } from "../hooks/usePreprocessPolling";
-import type { PreprocessDocument, StepStatus } from "../types/preprocess";
+import { preprocessStore, usePreprocessStore } from "../stores/preprocessStore";
+import type { PreprocessDocument } from "../types/preprocess";
 import "./PreProcessingPage.css";
-
-function statusClassName(status: string): string {
-  return `status-badge status-${status}`;
-}
-
-function stepStatusClassName(status: StepStatus): string {
-  return `step-status step-${status}`;
-}
-
-function stepStatusLabel(status: StepStatus): string {
-  const labels: Record<StepStatus, string> = {
-    pending: "Pendente",
-    in_progress: "Em andamento",
-    completed: "ConcluÃ­do",
-    error: "Erro",
-  };
-  return labels[status];
-}
-
-function formatPercentage(value: number): string {
-  if (!Number.isFinite(value)) {
-    return "0%";
-  }
-
-  if (value < 1) {
-    return `${value.toFixed(2)}%`;
-  }
-
-  if (value < 10) {
-    return `${value.toFixed(1)}%`;
-  }
-
-  return `${value.toFixed(0)}%`;
-}
-
-const STEP_NAMES: Record<string, string> = {
-  one_download_datasets: "Download dos Datasets",
-  two_data_extraction: "ExtraÃ§Ã£o de Dados",
-  three_translating: "Curadoria - TraduÃ§Ã£o dos Dados",
-};
 
 interface Props {
   onPreprocessComplete?: (id: string) => void;
 }
 
 export function PreProcessingPage({ onPreprocessComplete }: Props) {
-  const [ragPercent, setRagPercent] = useState(0.5);
-  const [document, setDocument] = useState<PreprocessDocument | null>(null);
-  const [pollingDocId, setPollingDocId] = useState<string | null>(null);
-  const [isStarting, setIsStarting] = useState(false);
-  const [isPolling, setIsPolling] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { document, pollingDocId, isStarting, isPolling, error } =
+    usePreprocessStore();
+  const [skipTranslation, setSkipTranslation] = useState(false);
 
   const handleStart = async () => {
-    setError(null);
-    setIsStarting(true);
+    preprocessStore.setStarting(true);
 
     try {
-      const created = await startPreprocess({ rag_percent: ragPercent });
-      setDocument(created);
-      setPollingDocId(created.id);
-      setIsPolling(true);
+      const created = await startPreprocess({ skip_translation: skipTranslation });
+      preprocessStore.setStarted(created);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Erro ao iniciar preprocessamento";
-      setError(message);
+      preprocessStore.setPollingError(message);
     } finally {
-      setIsStarting(false);
+      preprocessStore.setStarting(false);
     }
   };
 
   const handleReset = () => {
-    setDocument(null);
-    setPollingDocId(null);
-    setIsPolling(false);
-    setError(null);
+    preprocessStore.reset();
   };
 
   const handleUpdate = useCallback((updated: PreprocessDocument) => {
-    setDocument(updated);
+    preprocessStore.updateDocument(updated);
   }, []);
 
   const handlePollingError = useCallback((message: string) => {
-    setError(message);
+    preprocessStore.setPollingError(message);
   }, []);
 
-  const handlePollingComplete = useCallback(() => {
-    setIsPolling(false);
-    setPollingDocId(null);
-    if (document && document.status === "completed" && onPreprocessComplete) {
-      onPreprocessComplete(document.id);
-    }
-  }, [document, onPreprocessComplete]);
+  const handlePollingComplete = useCallback(
+    (completedDocument: PreprocessDocument | null) => {
+      preprocessStore.stopPolling();
+      if (completedDocument?.status === "completed" && onPreprocessComplete) {
+        onPreprocessComplete(completedDocument.id);
+      }
+    },
+    [onPreprocessComplete],
+  );
 
   usePreprocessPolling({
     docId: pollingDocId,
@@ -110,45 +68,43 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
       <header className="page-header">
         <h1>Pre Processing</h1>
         <p>
-          Inicie o preprocessamento dos datasets PubMedQA e MedQuAD e acompanhe
-          o progresso em tempo real.
+          Inicie o preprocessamento dos datasets PubMedQA, MedQuAD e protocolos
+          clínicos da FHEMIG e acompanhe o progresso em tempo real.
         </p>
       </header>
 
       <section className="card">
-        <div className="form-row">
-          <label htmlFor="rag-percent">RAG percent</label>
-          <input
-            id="rag-percent"
-            type="range"
-            min={0}
-            max={1}
-            step={0.05}
-            value={ragPercent}
-            onChange={(event) => setRagPercent(Number(event.target.value))}
-            disabled={isStarting || isPolling}
-          />
-          <span className="rag-value">{ragPercent.toFixed(2)}</span>
-        </div>
-
         <div className="actions">
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => void handleStart()}
-            disabled={isStarting || isPolling}
-          >
-            {isStarting ? "Iniciando..." : "Iniciar preprocessamento"}
-          </button>
+          <div className="start-actions">
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => void handleStart()}
+              disabled={isStarting || isPolling || document !== null}
+            >
+              {isStarting ? "Iniciando..." : "Iniciar preprocessamento"}
+            </button>
+            {!document && (
+              <label className="skip-translation-label">
+                <input
+                  type="checkbox"
+                  checked={skipTranslation}
+                  onChange={(e) => setSkipTranslation(e.target.checked)}
+                  disabled={isStarting || isPolling}
+                />
+                Pular etapa de tradução (utilizar dados fixos)
+              </label>
+            )}
+          </div>
 
-          {document && (
+          {document?.status === "completed" && (
             <button
               type="button"
               className="btn btn-secondary"
               onClick={handleReset}
               disabled={isStarting}
             >
-              Limpar
+              Iniciar Novo Processamento
             </button>
           )}
         </div>
@@ -165,127 +121,15 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
 
           {document ? (
             <>
-              <div className="status-grid">
-                <div className="status-item">
-                  <span>ID</span>
-                  <strong>{document.id}</strong>
-                </div>
-                <div className="status-item">
-                  <span>RAG Percent</span>
-                  <strong>{(document.rag_percent * 100).toFixed(0)}%</strong>
-                </div>
-                <div className="status-item">
-                  <span>Status</span>
-                  <strong>
-                    <span className={statusClassName(document.status)}>
-                      {document.status}
-                    </span>
-                  </strong>
-                </div>
-                <div className="status-item">
-                  <span>Atualizado em</span>
-                  <strong>
-                    {new Date(document.updated_date).toLocaleString("pt-BR")}
-                  </strong>
-                </div>
-              </div>
-
-              {document.error_message && (
-                <div className="alert alert-error">
-                  <strong>Erro geral:</strong> {document.error_message}
-                </div>
-              )}
-
-              <div className="steps-container">
-                <h3>Status dos Steps</h3>
-                {Object.entries(document.steps).map(([stepKey, stepInfo]) => {
-                  const stepCompletion = stepInfo.completion_percentage ?? 0;
-                  return (
-                    <div key={stepKey} className="step-item">
-                      <div className="step-header">
-                        <div>
-                          <span className="step-name">
-                            {STEP_NAMES[stepKey] || stepKey}
-                          </span>
-                          <span className="step-percent">
-                            {formatPercentage(stepCompletion)}
-                          </span>
-                        </div>
-                        <span className={stepStatusClassName(stepInfo.status)}>
-                          {stepStatusLabel(stepInfo.status)}
-                        </span>
-                      </div>
-                      {stepInfo.error_message && (
-                        <div className="step-error">
-                          <strong>Erro:</strong> {stepInfo.error_message}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="results-container">
-                <h3>Resultados</h3>
-                <div className="results-grid">
-                  <div className="result-group">
-                    <h4>QAs</h4>
-                    <div className="result-item">
-                      <span>Train data</span>
-                      <strong>
-                        {document.results.QAs.train_data.toLocaleString("pt-BR")}
-                      </strong>
-                    </div>
-                    <div className="result-item">
-                      <span>RAG data</span>
-                      <strong>
-                        {document.results.QAs.rag_data.toLocaleString("pt-BR")}
-                      </strong>
-                    </div>
-                  </div>
-                  <div className="result-group">
-                    <h4>Clinical Protocols</h4>
-                    <div className="result-item">
-                      <span>Train data</span>
-                      <strong>
-                        {document.results.clinical_protocols.train_data.toLocaleString(
-                          "pt-BR",
-                        )}
-                      </strong>
-                    </div>
-                    <div className="result-item">
-                      <span>RAG data</span>
-                      <strong>
-                        {document.results.clinical_protocols.rag_data.toLocaleString(
-                          "pt-BR",
-                        )}
-                      </strong>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <div className="status-item">
-                  <span>ConclusÃ£o — {formatPercentage(document.completion_percentage)}</span>
-                  <div className="progress-bar" aria-hidden="true">
-                    <div
-                      className="progress-bar-fill"
-                      style={{ width: `${document.completion_percentage}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="response-block">
-                <h3>Resposta da API</h3>
-                <pre>{JSON.stringify(document, null, 2)}</pre>
-              </div>
+              <ProcessStatus document={document} />
+              <ProcessSteps steps={document.steps} />
+              <ProcessResults results={document.results} />
+              <ApiResponseBlock document={document} />
             </>
           ) : (
             <p className="empty-state">
-              Nenhuma execuÃ§Ã£o iniciada. Clique em &quot;Iniciar preprocessamento&quot;
-              para comeÃ§ar.
+              Nenhuma execução iniciada. Clique em &quot;Iniciar preprocessamento&quot;
+              para começar.
             </p>
           )}
         </div>

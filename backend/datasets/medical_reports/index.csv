@@ -1,0 +1,501 @@
+arquivo;exame;paciente;conclusao
+laudo_001_rx-coluna-lombar.pdf;Laudo Radiográfico;IAGO PIMENTEL RIOS VILAR;Sinais de espondilose lombar e discopatia degenerativa em L4-L5 e L5-S1.
+laudo_002_rx-joelho.pdf;Laudo Radiográfico;FABRÍCIO GUEDES ANTUNES COUTINHO;Gonartrose medial moderada. Correlação clínica e, se necessário, ressonância magnética.
+laudo_003_rx-seios-face.pdf;Laudo Radiográfico;GUSTAVO PENNA ROCHA COUTINHO;Radiografia dos seios da face sem alterações significativas.
+laudo_004_eeg.pdf;Laudo de Eletroencefalograma;VICTOR HUGO CORDEIRO XAVIER;Traçado com atividade epileptiforme generalizada, compatível com padrão de ausência. Correlação clínica obrigatória.
+laudo_005_ecg.pdf;Laudo de Eletrocardiograma;OTÁVIO LEME SIQUEIRA COUTINHO;Sobrecarga ventricular esquerda com alterações inespecíficas da repolarização. Correlação com hipertensão arterial e ecocardiograma, se clinicamente indicado.
+laudo_006_holter.pdf;Laudo de Holter 24 horas;PEDRO VILELA CAMPOS FAGUNDES;Holter 24 horas sem arritmias clinicamente relevantes.
+laudo_007_mapa.pdf;Laudo de MAPA;OLIVIA FARIAS DUTRA VILAR;MAPA dentro dos limites da normalidade, com descenso noturno preservado.
+laudo_008_teste-ergometrico.pdf;Laudo de Teste Ergométrico;HEITOR ALENCAR PRADO BARRETO;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_009_espirometria.pdf;Laudo de Espirometria;HENRIQUE BASTOS MELO FAGUNDES;Distúrbio ventilatório restritivo sugestivo. Correlação clínica e radiológica recomendada.
+laudo_010_mamografia.pdf;Laudo de Mamografia;HELENA VASCONCELOS PORTELLA;BI-RADS 1 — mamografia negativa. Controle habitual conforme rastreamento.
+laudo_011_tc-cranio.pdf;Laudo de Tomografia Computadorizada;PAULO HENRIQUE LACERDA CALDEIRA;Achados compatíveis com acidente vascular encefálico isquêmico em evolução à esquerda. Correlação clínica e tempo de início dos sintomas são essenciais.
+laudo_012_tc-torax.pdf;Laudo de Tomografia Computadorizada;HENRIQUE BASTOS MELO PORTELLA;Tomografia de tórax sem achados significativos.
+laudo_013_rm-joelho.pdf;Laudo de Ressonância Magnética;HELENA VASCONCELOS FAGUNDES;Ruptura completa do LCA associada a lesão meniscal medial e contusão óssea. Correlação ortopédica.
+laudo_014_rm-coluna.pdf;Laudo de Ressonância Magnética;VICTOR HUGO CORDEIRO PORTELLA;RM da coluna lombar sem alterações compressivas ou degenerativas significativas.
+laudo_015_densitometria.pdf;Laudo de Densitometria Óssea;PAULO HENRIQUE LACERDA ANDRADE;Osteopenia. Recomenda-se correlação com fatores de risco e conduta clínica para prevenção de fraturas.
+laudo_016_us-abdome.pdf;Laudo de Ultrassonografia;VANESSA LACERDA CRUZ ANDRADE;Ultrassonografia de abdome total sem alterações significativas.
+laudo_017_us-tireoide.pdf;Laudo de Ultrassonografia;NICOLAS AZEVEDO PIRES MESQUITA;Nódulo tireoidiano ACR TI-RADS 3. Seguimento ultrassonográfico conforme protocolo institucional.
+laudo_018_polissonografia.pdf;Laudo de Polissonografia;IAGO PIMENTEL RIOS SERPA;Polissonografia sem evidência de apneia obstrutiva do sono clinicamente significativa.
+laudo_019_fundoscopia.pdf;Laudo de Fundoscopia;SABRINA TEIXEIRA LOPES MARANHÃO;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_020_campimetria.pdf;Laudo de Campimetria;LARISSA MENDONÇA PAIVA SERPA;Alteração campimétrica sugestiva de glaucoma no olho direito. Correlação com PIO, papila e RNFL.
+laudo_021_acuidade-visual.pdf;Laudo de Acuidade Visual;BRENO TAVARES LINS VILAR;Exame oftalmológico funcional dentro da normalidade, com ametropia leve.
+laudo_022_itb.pdf;Laudo de Índice Tornozelo-Braço;EDUARDO FALCÃO NEVES MARANHÃO;ITB reduzido à direita, compatível com doença arterial periférica moderada. Avaliação vascular recomendada.
+laudo_023_angio-tc.pdf;Laudo de Angiotomografia;PEDRO VILELA CAMPOS PORTELLA;Tromboembolismo pulmonar agudo segmentar bilateral, com sinais discretos de repercussão no ventrículo direito.
+laudo_024_rx-torax.pdf;Laudo Radiográfico;GABRIELA TAVARES MELO FAGUNDES;Nódulo pulmonar isolado à esquerda. Recomenda-se tomografia de tórax para melhor caracterização.
+laudo_025_rx-coluna-lombar.pdf;Laudo Radiográfico;VALENTINA CORREIA LUZ XAVIER;Escoliose lombar leve. Avaliação clínica e, se indicado, estudo complementar.
+laudo_026_rx-joelho.pdf;Laudo Radiográfico;FERNANDA AGUIAR PRADO DAMÁSIO;Radiografia de joelho direito sem alterações evidentes.
+laudo_027_rx-seios-face.pdf;Laudo Radiográfico;GUSTAVO PENNA ROCHA MESQUITA;Sinais radiológicos compatíveis com sinusopatia maxilar à esquerda.
+laudo_028_eeg.pdf;Laudo de Eletroencefalograma;BRENO TAVARES LINS CALDEIRA;Traçado com atividade epileptiforme generalizada, compatível com padrão de ausência. Correlação clínica obrigatória.
+laudo_029_ecg.pdf;Laudo de Eletrocardiograma;RAFAEL MOURA PACHECO DAMÁSIO;Sobrecarga ventricular esquerda com alterações inespecíficas da repolarização. Correlação com hipertensão arterial e ecocardiograma, se clinicamente indicado.
+laudo_030_holter.pdf;Laudo de Holter 24 horas;RENATO QUEIROZ DIAS ANDRADE;Holter 24 horas sem arritmias clinicamente relevantes.
+laudo_031_mapa.pdf;Laudo de MAPA;SABRINA TEIXEIRA LOPES VILAR;MAPA dentro dos limites da normalidade, com descenso noturno preservado.
+laudo_032_teste-ergometrico.pdf;Laudo de Teste Ergométrico;GABRIELA TAVARES MELO LEAL;Teste ergométrico positivo para isquemia miocárdica. Avaliação cardiológica complementar é recomendada.
+laudo_033_espirometria.pdf;Laudo de Espirometria;JÚLIA CAVALCANTE DIAS SERPA;Distúrbio ventilatório restritivo sugestivo. Correlação clínica e radiológica recomendada.
+laudo_034_mamografia.pdf;Laudo de Mamografia;ISADORA PIMENTEL MARANHÃO;BI-RADS 5 — altamente sugestivo de malignidade. Biópsia e avaliação multidisciplinar indicadas.
+laudo_035_tc-cranio.pdf;Laudo de Tomografia Computadorizada;LEANDRO PAIVA RAMOS CALDEIRA;Hematoma subdural crônico à direita com mínimo efeito de massa. Avaliação neurocirúrgica conforme status clínico.
+laudo_036_tc-torax.pdf;Laudo de Tomografia Computadorizada;BRENO TAVARES LINS COUTINHO;Opacidades em vidro fosco de padrão inflamatório/infeccioso. Correlação clínica, laboratorial e evolutiva.
+laudo_037_rm-joelho.pdf;Laudo de Ressonância Magnética;ELISA MONTEIRO CUNHA CAMARGO;Ressonância magnética do joelho esquerdo sem alterações significativas.
+laudo_038_rm-coluna.pdf;Laudo de Ressonância Magnética;LEANDRO PAIVA RAMOS FAGUNDES;Doença discal degenerativa com protrusão em L4-L5 e contato radicular à esquerda. Correlação com o quadro álgico.
+laudo_039_densitometria.pdf;Laudo de Densitometria Óssea;IGOR VASQUES PINTO GOULART;Osteopenia. Recomenda-se correlação com fatores de risco e conduta clínica para prevenção de fraturas.
+laudo_040_us-abdome.pdf;Laudo de Ultrassonografia;TATIANE AMARAL COSTA ANDRADE;Esteatose hepática moderada e colelitíase. Sem sinais de colecistite aguda neste exame.
+laudo_041_us-tireoide.pdf;Laudo de Ultrassonografia;ÉRICA BASTOS ANTUNES COUTINHO;Ultrassonografia de tireoide sem alterações.
+laudo_042_polissonografia.pdf;Laudo de Polissonografia;HEITOR ALENCAR PRADO MARANHÃO;Polissonografia sem evidência de apneia obstrutiva do sono clinicamente significativa.
+laudo_043_fundoscopia.pdf;Laudo de Fundoscopia;ANDRÉ SALDANHA CRUZ FIGUEIRA;Retinopatia hipertensiva moderada à direita e leve à esquerda. Controle pressórico e reavaliação oftalmológica.
+laudo_044_campimetria.pdf;Laudo de Campimetria;RAFAELA NUNES BRITO XAVIER;Alteração campimétrica sugestiva de glaucoma no olho direito. Correlação com PIO, papila e RNFL.
+laudo_045_acuidade-visual.pdf;Laudo de Acuidade Visual;DÉBORA PENNA FREITAS FIGUEIRA;Baixa visual corrigível por erro refracional. Prescrição óptica atualizada recomendada.
+laudo_046_itb.pdf;Laudo de Índice Tornozelo-Braço;HELENA VASCONCELOS CAMARGO;ITB dentro da normalidade, sem evidência de doença arterial periférica obstrutiva neste método.
+laudo_047_angio-tc.pdf;Laudo de Angiotomografia;THIAGO FARIAS NUNES PORTELLA;Angiotomografia negativa para tromboembolismo pulmonar agudo.
+laudo_048_rx-torax.pdf;Laudo Radiográfico;IAGO PIMENTEL RIOS BARRETO;Opacidade em lobo inferior direito, podendo corresponder a processo inflamatório/infeccioso. Sugere-se correlação clínica e controle evolutivo.
+laudo_049_rx-coluna-lombar.pdf;Laudo Radiográfico;PATRÍCIA MOURA SENA VILAR;Estudo radiográfico da coluna lombar sem alterações significativas.
+laudo_050_rx-joelho.pdf;Laudo Radiográfico;MARINA PEIXOTO ALVES LEAL;Radiografia de joelho direito sem alterações evidentes.
+laudo_051_rx-seios-face.pdf;Laudo Radiográfico;VALENTINA CORREIA LUZ GOULART;Sinais radiológicos compatíveis com sinusopatia maxilar à esquerda.
+laudo_052_eeg.pdf;Laudo de Eletroencefalograma;IGOR VASQUES PINTO PORTELLA;Traçado com atividade epileptiforme generalizada, compatível com padrão de ausência. Correlação clínica obrigatória.
+laudo_053_ecg.pdf;Laudo de Eletrocardiograma;IAGO PIMENTEL RIOS FAGUNDES;Fibrilação atrial com resposta ventricular controlada. Avaliação clínica e de risco tromboembólico recomendada.
+laudo_054_holter.pdf;Laudo de Holter 24 horas;MURILO QUINTELA SERPA;Ectopia supraventricular frequente com taquicardia atrial não sustentada. Correlação com sintomas e avaliação cardiológica.
+laudo_055_mapa.pdf;Laudo de MAPA;ISADORA PIMENTEL SERPA;MAPA dentro dos limites da normalidade, com descenso noturno preservado.
+laudo_056_teste-ergometrico.pdf;Laudo de Teste Ergométrico;ENZO GALVÃO DUTRA XAVIER;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_057_espirometria.pdf;Laudo de Espirometria;ELISA MONTEIRO CUNHA CAMARGO;Distúrbio ventilatório obstrutivo moderado, sem resposta broncodilatadora significativa neste exame.
+laudo_058_mamografia.pdf;Laudo de Mamografia;DANIELA BORGES LINS CAMARGO;BI-RADS 3 — achado provavelmente benigno. Controle em 6 meses ou ultrassonografia complementar.
+laudo_059_tc-cranio.pdf;Laudo de Tomografia Computadorizada;YURI ALBUQUERQUE FIGUEIRA;Hematoma subdural crônico à direita com mínimo efeito de massa. Avaliação neurocirúrgica conforme status clínico.
+laudo_060_tc-torax.pdf;Laudo de Tomografia Computadorizada;BEATRIZ FURTADO NOGUEIRA MARANHÃO;Tomografia de tórax sem achados significativos.
+laudo_061_rm-joelho.pdf;Laudo de Ressonância Magnética;ÉRICA BASTOS ANTUNES CALDEIRA;Ruptura completa do LCA associada a lesão meniscal medial e contusão óssea. Correlação ortopédica.
+laudo_062_rm-coluna.pdf;Laudo de Ressonância Magnética;BRUNA SIQUEIRA VALE CALDEIRA;RM da coluna lombar sem alterações compressivas ou degenerativas significativas.
+laudo_063_densitometria.pdf;Laudo de Densitometria Óssea;OLIVIA FARIAS DUTRA SERPA;Densidade mineral óssea dentro da faixa de normalidade (OMS).
+laudo_064_us-abdome.pdf;Laudo de Ultrassonografia;YURI ALBUQUERQUE BARRETO;Esteatose hepática moderada e colelitíase. Sem sinais de colecistite aguda neste exame.
+laudo_065_us-tireoide.pdf;Laudo de Ultrassonografia;BRENO TAVARES LINS FAGUNDES;Ultrassonografia de tireoide sem alterações.
+laudo_066_polissonografia.pdf;Laudo de Polissonografia;LARISSA MENDONÇA PAIVA SERPA;Polissonografia sem evidência de apneia obstrutiva do sono clinicamente significativa.
+laudo_067_fundoscopia.pdf;Laudo de Fundoscopia;CAIO BELMONTE LEAL;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_068_campimetria.pdf;Laudo de Campimetria;LETÍCIA NAVARRO GOMES CAMARGO;Alteração campimétrica sugestiva de glaucoma no olho direito. Correlação com PIO, papila e RNFL.
+laudo_069_acuidade-visual.pdf;Laudo de Acuidade Visual;ELISA MONTEIRO CUNHA XAVIER;Exame oftalmológico funcional dentro da normalidade, com ametropia leve.
+laudo_070_itb.pdf;Laudo de Índice Tornozelo-Braço;RENATO QUEIROZ DIAS DAMÁSIO;ITB dentro da normalidade, sem evidência de doença arterial periférica obstrutiva neste método.
+laudo_071_angio-tc.pdf;Laudo de Angiotomografia;BRUNA SIQUEIRA VALE GOULART;Tromboembolismo pulmonar agudo segmentar bilateral, com sinais discretos de repercussão no ventrículo direito.
+laudo_072_rx-torax.pdf;Laudo Radiográfico;VALENTINA CORREIA LUZ COUTINHO;Exame radiológico de aspecto normal.
+laudo_073_rx-coluna-lombar.pdf;Laudo Radiográfico;VALENTINA CORREIA LUZ SERPA;Sinais de espondilose lombar e discopatia degenerativa em L4-L5 e L5-S1.
+laudo_074_rx-joelho.pdf;Laudo Radiográfico;CÍNTIA ALENCAR RAMOS DAMÁSIO;Gonartrose medial moderada. Correlação clínica e, se necessário, ressonância magnética.
+laudo_075_rx-seios-face.pdf;Laudo Radiográfico;CAUÃ BERNARDES SERPA;Sinais radiológicos compatíveis com sinusopatia maxilar à esquerda.
+laudo_076_eeg.pdf;Laudo de Eletroencefalograma;IGOR VASQUES PINTO ANDRADE;Discretos sinais de disfunção cortical de caráter inespecífico.
+laudo_077_ecg.pdf;Laudo de Eletrocardiograma;CAUÃ BERNARDES FAGUNDES;Sobrecarga ventricular esquerda com alterações inespecíficas da repolarização. Correlação com hipertensão arterial e ecocardiograma, se clinicamente indicado.
+laudo_078_holter.pdf;Laudo de Holter 24 horas;INGRID SAMPAIO REIS FAGUNDES;Holter 24 horas sem arritmias clinicamente relevantes.
+laudo_079_mapa.pdf;Laudo de MAPA;LARISSA MENDONÇA PAIVA FAGUNDES;Hipertensão arterial ao MAPA, com padrão não dipper. Ajuste terapêutico e seguimento clínico indicados.
+laudo_080_teste-ergometrico.pdf;Laudo de Teste Ergométrico;DANIELA BORGES LINS BARRETO;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_081_espirometria.pdf;Laudo de Espirometria;LARISSA MENDONÇA PAIVA FAGUNDES;Distúrbio ventilatório restritivo sugestivo. Correlação clínica e radiológica recomendada.
+laudo_082_mamografia.pdf;Laudo de Mamografia;SABRINA TEIXEIRA LOPES BARRETO;BI-RADS 3 — achado provavelmente benigno. Controle em 6 meses ou ultrassonografia complementar.
+laudo_083_tc-cranio.pdf;Laudo de Tomografia Computadorizada;BRENO TAVARES LINS ANDRADE;Hematoma subdural crônico à direita com mínimo efeito de massa. Avaliação neurocirúrgica conforme status clínico.
+laudo_084_tc-torax.pdf;Laudo de Tomografia Computadorizada;JOÃO CÂNDIDO FREITAS COUTINHO;Opacidades em vidro fosco de padrão inflamatório/infeccioso. Correlação clínica, laboratorial e evolutiva.
+laudo_085_rm-joelho.pdf;Laudo de Ressonância Magnética;GUSTAVO PENNA ROCHA GOULART;Ruptura completa do LCA associada a lesão meniscal medial e contusão óssea. Correlação ortopédica.
+laudo_086_rm-coluna.pdf;Laudo de Ressonância Magnética;GABRIELA TAVARES MELO GOULART;RM da coluna lombar sem alterações compressivas ou degenerativas significativas.
+laudo_087_densitometria.pdf;Laudo de Densitometria Óssea;LUCAS AMARANTE CALDEIRA;Osteoporose densitométrica. Avaliação clínica, laboratorial e de risco de fratura indicada.
+laudo_088_us-abdome.pdf;Laudo de Ultrassonografia;INGRID SAMPAIO REIS FIGUEIRA;Ultrassonografia de abdome total sem alterações significativas.
+laudo_089_us-tireoide.pdf;Laudo de Ultrassonografia;VALENTINA CORREIA LUZ GOULART;Nódulo tireoidiano ACR TI-RADS 3. Seguimento ultrassonográfico conforme protocolo institucional.
+laudo_090_polissonografia.pdf;Laudo de Polissonografia;GUSTAVO PENNA ROCHA DAMÁSIO;Polissonografia sem evidência de apneia obstrutiva do sono clinicamente significativa.
+laudo_091_fundoscopia.pdf;Laudo de Fundoscopia;CAMILA ESTEVES RANGEL SERPA;Retinopatia hipertensiva moderada à direita e leve à esquerda. Controle pressórico e reavaliação oftalmológica.
+laudo_092_campimetria.pdf;Laudo de Campimetria;HELOÍSA QUINTANILHA COUTINHO;Campimetria computadorizada dentro dos limites da normalidade.
+laudo_093_acuidade-visual.pdf;Laudo de Acuidade Visual;VALENTINA CORREIA LUZ PORTELLA;Baixa visual corrigível por erro refracional. Prescrição óptica atualizada recomendada.
+laudo_094_itb.pdf;Laudo de Índice Tornozelo-Braço;RENATO QUEIROZ DIAS ANDRADE;ITB dentro da normalidade, sem evidência de doença arterial periférica obstrutiva neste método.
+laudo_095_angio-tc.pdf;Laudo de Angiotomografia;MARCELO TELES BRAGA GOULART;Tromboembolismo pulmonar agudo segmentar bilateral, com sinais discretos de repercussão no ventrículo direito.
+laudo_096_rx-torax.pdf;Laudo Radiográfico;NICOLAS AZEVEDO PIRES COUTINHO;Cardiomegalia discreta associada a sinais de congestão pulmonar leve. Correlação clínica recomendada.
+laudo_097_rx-coluna-lombar.pdf;Laudo Radiográfico;LEANDRO PAIVA RAMOS CALDEIRA;Escoliose lombar leve. Avaliação clínica e, se indicado, estudo complementar.
+laudo_098_rx-joelho.pdf;Laudo Radiográfico;PEDRO VILELA CAMPOS CALDEIRA;Radiografia de joelho direito sem alterações evidentes.
+laudo_099_rx-seios-face.pdf;Laudo Radiográfico;LEANDRO PAIVA RAMOS COUTINHO;Radiografia dos seios da face sem alterações significativas.
+laudo_100_eeg.pdf;Laudo de Eletroencefalograma;GABRIELA TAVARES MELO CAMARGO;Atividade epileptiforme focal em região temporal esquerda. Sugere-se correlação com história clínica e, se indicado, EEG prolongado.
+laudo_101_ecg.pdf;Laudo de Eletrocardiograma;HELOÍSA QUINTANILHA FAGUNDES;Sobrecarga ventricular esquerda com alterações inespecíficas da repolarização. Correlação com hipertensão arterial e ecocardiograma, se clinicamente indicado.
+laudo_102_holter.pdf;Laudo de Holter 24 horas;HELOÍSA QUINTANILHA XAVIER;Holter 24 horas sem arritmias clinicamente relevantes.
+laudo_103_mapa.pdf;Laudo de MAPA;PAULO HENRIQUE LACERDA DAMÁSIO;Hipertensão arterial ao MAPA, com padrão não dipper. Ajuste terapêutico e seguimento clínico indicados.
+laudo_104_teste-ergometrico.pdf;Laudo de Teste Ergométrico;JÚLIA CAVALCANTE DIAS PORTELLA;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_105_espirometria.pdf;Laudo de Espirometria;YURI ALBUQUERQUE PORTELLA;Prova de função pulmonar dentro dos limites da normalidade.
+laudo_106_mamografia.pdf;Laudo de Mamografia;GABRIELA TAVARES MELO CAMARGO;BI-RADS 5 — altamente sugestivo de malignidade. Biópsia e avaliação multidisciplinar indicadas.
+laudo_107_tc-cranio.pdf;Laudo de Tomografia Computadorizada;MURILO QUINTELA COUTINHO;Tomografia de crânio sem alterações agudas evidenciáveis.
+laudo_108_tc-torax.pdf;Laudo de Tomografia Computadorizada;HENRIQUE BASTOS MELO CALDEIRA;Tomografia de tórax sem achados significativos.
+laudo_109_rm-joelho.pdf;Laudo de Ressonância Magnética;MURILO QUINTELA DAMÁSIO;Ressonância magnética do joelho esquerdo sem alterações significativas.
+laudo_110_rm-coluna.pdf;Laudo de Ressonância Magnética;JÚLIA CAVALCANTE DIAS FIGUEIRA;RM da coluna lombar sem alterações compressivas ou degenerativas significativas.
+laudo_111_densitometria.pdf;Laudo de Densitometria Óssea;BRENO TAVARES LINS MESQUITA;Osteoporose densitométrica. Avaliação clínica, laboratorial e de risco de fratura indicada.
+laudo_112_us-abdome.pdf;Laudo de Ultrassonografia;LARISSA MENDONÇA PAIVA VILAR;Esteatose hepática moderada e colelitíase. Sem sinais de colecistite aguda neste exame.
+laudo_113_us-tireoide.pdf;Laudo de Ultrassonografia;ELISA MONTEIRO CUNHA SERPA;Nódulo tireoidiano ACR TI-RADS 3. Seguimento ultrassonográfico conforme protocolo institucional.
+laudo_114_polissonografia.pdf;Laudo de Polissonografia;PEDRO VILELA CAMPOS ANDRADE;Síndrome da apneia obstrutiva do sono de grau moderado a grave. Avaliação para terapia ventilatória e medidas gerais.
+laudo_115_fundoscopia.pdf;Laudo de Fundoscopia;ALINE GUIMARÃES ROCHA BARRETO;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_116_campimetria.pdf;Laudo de Campimetria;RENATO QUEIROZ DIAS FAGUNDES;Campimetria computadorizada dentro dos limites da normalidade.
+laudo_117_acuidade-visual.pdf;Laudo de Acuidade Visual;WAGNER MONTEIRO REIS XAVIER;Baixa visual corrigível por erro refracional. Prescrição óptica atualizada recomendada.
+laudo_118_itb.pdf;Laudo de Índice Tornozelo-Braço;GABRIELA TAVARES MELO SERPA;ITB dentro da normalidade, sem evidência de doença arterial periférica obstrutiva neste método.
+laudo_119_angio-tc.pdf;Laudo de Angiotomografia;THIAGO FARIAS NUNES GOULART;Angiotomografia negativa para tromboembolismo pulmonar agudo.
+laudo_120_rx-torax.pdf;Laudo Radiográfico;SAMUEL FONTES LIMA LEAL;Exame radiológico de aspecto normal.
+laudo_121_rx-coluna-lombar.pdf;Laudo Radiográfico;HENRIQUE BASTOS MELO FIGUEIRA;Escoliose lombar leve. Avaliação clínica e, se indicado, estudo complementar.
+laudo_122_rx-joelho.pdf;Laudo Radiográfico;RENATO QUEIROZ DIAS CALDEIRA;Gonartrose medial moderada. Correlação clínica e, se necessário, ressonância magnética.
+laudo_123_rx-seios-face.pdf;Laudo Radiográfico;BRUNA SIQUEIRA VALE LEAL;Radiografia dos seios da face sem alterações significativas.
+laudo_124_eeg.pdf;Laudo de Eletroencefalograma;WAGNER MONTEIRO REIS ANDRADE;Traçado com atividade epileptiforme generalizada, compatível com padrão de ausência. Correlação clínica obrigatória.
+laudo_125_ecg.pdf;Laudo de Eletrocardiograma;VICTOR HUGO CORDEIRO MARANHÃO;Fibrilação atrial com resposta ventricular controlada. Avaliação clínica e de risco tromboembólico recomendada.
+laudo_126_holter.pdf;Laudo de Holter 24 horas;BEATRIZ FURTADO NOGUEIRA DAMÁSIO;Holter 24 horas sem arritmias clinicamente relevantes.
+laudo_127_mapa.pdf;Laudo de MAPA;OTÁVIO LEME SIQUEIRA VILAR;Hipertensão arterial ao MAPA, com padrão não dipper. Ajuste terapêutico e seguimento clínico indicados.
+laudo_128_teste-ergometrico.pdf;Laudo de Teste Ergométrico;NATÁLIA RIBEIRO CAMPOS SERPA;Teste ergométrico positivo para isquemia miocárdica. Avaliação cardiológica complementar é recomendada.
+laudo_129_espirometria.pdf;Laudo de Espirometria;ENZO GALVÃO DUTRA XAVIER;Distúrbio ventilatório restritivo sugestivo. Correlação clínica e radiológica recomendada.
+laudo_130_mamografia.pdf;Laudo de Mamografia;ALINE GUIMARÃES ROCHA SERPA;BI-RADS 1 — mamografia negativa. Controle habitual conforme rastreamento.
+laudo_131_tc-cranio.pdf;Laudo de Tomografia Computadorizada;BRUNA SIQUEIRA VALE DAMÁSIO;Hematoma subdural crônico à direita com mínimo efeito de massa. Avaliação neurocirúrgica conforme status clínico.
+laudo_132_tc-torax.pdf;Laudo de Tomografia Computadorizada;JÚLIA CAVALCANTE DIAS SERPA;Tomografia de tórax sem achados significativos.
+laudo_133_rm-joelho.pdf;Laudo de Ressonância Magnética;VICTOR HUGO CORDEIRO MARANHÃO;Ruptura completa do LCA associada a lesão meniscal medial e contusão óssea. Correlação ortopédica.
+laudo_134_rm-coluna.pdf;Laudo de Ressonância Magnética;LETÍCIA NAVARRO GOMES VILAR;Doença discal degenerativa com protrusão em L4-L5 e contato radicular à esquerda. Correlação com o quadro álgico.
+laudo_135_densitometria.pdf;Laudo de Densitometria Óssea;LEANDRO PAIVA RAMOS VILAR;Osteopenia. Recomenda-se correlação com fatores de risco e conduta clínica para prevenção de fraturas.
+laudo_136_us-abdome.pdf;Laudo de Ultrassonografia;VANESSA LACERDA CRUZ COUTINHO;Esteatose hepática moderada e colelitíase. Sem sinais de colecistite aguda neste exame.
+laudo_137_us-tireoide.pdf;Laudo de Ultrassonografia;CAIO BELMONTE COUTINHO;Nódulo tireoidiano ACR TI-RADS 3. Seguimento ultrassonográfico conforme protocolo institucional.
+laudo_138_polissonografia.pdf;Laudo de Polissonografia;ALINE GUIMARÃES ROCHA DAMÁSIO;Síndrome da apneia obstrutiva do sono de grau moderado a grave. Avaliação para terapia ventilatória e medidas gerais.
+laudo_139_fundoscopia.pdf;Laudo de Fundoscopia;THIAGO FARIAS NUNES VILAR;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_140_campimetria.pdf;Laudo de Campimetria;LETÍCIA NAVARRO GOMES DAMÁSIO;Campimetria computadorizada dentro dos limites da normalidade.
+laudo_141_acuidade-visual.pdf;Laudo de Acuidade Visual;INGRID SAMPAIO REIS XAVIER;Exame oftalmológico funcional dentro da normalidade, com ametropia leve.
+laudo_142_itb.pdf;Laudo de Índice Tornozelo-Braço;VICTOR HUGO CORDEIRO CAMARGO;ITB reduzido à direita, compatível com doença arterial periférica moderada. Avaliação vascular recomendada.
+laudo_143_angio-tc.pdf;Laudo de Angiotomografia;LARISSA MENDONÇA PAIVA CAMARGO;Angiotomografia negativa para tromboembolismo pulmonar agudo.
+laudo_144_rx-torax.pdf;Laudo Radiográfico;VICTOR HUGO CORDEIRO VILAR;Nódulo pulmonar isolado à esquerda. Recomenda-se tomografia de tórax para melhor caracterização.
+laudo_145_rx-coluna-lombar.pdf;Laudo Radiográfico;PEDRO VILELA CAMPOS COUTINHO;Estudo radiográfico da coluna lombar sem alterações significativas.
+laudo_146_rx-joelho.pdf;Laudo Radiográfico;RENATO QUEIROZ DIAS DAMÁSIO;Gonartrose medial moderada. Correlação clínica e, se necessário, ressonância magnética.
+laudo_147_rx-seios-face.pdf;Laudo Radiográfico;TATIANE AMARAL COSTA DAMÁSIO;Sinais radiológicos compatíveis com sinusopatia maxilar à esquerda.
+laudo_148_eeg.pdf;Laudo de Eletroencefalograma;FABRÍCIO GUEDES ANTUNES DAMÁSIO;Atividade epileptiforme focal em região temporal esquerda. Sugere-se correlação com história clínica e, se indicado, EEG prolongado.
+laudo_149_ecg.pdf;Laudo de Eletrocardiograma;HELOÍSA QUINTANILHA CAMARGO;Sobrecarga ventricular esquerda com alterações inespecíficas da repolarização. Correlação com hipertensão arterial e ecocardiograma, se clinicamente indicado.
+laudo_150_holter.pdf;Laudo de Holter 24 horas;CAUÃ BERNARDES XAVIER;Ectopia supraventricular frequente com taquicardia atrial não sustentada. Correlação com sintomas e avaliação cardiológica.
+laudo_151_mapa.pdf;Laudo de MAPA;BRENO TAVARES LINS FIGUEIRA;Hipertensão arterial ao MAPA, com padrão não dipper. Ajuste terapêutico e seguimento clínico indicados.
+laudo_152_teste-ergometrico.pdf;Laudo de Teste Ergométrico;HENRIQUE BASTOS MELO LEAL;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_153_espirometria.pdf;Laudo de Espirometria;ENZO GALVÃO DUTRA COUTINHO;Distúrbio ventilatório restritivo sugestivo. Correlação clínica e radiológica recomendada.
+laudo_154_mamografia.pdf;Laudo de Mamografia;MARINA PEIXOTO ALVES FAGUNDES;BI-RADS 1 — mamografia negativa. Controle habitual conforme rastreamento.
+laudo_155_tc-cranio.pdf;Laudo de Tomografia Computadorizada;RAFAELA NUNES BRITO DAMÁSIO;Tomografia de crânio sem alterações agudas evidenciáveis.
+laudo_156_tc-torax.pdf;Laudo de Tomografia Computadorizada;KARINA LOBATO PIRES FIGUEIRA;Opacidades em vidro fosco de padrão inflamatório/infeccioso. Correlação clínica, laboratorial e evolutiva.
+laudo_157_rm-joelho.pdf;Laudo de Ressonância Magnética;CÍNTIA ALENCAR RAMOS MESQUITA;Ressonância magnética do joelho esquerdo sem alterações significativas.
+laudo_158_rm-coluna.pdf;Laudo de Ressonância Magnética;CAMILA ESTEVES RANGEL FIGUEIRA;RM da coluna lombar sem alterações compressivas ou degenerativas significativas.
+laudo_159_densitometria.pdf;Laudo de Densitometria Óssea;GABRIELA TAVARES MELO VILAR;Osteopenia. Recomenda-se correlação com fatores de risco e conduta clínica para prevenção de fraturas.
+laudo_160_us-abdome.pdf;Laudo de Ultrassonografia;GUSTAVO PENNA ROCHA BARRETO;Ultrassonografia de abdome total sem alterações significativas.
+laudo_161_us-tireoide.pdf;Laudo de Ultrassonografia;JÚLIA CAVALCANTE DIAS SERPA;Nódulo tireoidiano ACR TI-RADS 3. Seguimento ultrassonográfico conforme protocolo institucional.
+laudo_162_polissonografia.pdf;Laudo de Polissonografia;SABRINA TEIXEIRA LOPES FAGUNDES;Polissonografia sem evidência de apneia obstrutiva do sono clinicamente significativa.
+laudo_163_fundoscopia.pdf;Laudo de Fundoscopia;LEANDRO PAIVA RAMOS SERPA;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_164_campimetria.pdf;Laudo de Campimetria;HELENA VASCONCELOS CALDEIRA;Alteração campimétrica sugestiva de glaucoma no olho direito. Correlação com PIO, papila e RNFL.
+laudo_165_acuidade-visual.pdf;Laudo de Acuidade Visual;WAGNER MONTEIRO REIS XAVIER;Exame oftalmológico funcional dentro da normalidade, com ametropia leve.
+laudo_166_itb.pdf;Laudo de Índice Tornozelo-Braço;OLIVIA FARIAS DUTRA DAMÁSIO;ITB dentro da normalidade, sem evidência de doença arterial periférica obstrutiva neste método.
+laudo_167_angio-tc.pdf;Laudo de Angiotomografia;WAGNER MONTEIRO REIS CAMARGO;Angiotomografia negativa para tromboembolismo pulmonar agudo.
+laudo_168_rx-torax.pdf;Laudo Radiográfico;ELISA MONTEIRO CUNHA SERPA;Cardiomegalia discreta associada a sinais de congestão pulmonar leve. Correlação clínica recomendada.
+laudo_169_rx-coluna-lombar.pdf;Laudo Radiográfico;OTÁVIO LEME SIQUEIRA VILAR;Estudo radiográfico da coluna lombar sem alterações significativas.
+laudo_170_rx-joelho.pdf;Laudo Radiográfico;DAVI NORONHA VALE MESQUITA;Radiografia de joelho direito sem alterações evidentes.
+laudo_171_rx-seios-face.pdf;Laudo Radiográfico;LEANDRO PAIVA RAMOS DAMÁSIO;Radiografia dos seios da face sem alterações significativas.
+laudo_172_eeg.pdf;Laudo de Eletroencefalograma;DÉBORA PENNA FREITAS MARANHÃO;Discretos sinais de disfunção cortical de caráter inespecífico.
+laudo_173_ecg.pdf;Laudo de Eletrocardiograma;DANIELA BORGES LINS ANDRADE;Sobrecarga ventricular esquerda com alterações inespecíficas da repolarização. Correlação com hipertensão arterial e ecocardiograma, se clinicamente indicado.
+laudo_174_holter.pdf;Laudo de Holter 24 horas;HEITOR ALENCAR PRADO MARANHÃO;Holter 24 horas sem arritmias clinicamente relevantes.
+laudo_175_mapa.pdf;Laudo de MAPA;JÚLIA CAVALCANTE DIAS PORTELLA;Hipertensão arterial ao MAPA, com padrão não dipper. Ajuste terapêutico e seguimento clínico indicados.
+laudo_176_teste-ergometrico.pdf;Laudo de Teste Ergométrico;JÚLIA CAVALCANTE DIAS LEAL;Teste ergométrico positivo para isquemia miocárdica. Avaliação cardiológica complementar é recomendada.
+laudo_177_espirometria.pdf;Laudo de Espirometria;KARINA LOBATO PIRES CALDEIRA;Distúrbio ventilatório restritivo sugestivo. Correlação clínica e radiológica recomendada.
+laudo_178_mamografia.pdf;Laudo de Mamografia;ALINE GUIMARÃES ROCHA LEAL;BI-RADS 1 — mamografia negativa. Controle habitual conforme rastreamento.
+laudo_179_tc-cranio.pdf;Laudo de Tomografia Computadorizada;VANESSA LACERDA CRUZ CAMARGO;Hematoma subdural crônico à direita com mínimo efeito de massa. Avaliação neurocirúrgica conforme status clínico.
+laudo_180_tc-torax.pdf;Laudo de Tomografia Computadorizada;BEATRIZ FURTADO NOGUEIRA PORTELLA;Tomografia de tórax sem achados significativos.
+laudo_181_rm-joelho.pdf;Laudo de Ressonância Magnética;PEDRO VILELA CAMPOS MESQUITA;Ruptura completa do LCA associada a lesão meniscal medial e contusão óssea. Correlação ortopédica.
+laudo_182_rm-coluna.pdf;Laudo de Ressonância Magnética;RENATO QUEIROZ DIAS DAMÁSIO;Doença discal degenerativa com protrusão em L4-L5 e contato radicular à esquerda. Correlação com o quadro álgico.
+laudo_183_densitometria.pdf;Laudo de Densitometria Óssea;VANESSA LACERDA CRUZ BARRETO;Osteopenia. Recomenda-se correlação com fatores de risco e conduta clínica para prevenção de fraturas.
+laudo_184_us-abdome.pdf;Laudo de Ultrassonografia;BRENO TAVARES LINS MARANHÃO;Ultrassonografia de abdome total sem alterações significativas.
+laudo_185_us-tireoide.pdf;Laudo de Ultrassonografia;CÍNTIA ALENCAR RAMOS ANDRADE;Ultrassonografia de tireoide sem alterações.
+laudo_186_polissonografia.pdf;Laudo de Polissonografia;ÚRSULA BERNARDES PINTO PORTELLA;Síndrome da apneia obstrutiva do sono de grau moderado a grave. Avaliação para terapia ventilatória e medidas gerais.
+laudo_187_fundoscopia.pdf;Laudo de Fundoscopia;DÉBORA PENNA FREITAS DAMÁSIO;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_188_campimetria.pdf;Laudo de Campimetria;SABRINA TEIXEIRA LOPES MARANHÃO;Alteração campimétrica sugestiva de glaucoma no olho direito. Correlação com PIO, papila e RNFL.
+laudo_189_acuidade-visual.pdf;Laudo de Acuidade Visual;EDUARDO FALCÃO NEVES COUTINHO;Exame oftalmológico funcional dentro da normalidade, com ametropia leve.
+laudo_190_itb.pdf;Laudo de Índice Tornozelo-Braço;ÉRICA BASTOS ANTUNES BARRETO;ITB dentro da normalidade, sem evidência de doença arterial periférica obstrutiva neste método.
+laudo_191_angio-tc.pdf;Laudo de Angiotomografia;HELOÍSA QUINTANILHA MESQUITA;Angiotomografia negativa para tromboembolismo pulmonar agudo.
+laudo_192_rx-torax.pdf;Laudo Radiográfico;SAMUEL FONTES LIMA CAMARGO;Sinais radiológicos de hiperinsuflação pulmonar, sugestivos de doença pulmonar obstrutiva. Correlação com espirometria é aconselhável.
+laudo_193_rx-coluna-lombar.pdf;Laudo Radiográfico;VALENTINA CORREIA LUZ GOULART;Sinais de espondilose lombar e discopatia degenerativa em L4-L5 e L5-S1.
+laudo_194_rx-joelho.pdf;Laudo Radiográfico;FERNANDA AGUIAR PRADO MESQUITA;Gonartrose medial moderada. Correlação clínica e, se necessário, ressonância magnética.
+laudo_195_rx-seios-face.pdf;Laudo Radiográfico;ENZO GALVÃO DUTRA XAVIER;Sinais radiológicos compatíveis com sinusopatia maxilar à esquerda.
+laudo_196_eeg.pdf;Laudo de Eletroencefalograma;VANESSA LACERDA CRUZ GOULART;Traçado com atividade epileptiforme generalizada, compatível com padrão de ausência. Correlação clínica obrigatória.
+laudo_197_ecg.pdf;Laudo de Eletrocardiograma;HENRIQUE BASTOS MELO XAVIER;Fibrilação atrial com resposta ventricular controlada. Avaliação clínica e de risco tromboembólico recomendada.
+laudo_198_holter.pdf;Laudo de Holter 24 horas;CAIO BELMONTE COUTINHO;Holter 24 horas sem arritmias clinicamente relevantes.
+laudo_199_mapa.pdf;Laudo de MAPA;BRENO TAVARES LINS XAVIER;Hipertensão arterial ao MAPA, com padrão não dipper. Ajuste terapêutico e seguimento clínico indicados.
+laudo_200_teste-ergometrico.pdf;Laudo de Teste Ergométrico;JÚLIA CAVALCANTE DIAS CALDEIRA;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_201_espirometria.pdf;Laudo de Espirometria;LETÍCIA NAVARRO GOMES LEAL;Distúrbio ventilatório restritivo sugestivo. Correlação clínica e radiológica recomendada.
+laudo_202_mamografia.pdf;Laudo de Mamografia;GABRIELA TAVARES MELO MESQUITA;BI-RADS 5 — altamente sugestivo de malignidade. Biópsia e avaliação multidisciplinar indicadas.
+laudo_203_tc-cranio.pdf;Laudo de Tomografia Computadorizada;NATÁLIA RIBEIRO CAMPOS ANDRADE;Tomografia de crânio sem alterações agudas evidenciáveis.
+laudo_204_tc-torax.pdf;Laudo de Tomografia Computadorizada;ENZO GALVÃO DUTRA ANDRADE;Opacidades em vidro fosco de padrão inflamatório/infeccioso. Correlação clínica, laboratorial e evolutiva.
+laudo_205_rm-joelho.pdf;Laudo de Ressonância Magnética;PEDRO VILELA CAMPOS FAGUNDES;Ruptura completa do LCA associada a lesão meniscal medial e contusão óssea. Correlação ortopédica.
+laudo_206_rm-coluna.pdf;Laudo de Ressonância Magnética;FERNANDA AGUIAR PRADO PORTELLA;Doença discal degenerativa com protrusão em L4-L5 e contato radicular à esquerda. Correlação com o quadro álgico.
+laudo_207_densitometria.pdf;Laudo de Densitometria Óssea;BEATRIZ FURTADO NOGUEIRA FAGUNDES;Osteopenia. Recomenda-se correlação com fatores de risco e conduta clínica para prevenção de fraturas.
+laudo_208_us-abdome.pdf;Laudo de Ultrassonografia;MARINA PEIXOTO ALVES DAMÁSIO;Ultrassonografia de abdome total sem alterações significativas.
+laudo_209_us-tireoide.pdf;Laudo de Ultrassonografia;PEDRO VILELA CAMPOS ANDRADE;Nódulo tireoidiano ACR TI-RADS 3. Seguimento ultrassonográfico conforme protocolo institucional.
+laudo_210_polissonografia.pdf;Laudo de Polissonografia;INGRID SAMPAIO REIS PORTELLA;Síndrome da apneia obstrutiva do sono de grau moderado a grave. Avaliação para terapia ventilatória e medidas gerais.
+laudo_211_fundoscopia.pdf;Laudo de Fundoscopia;LUCAS AMARANTE FAGUNDES;Retinopatia hipertensiva moderada à direita e leve à esquerda. Controle pressórico e reavaliação oftalmológica.
+laudo_212_campimetria.pdf;Laudo de Campimetria;BRENO TAVARES LINS COUTINHO;Campimetria computadorizada dentro dos limites da normalidade.
+laudo_213_acuidade-visual.pdf;Laudo de Acuidade Visual;ALINE GUIMARÃES ROCHA ANDRADE;Baixa visual corrigível por erro refracional. Prescrição óptica atualizada recomendada.
+laudo_214_itb.pdf;Laudo de Índice Tornozelo-Braço;MARINA PEIXOTO ALVES SERPA;ITB reduzido à direita, compatível com doença arterial periférica moderada. Avaliação vascular recomendada.
+laudo_215_angio-tc.pdf;Laudo de Angiotomografia;ÚRSULA BERNARDES PINTO LEAL;Tromboembolismo pulmonar agudo segmentar bilateral, com sinais discretos de repercussão no ventrículo direito.
+laudo_216_rx-torax.pdf;Laudo Radiográfico;TATIANE AMARAL COSTA LEAL;Cardiomegalia discreta associada a sinais de congestão pulmonar leve. Correlação clínica recomendada.
+laudo_217_rx-coluna-lombar.pdf;Laudo Radiográfico;MURILO QUINTELA FIGUEIRA;Escoliose lombar leve. Avaliação clínica e, se indicado, estudo complementar.
+laudo_218_rx-joelho.pdf;Laudo Radiográfico;LUCAS AMARANTE DAMÁSIO;Gonartrose medial moderada. Correlação clínica e, se necessário, ressonância magnética.
+laudo_219_rx-seios-face.pdf;Laudo Radiográfico;CÍNTIA ALENCAR RAMOS GOULART;Radiografia dos seios da face sem alterações significativas.
+laudo_220_eeg.pdf;Laudo de Eletroencefalograma;ÉRICA BASTOS ANTUNES MARANHÃO;Atividade epileptiforme focal em região temporal esquerda. Sugere-se correlação com história clínica e, se indicado, EEG prolongado.
+laudo_221_ecg.pdf;Laudo de Eletrocardiograma;HENRIQUE BASTOS MELO VILAR;Sobrecarga ventricular esquerda com alterações inespecíficas da repolarização. Correlação com hipertensão arterial e ecocardiograma, se clinicamente indicado.
+laudo_222_holter.pdf;Laudo de Holter 24 horas;YASMIN FIGUEIREDO LEAL;Ectopia supraventricular frequente com taquicardia atrial não sustentada. Correlação com sintomas e avaliação cardiológica.
+laudo_223_mapa.pdf;Laudo de MAPA;CAUÃ BERNARDES ANDRADE;MAPA dentro dos limites da normalidade, com descenso noturno preservado.
+laudo_224_teste-ergometrico.pdf;Laudo de Teste Ergométrico;BEATRIZ FURTADO NOGUEIRA COUTINHO;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_225_espirometria.pdf;Laudo de Espirometria;GUSTAVO PENNA ROCHA GOULART;Prova de função pulmonar dentro dos limites da normalidade.
+laudo_226_mamografia.pdf;Laudo de Mamografia;GABRIELA TAVARES MELO FIGUEIRA;BI-RADS 3 — achado provavelmente benigno. Controle em 6 meses ou ultrassonografia complementar.
+laudo_227_tc-cranio.pdf;Laudo de Tomografia Computadorizada;RAFAEL MOURA PACHECO ANDRADE;Hematoma subdural crônico à direita com mínimo efeito de massa. Avaliação neurocirúrgica conforme status clínico.
+laudo_228_tc-torax.pdf;Laudo de Tomografia Computadorizada;JÚLIA CAVALCANTE DIAS CALDEIRA;Opacidades em vidro fosco de padrão inflamatório/infeccioso. Correlação clínica, laboratorial e evolutiva.
+laudo_229_rm-joelho.pdf;Laudo de Ressonância Magnética;ANDRÉ SALDANHA CRUZ FAGUNDES;Ruptura completa do LCA associada a lesão meniscal medial e contusão óssea. Correlação ortopédica.
+laudo_230_rm-coluna.pdf;Laudo de Ressonância Magnética;ALINE GUIMARÃES ROCHA MARANHÃO;RM da coluna lombar sem alterações compressivas ou degenerativas significativas.
+laudo_231_densitometria.pdf;Laudo de Densitometria Óssea;MURILO QUINTELA FAGUNDES;Osteoporose densitométrica. Avaliação clínica, laboratorial e de risco de fratura indicada.
+laudo_232_us-abdome.pdf;Laudo de Ultrassonografia;FABRÍCIO GUEDES ANTUNES CALDEIRA;Ultrassonografia de abdome total sem alterações significativas.
+laudo_233_us-tireoide.pdf;Laudo de Ultrassonografia;ALINE GUIMARÃES ROCHA ANDRADE;Ultrassonografia de tireoide sem alterações.
+laudo_234_polissonografia.pdf;Laudo de Polissonografia;DAVI NORONHA VALE FIGUEIRA;Polissonografia sem evidência de apneia obstrutiva do sono clinicamente significativa.
+laudo_235_fundoscopia.pdf;Laudo de Fundoscopia;DAVI NORONHA VALE FAGUNDES;Retinopatia hipertensiva moderada à direita e leve à esquerda. Controle pressórico e reavaliação oftalmológica.
+laudo_236_campimetria.pdf;Laudo de Campimetria;SABRINA TEIXEIRA LOPES SERPA;Campimetria computadorizada dentro dos limites da normalidade.
+laudo_237_acuidade-visual.pdf;Laudo de Acuidade Visual;ISADORA PIMENTEL MESQUITA;Exame oftalmológico funcional dentro da normalidade, com ametropia leve.
+laudo_238_itb.pdf;Laudo de Índice Tornozelo-Braço;WAGNER MONTEIRO REIS PORTELLA;ITB dentro da normalidade, sem evidência de doença arterial periférica obstrutiva neste método.
+laudo_239_angio-tc.pdf;Laudo de Angiotomografia;DÉBORA PENNA FREITAS LEAL;Tromboembolismo pulmonar agudo segmentar bilateral, com sinais discretos de repercussão no ventrículo direito.
+laudo_240_rx-torax.pdf;Laudo Radiográfico;DANIELA BORGES LINS MESQUITA;Exame radiológico de aspecto normal.
+laudo_241_rx-coluna-lombar.pdf;Laudo Radiográfico;CAIO BELMONTE ANDRADE;Escoliose lombar leve. Avaliação clínica e, se indicado, estudo complementar.
+laudo_242_rx-joelho.pdf;Laudo Radiográfico;RAFAEL MOURA PACHECO SERPA;Gonartrose medial moderada. Correlação clínica e, se necessário, ressonância magnética.
+laudo_243_rx-seios-face.pdf;Laudo Radiográfico;FELIPE GUIMARÃES LOBO COUTINHO;Sinais radiológicos compatíveis com sinusopatia maxilar à esquerda.
+laudo_244_eeg.pdf;Laudo de Eletroencefalograma;ISADORA PIMENTEL PORTELLA;Discretos sinais de disfunção cortical de caráter inespecífico.
+laudo_245_ecg.pdf;Laudo de Eletrocardiograma;FABRÍCIO GUEDES ANTUNES GOULART;Eletrocardiograma de repouso normal.
+laudo_246_holter.pdf;Laudo de Holter 24 horas;IGOR VASQUES PINTO DAMÁSIO;Holter 24 horas sem arritmias clinicamente relevantes.
+laudo_247_mapa.pdf;Laudo de MAPA;RENATO QUEIROZ DIAS FAGUNDES;MAPA dentro dos limites da normalidade, com descenso noturno preservado.
+laudo_248_teste-ergometrico.pdf;Laudo de Teste Ergométrico;MURILO QUINTELA COUTINHO;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_249_espirometria.pdf;Laudo de Espirometria;GUSTAVO PENNA ROCHA FIGUEIRA;Prova de função pulmonar dentro dos limites da normalidade.
+laudo_250_mamografia.pdf;Laudo de Mamografia;KARINA LOBATO PIRES MESQUITA;BI-RADS 1 — mamografia negativa. Controle habitual conforme rastreamento.
+laudo_251_tc-cranio.pdf;Laudo de Tomografia Computadorizada;CAIO BELMONTE MARANHÃO;Hematoma subdural crônico à direita com mínimo efeito de massa. Avaliação neurocirúrgica conforme status clínico.
+laudo_252_tc-torax.pdf;Laudo de Tomografia Computadorizada;MURILO QUINTELA VILAR;Tomografia de tórax sem achados significativos.
+laudo_253_rm-joelho.pdf;Laudo de Ressonância Magnética;ALINE GUIMARÃES ROCHA CALDEIRA;Ressonância magnética do joelho esquerdo sem alterações significativas.
+laudo_254_rm-coluna.pdf;Laudo de Ressonância Magnética;CAUÃ BERNARDES XAVIER;Doença discal degenerativa com protrusão em L4-L5 e contato radicular à esquerda. Correlação com o quadro álgico.
+laudo_255_densitometria.pdf;Laudo de Densitometria Óssea;WAGNER MONTEIRO REIS CAMARGO;Osteoporose densitométrica. Avaliação clínica, laboratorial e de risco de fratura indicada.
+laudo_256_us-abdome.pdf;Laudo de Ultrassonografia;PATRÍCIA MOURA SENA VILAR;Ultrassonografia de abdome total sem alterações significativas.
+laudo_257_us-tireoide.pdf;Laudo de Ultrassonografia;CÍNTIA ALENCAR RAMOS SERPA;Ultrassonografia de tireoide sem alterações.
+laudo_258_polissonografia.pdf;Laudo de Polissonografia;JOÃO CÂNDIDO FREITAS SERPA;Polissonografia sem evidência de apneia obstrutiva do sono clinicamente significativa.
+laudo_259_fundoscopia.pdf;Laudo de Fundoscopia;RAFAEL MOURA PACHECO BARRETO;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_260_campimetria.pdf;Laudo de Campimetria;JÚLIA CAVALCANTE DIAS COUTINHO;Campimetria computadorizada dentro dos limites da normalidade.
+laudo_261_acuidade-visual.pdf;Laudo de Acuidade Visual;ALINE GUIMARÃES ROCHA SERPA;Baixa visual corrigível por erro refracional. Prescrição óptica atualizada recomendada.
+laudo_262_itb.pdf;Laudo de Índice Tornozelo-Braço;CAUÃ BERNARDES VILAR;ITB dentro da normalidade, sem evidência de doença arterial periférica obstrutiva neste método.
+laudo_263_angio-tc.pdf;Laudo de Angiotomografia;CAIO BELMONTE CALDEIRA;Angiotomografia negativa para tromboembolismo pulmonar agudo.
+laudo_264_rx-torax.pdf;Laudo Radiográfico;GUSTAVO PENNA ROCHA MARANHÃO;Opacidade em lobo inferior direito, podendo corresponder a processo inflamatório/infeccioso. Sugere-se correlação clínica e controle evolutivo.
+laudo_265_rx-coluna-lombar.pdf;Laudo Radiográfico;YURI ALBUQUERQUE VILAR;Escoliose lombar leve. Avaliação clínica e, se indicado, estudo complementar.
+laudo_266_rx-joelho.pdf;Laudo Radiográfico;KARINA LOBATO PIRES PORTELLA;Radiografia de joelho direito sem alterações evidentes.
+laudo_267_rx-seios-face.pdf;Laudo Radiográfico;DAVI NORONHA VALE DAMÁSIO;Radiografia dos seios da face sem alterações significativas.
+laudo_268_eeg.pdf;Laudo de Eletroencefalograma;RAFAEL MOURA PACHECO SERPA;Traçado com atividade epileptiforme generalizada, compatível com padrão de ausência. Correlação clínica obrigatória.
+laudo_269_ecg.pdf;Laudo de Eletrocardiograma;MARINA PEIXOTO ALVES PORTELLA;Fibrilação atrial com resposta ventricular controlada. Avaliação clínica e de risco tromboembólico recomendada.
+laudo_270_holter.pdf;Laudo de Holter 24 horas;EDUARDO FALCÃO NEVES PORTELLA;Holter 24 horas sem arritmias clinicamente relevantes.
+laudo_271_mapa.pdf;Laudo de MAPA;PAULO HENRIQUE LACERDA XAVIER;Hipertensão arterial ao MAPA, com padrão não dipper. Ajuste terapêutico e seguimento clínico indicados.
+laudo_272_teste-ergometrico.pdf;Laudo de Teste Ergométrico;FABRÍCIO GUEDES ANTUNES LEAL;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_273_espirometria.pdf;Laudo de Espirometria;JÚLIA CAVALCANTE DIAS VILAR;Distúrbio ventilatório obstrutivo moderado, sem resposta broncodilatadora significativa neste exame.
+laudo_274_mamografia.pdf;Laudo de Mamografia;DANIELA BORGES LINS GOULART;BI-RADS 3 — achado provavelmente benigno. Controle em 6 meses ou ultrassonografia complementar.
+laudo_275_tc-cranio.pdf;Laudo de Tomografia Computadorizada;IAGO PIMENTEL RIOS BARRETO;Tomografia de crânio sem alterações agudas evidenciáveis.
+laudo_276_tc-torax.pdf;Laudo de Tomografia Computadorizada;JÚLIA CAVALCANTE DIAS PORTELLA;Tomografia de tórax sem achados significativos.
+laudo_277_rm-joelho.pdf;Laudo de Ressonância Magnética;CAUÃ BERNARDES XAVIER;Ruptura completa do LCA associada a lesão meniscal medial e contusão óssea. Correlação ortopédica.
+laudo_278_rm-coluna.pdf;Laudo de Ressonância Magnética;RAFAEL MOURA PACHECO DAMÁSIO;Doença discal degenerativa com protrusão em L4-L5 e contato radicular à esquerda. Correlação com o quadro álgico.
+laudo_279_densitometria.pdf;Laudo de Densitometria Óssea;GABRIELA TAVARES MELO VILAR;Osteoporose densitométrica. Avaliação clínica, laboratorial e de risco de fratura indicada.
+laudo_280_us-abdome.pdf;Laudo de Ultrassonografia;YASMIN FIGUEIREDO ANDRADE;Esteatose hepática moderada e colelitíase. Sem sinais de colecistite aguda neste exame.
+laudo_281_us-tireoide.pdf;Laudo de Ultrassonografia;DAVI NORONHA VALE CALDEIRA;Nódulo tireoidiano ACR TI-RADS 3. Seguimento ultrassonográfico conforme protocolo institucional.
+laudo_282_polissonografia.pdf;Laudo de Polissonografia;TATIANE AMARAL COSTA COUTINHO;Polissonografia sem evidência de apneia obstrutiva do sono clinicamente significativa.
+laudo_283_fundoscopia.pdf;Laudo de Fundoscopia;ÚRSULA BERNARDES PINTO CAMARGO;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_284_campimetria.pdf;Laudo de Campimetria;JOÃO CÂNDIDO FREITAS PORTELLA;Alteração campimétrica sugestiva de glaucoma no olho direito. Correlação com PIO, papila e RNFL.
+laudo_285_acuidade-visual.pdf;Laudo de Acuidade Visual;BEATRIZ FURTADO NOGUEIRA LEAL;Baixa visual corrigível por erro refracional. Prescrição óptica atualizada recomendada.
+laudo_286_itb.pdf;Laudo de Índice Tornozelo-Braço;SAMUEL FONTES LIMA MESQUITA;ITB reduzido à direita, compatível com doença arterial periférica moderada. Avaliação vascular recomendada.
+laudo_287_angio-tc.pdf;Laudo de Angiotomografia;KARINA LOBATO PIRES CAMARGO;Tromboembolismo pulmonar agudo segmentar bilateral, com sinais discretos de repercussão no ventrículo direito.
+laudo_288_rx-torax.pdf;Laudo Radiográfico;CAUÃ BERNARDES LEAL;Sinais radiológicos de hiperinsuflação pulmonar, sugestivos de doença pulmonar obstrutiva. Correlação com espirometria é aconselhável.
+laudo_289_rx-coluna-lombar.pdf;Laudo Radiográfico;CAUÃ BERNARDES LEAL;Sinais de espondilose lombar e discopatia degenerativa em L4-L5 e L5-S1.
+laudo_290_rx-joelho.pdf;Laudo Radiográfico;CAMILA ESTEVES RANGEL SERPA;Gonartrose medial moderada. Correlação clínica e, se necessário, ressonância magnética.
+laudo_291_rx-seios-face.pdf;Laudo Radiográfico;MARCELO TELES BRAGA GOULART;Sinais radiológicos compatíveis com sinusopatia maxilar à esquerda.
+laudo_292_eeg.pdf;Laudo de Eletroencefalograma;ELISA MONTEIRO CUNHA FAGUNDES;Traçado com atividade epileptiforme generalizada, compatível com padrão de ausência. Correlação clínica obrigatória.
+laudo_293_ecg.pdf;Laudo de Eletrocardiograma;FELIPE GUIMARÃES LOBO XAVIER;Eletrocardiograma de repouso normal.
+laudo_294_holter.pdf;Laudo de Holter 24 horas;ALINE GUIMARÃES ROCHA FAGUNDES;Ectopia supraventricular frequente com taquicardia atrial não sustentada. Correlação com sintomas e avaliação cardiológica.
+laudo_295_mapa.pdf;Laudo de MAPA;PATRÍCIA MOURA SENA PORTELLA;MAPA dentro dos limites da normalidade, com descenso noturno preservado.
+laudo_296_teste-ergometrico.pdf;Laudo de Teste Ergométrico;FELIPE GUIMARÃES LOBO BARRETO;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_297_espirometria.pdf;Laudo de Espirometria;ALINE GUIMARÃES ROCHA CALDEIRA;Distúrbio ventilatório obstrutivo moderado, sem resposta broncodilatadora significativa neste exame.
+laudo_298_mamografia.pdf;Laudo de Mamografia;VALENTINA CORREIA LUZ GOULART;BI-RADS 1 — mamografia negativa. Controle habitual conforme rastreamento.
+laudo_299_tc-cranio.pdf;Laudo de Tomografia Computadorizada;ÉRICA BASTOS ANTUNES LEAL;Achados compatíveis com acidente vascular encefálico isquêmico em evolução à esquerda. Correlação clínica e tempo de início dos sintomas são essenciais.
+laudo_300_tc-torax.pdf;Laudo de Tomografia Computadorizada;ANDRÉ SALDANHA CRUZ ANDRADE;Opacidades em vidro fosco de padrão inflamatório/infeccioso. Correlação clínica, laboratorial e evolutiva.
+laudo_301_rm-joelho.pdf;Laudo de Ressonância Magnética;YASMIN FIGUEIREDO CALDEIRA;Ruptura completa do LCA associada a lesão meniscal medial e contusão óssea. Correlação ortopédica.
+laudo_302_rm-coluna.pdf;Laudo de Ressonância Magnética;GUSTAVO PENNA ROCHA GOULART;RM da coluna lombar sem alterações compressivas ou degenerativas significativas.
+laudo_303_densitometria.pdf;Laudo de Densitometria Óssea;BEATRIZ FURTADO NOGUEIRA CALDEIRA;Osteoporose densitométrica. Avaliação clínica, laboratorial e de risco de fratura indicada.
+laudo_304_us-abdome.pdf;Laudo de Ultrassonografia;GUSTAVO PENNA ROCHA GOULART;Ultrassonografia de abdome total sem alterações significativas.
+laudo_305_us-tireoide.pdf;Laudo de Ultrassonografia;EDUARDO FALCÃO NEVES PORTELLA;Ultrassonografia de tireoide sem alterações.
+laudo_306_polissonografia.pdf;Laudo de Polissonografia;PAULO HENRIQUE LACERDA GOULART;Síndrome da apneia obstrutiva do sono de grau moderado a grave. Avaliação para terapia ventilatória e medidas gerais.
+laudo_307_fundoscopia.pdf;Laudo de Fundoscopia;RAFAEL MOURA PACHECO COUTINHO;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_308_campimetria.pdf;Laudo de Campimetria;BEATRIZ FURTADO NOGUEIRA LEAL;Alteração campimétrica sugestiva de glaucoma no olho direito. Correlação com PIO, papila e RNFL.
+laudo_309_acuidade-visual.pdf;Laudo de Acuidade Visual;VALENTINA CORREIA LUZ FAGUNDES;Baixa visual corrigível por erro refracional. Prescrição óptica atualizada recomendada.
+laudo_310_itb.pdf;Laudo de Índice Tornozelo-Braço;ELISA MONTEIRO CUNHA XAVIER;ITB reduzido à direita, compatível com doença arterial periférica moderada. Avaliação vascular recomendada.
+laudo_311_angio-tc.pdf;Laudo de Angiotomografia;SAMUEL FONTES LIMA XAVIER;Tromboembolismo pulmonar agudo segmentar bilateral, com sinais discretos de repercussão no ventrículo direito.
+laudo_312_rx-torax.pdf;Laudo Radiográfico;JOÃO CÂNDIDO FREITAS COUTINHO;Opacidade em lobo inferior direito, podendo corresponder a processo inflamatório/infeccioso. Sugere-se correlação clínica e controle evolutivo.
+laudo_313_rx-coluna-lombar.pdf;Laudo Radiográfico;BRUNA SIQUEIRA VALE FAGUNDES;Sinais de espondilose lombar e discopatia degenerativa em L4-L5 e L5-S1.
+laudo_314_rx-joelho.pdf;Laudo Radiográfico;FABRÍCIO GUEDES ANTUNES ANDRADE;Gonartrose medial moderada. Correlação clínica e, se necessário, ressonância magnética.
+laudo_315_rx-seios-face.pdf;Laudo Radiográfico;HEITOR ALENCAR PRADO MARANHÃO;Radiografia dos seios da face sem alterações significativas.
+laudo_316_eeg.pdf;Laudo de Eletroencefalograma;FABRÍCIO GUEDES ANTUNES COUTINHO;Traçado com atividade epileptiforme generalizada, compatível com padrão de ausência. Correlação clínica obrigatória.
+laudo_317_ecg.pdf;Laudo de Eletrocardiograma;LETÍCIA NAVARRO GOMES SERPA;Bloqueio de ramo direito completo, sem sinais eletrocardiográficos de isquemia aguda.
+laudo_318_holter.pdf;Laudo de Holter 24 horas;ÉRICA BASTOS ANTUNES BARRETO;Holter 24 horas sem arritmias clinicamente relevantes.
+laudo_319_mapa.pdf;Laudo de MAPA;MARCELO TELES BRAGA LEAL;MAPA dentro dos limites da normalidade, com descenso noturno preservado.
+laudo_320_teste-ergometrico.pdf;Laudo de Teste Ergométrico;HENRIQUE BASTOS MELO VILAR;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_321_espirometria.pdf;Laudo de Espirometria;MARCELO TELES BRAGA MARANHÃO;Prova de função pulmonar dentro dos limites da normalidade.
+laudo_322_mamografia.pdf;Laudo de Mamografia;FERNANDA AGUIAR PRADO LEAL;BI-RADS 1 — mamografia negativa. Controle habitual conforme rastreamento.
+laudo_323_tc-cranio.pdf;Laudo de Tomografia Computadorizada;TATIANE AMARAL COSTA GOULART;Hematoma subdural crônico à direita com mínimo efeito de massa. Avaliação neurocirúrgica conforme status clínico.
+laudo_324_tc-torax.pdf;Laudo de Tomografia Computadorizada;KARINA LOBATO PIRES MARANHÃO;Opacidades em vidro fosco de padrão inflamatório/infeccioso. Correlação clínica, laboratorial e evolutiva.
+laudo_325_rm-joelho.pdf;Laudo de Ressonância Magnética;ELISA MONTEIRO CUNHA MARANHÃO;Ruptura completa do LCA associada a lesão meniscal medial e contusão óssea. Correlação ortopédica.
+laudo_326_rm-coluna.pdf;Laudo de Ressonância Magnética;MARCELO TELES BRAGA CAMARGO;Doença discal degenerativa com protrusão em L4-L5 e contato radicular à esquerda. Correlação com o quadro álgico.
+laudo_327_densitometria.pdf;Laudo de Densitometria Óssea;HENRIQUE BASTOS MELO DAMÁSIO;Osteoporose densitométrica. Avaliação clínica, laboratorial e de risco de fratura indicada.
+laudo_328_us-abdome.pdf;Laudo de Ultrassonografia;CÍNTIA ALENCAR RAMOS LEAL;Ultrassonografia de abdome total sem alterações significativas.
+laudo_329_us-tireoide.pdf;Laudo de Ultrassonografia;MURILO QUINTELA LEAL;Nódulo tireoidiano ACR TI-RADS 3. Seguimento ultrassonográfico conforme protocolo institucional.
+laudo_330_polissonografia.pdf;Laudo de Polissonografia;IAGO PIMENTEL RIOS FIGUEIRA;Polissonografia sem evidência de apneia obstrutiva do sono clinicamente significativa.
+laudo_331_fundoscopia.pdf;Laudo de Fundoscopia;IAGO PIMENTEL RIOS BARRETO;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_332_campimetria.pdf;Laudo de Campimetria;JOÃO CÂNDIDO FREITAS COUTINHO;Campimetria computadorizada dentro dos limites da normalidade.
+laudo_333_acuidade-visual.pdf;Laudo de Acuidade Visual;DANIELA BORGES LINS CAMARGO;Baixa visual corrigível por erro refracional. Prescrição óptica atualizada recomendada.
+laudo_334_itb.pdf;Laudo de Índice Tornozelo-Braço;DAVI NORONHA VALE CAMARGO;ITB dentro da normalidade, sem evidência de doença arterial periférica obstrutiva neste método.
+laudo_335_angio-tc.pdf;Laudo de Angiotomografia;DÉBORA PENNA FREITAS COUTINHO;Tromboembolismo pulmonar agudo segmentar bilateral, com sinais discretos de repercussão no ventrículo direito.
+laudo_336_rx-torax.pdf;Laudo Radiográfico;ELISA MONTEIRO CUNHA MARANHÃO;Opacidade em lobo inferior direito, podendo corresponder a processo inflamatório/infeccioso. Sugere-se correlação clínica e controle evolutivo.
+laudo_337_rx-coluna-lombar.pdf;Laudo Radiográfico;FABRÍCIO GUEDES ANTUNES VILAR;Estudo radiográfico da coluna lombar sem alterações significativas.
+laudo_338_rx-joelho.pdf;Laudo Radiográfico;DAVI NORONHA VALE CALDEIRA;Radiografia de joelho direito sem alterações evidentes.
+laudo_339_rx-seios-face.pdf;Laudo Radiográfico;CÍNTIA ALENCAR RAMOS PORTELLA;Sinais radiológicos compatíveis com sinusopatia maxilar à esquerda.
+laudo_340_eeg.pdf;Laudo de Eletroencefalograma;FELIPE GUIMARÃES LOBO FIGUEIRA;Eletroencefalograma dentro dos limites da normalidade.
+laudo_341_ecg.pdf;Laudo de Eletrocardiograma;CAUÃ BERNARDES PORTELLA;Bloqueio de ramo direito completo, sem sinais eletrocardiográficos de isquemia aguda.
+laudo_342_holter.pdf;Laudo de Holter 24 horas;OLIVIA FARIAS DUTRA CALDEIRA;Ectopia supraventricular frequente com taquicardia atrial não sustentada. Correlação com sintomas e avaliação cardiológica.
+laudo_343_mapa.pdf;Laudo de MAPA;OTÁVIO LEME SIQUEIRA ANDRADE;MAPA dentro dos limites da normalidade, com descenso noturno preservado.
+laudo_344_teste-ergometrico.pdf;Laudo de Teste Ergométrico;CAMILA ESTEVES RANGEL CAMARGO;Teste ergométrico positivo para isquemia miocárdica. Avaliação cardiológica complementar é recomendada.
+laudo_345_espirometria.pdf;Laudo de Espirometria;OTÁVIO LEME SIQUEIRA MESQUITA;Distúrbio ventilatório obstrutivo moderado, sem resposta broncodilatadora significativa neste exame.
+laudo_346_mamografia.pdf;Laudo de Mamografia;JÚLIA CAVALCANTE DIAS ANDRADE;BI-RADS 3 — achado provavelmente benigno. Controle em 6 meses ou ultrassonografia complementar.
+laudo_347_tc-cranio.pdf;Laudo de Tomografia Computadorizada;BRUNA SIQUEIRA VALE MESQUITA;Tomografia de crânio sem alterações agudas evidenciáveis.
+laudo_348_tc-torax.pdf;Laudo de Tomografia Computadorizada;RAFAEL MOURA PACHECO GOULART;Tomografia de tórax sem achados significativos.
+laudo_349_rm-joelho.pdf;Laudo de Ressonância Magnética;FELIPE GUIMARÃES LOBO DAMÁSIO;Ruptura completa do LCA associada a lesão meniscal medial e contusão óssea. Correlação ortopédica.
+laudo_350_rm-coluna.pdf;Laudo de Ressonância Magnética;TATIANE AMARAL COSTA MESQUITA;Doença discal degenerativa com protrusão em L4-L5 e contato radicular à esquerda. Correlação com o quadro álgico.
+laudo_351_densitometria.pdf;Laudo de Densitometria Óssea;THIAGO FARIAS NUNES CAMARGO;Densidade mineral óssea dentro da faixa de normalidade (OMS).
+laudo_352_us-abdome.pdf;Laudo de Ultrassonografia;WAGNER MONTEIRO REIS XAVIER;Ultrassonografia de abdome total sem alterações significativas.
+laudo_353_us-tireoide.pdf;Laudo de Ultrassonografia;SABRINA TEIXEIRA LOPES CAMARGO;Nódulo tireoidiano ACR TI-RADS 3. Seguimento ultrassonográfico conforme protocolo institucional.
+laudo_354_polissonografia.pdf;Laudo de Polissonografia;MARINA PEIXOTO ALVES XAVIER;Síndrome da apneia obstrutiva do sono de grau moderado a grave. Avaliação para terapia ventilatória e medidas gerais.
+laudo_355_fundoscopia.pdf;Laudo de Fundoscopia;JOÃO CÂNDIDO FREITAS CAMARGO;Retinopatia hipertensiva moderada à direita e leve à esquerda. Controle pressórico e reavaliação oftalmológica.
+laudo_356_campimetria.pdf;Laudo de Campimetria;HENRIQUE BASTOS MELO GOULART;Alteração campimétrica sugestiva de glaucoma no olho direito. Correlação com PIO, papila e RNFL.
+laudo_357_acuidade-visual.pdf;Laudo de Acuidade Visual;CAUÃ BERNARDES FAGUNDES;Baixa visual corrigível por erro refracional. Prescrição óptica atualizada recomendada.
+laudo_358_itb.pdf;Laudo de Índice Tornozelo-Braço;LARISSA MENDONÇA PAIVA CALDEIRA;ITB dentro da normalidade, sem evidência de doença arterial periférica obstrutiva neste método.
+laudo_359_angio-tc.pdf;Laudo de Angiotomografia;RAFAELA NUNES BRITO COUTINHO;Angiotomografia negativa para tromboembolismo pulmonar agudo.
+laudo_360_rx-torax.pdf;Laudo Radiográfico;JÚLIA CAVALCANTE DIAS MARANHÃO;Exame radiológico de aspecto normal.
+laudo_361_rx-coluna-lombar.pdf;Laudo Radiográfico;MARINA PEIXOTO ALVES DAMÁSIO;Escoliose lombar leve. Avaliação clínica e, se indicado, estudo complementar.
+laudo_362_rx-joelho.pdf;Laudo Radiográfico;BRENO TAVARES LINS CALDEIRA;Gonartrose medial moderada. Correlação clínica e, se necessário, ressonância magnética.
+laudo_363_rx-seios-face.pdf;Laudo Radiográfico;VANESSA LACERDA CRUZ ANDRADE;Radiografia dos seios da face sem alterações significativas.
+laudo_364_eeg.pdf;Laudo de Eletroencefalograma;HEITOR ALENCAR PRADO FAGUNDES;Traçado com atividade epileptiforme generalizada, compatível com padrão de ausência. Correlação clínica obrigatória.
+laudo_365_ecg.pdf;Laudo de Eletrocardiograma;ÉRICA BASTOS ANTUNES FAGUNDES;Eletrocardiograma de repouso normal.
+laudo_366_holter.pdf;Laudo de Holter 24 horas;SABRINA TEIXEIRA LOPES LEAL;Holter 24 horas sem arritmias clinicamente relevantes.
+laudo_367_mapa.pdf;Laudo de MAPA;EDUARDO FALCÃO NEVES DAMÁSIO;MAPA dentro dos limites da normalidade, com descenso noturno preservado.
+laudo_368_teste-ergometrico.pdf;Laudo de Teste Ergométrico;SAMUEL FONTES LIMA LEAL;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_369_espirometria.pdf;Laudo de Espirometria;VICTOR HUGO CORDEIRO COUTINHO;Prova de função pulmonar dentro dos limites da normalidade.
+laudo_370_mamografia.pdf;Laudo de Mamografia;RAFAELA NUNES BRITO FAGUNDES;BI-RADS 5 — altamente sugestivo de malignidade. Biópsia e avaliação multidisciplinar indicadas.
+laudo_371_tc-cranio.pdf;Laudo de Tomografia Computadorizada;BEATRIZ FURTADO NOGUEIRA DAMÁSIO;Hematoma subdural crônico à direita com mínimo efeito de massa. Avaliação neurocirúrgica conforme status clínico.
+laudo_372_tc-torax.pdf;Laudo de Tomografia Computadorizada;TATIANE AMARAL COSTA GOULART;Tomografia de tórax sem achados significativos.
+laudo_373_rm-joelho.pdf;Laudo de Ressonância Magnética;MARINA PEIXOTO ALVES BARRETO;Ressonância magnética do joelho esquerdo sem alterações significativas.
+laudo_374_rm-coluna.pdf;Laudo de Ressonância Magnética;DANIELA BORGES LINS CAMARGO;RM da coluna lombar sem alterações compressivas ou degenerativas significativas.
+laudo_375_densitometria.pdf;Laudo de Densitometria Óssea;FERNANDA AGUIAR PRADO PORTELLA;Osteopenia. Recomenda-se correlação com fatores de risco e conduta clínica para prevenção de fraturas.
+laudo_376_us-abdome.pdf;Laudo de Ultrassonografia;ÚRSULA BERNARDES PINTO FAGUNDES;Esteatose hepática moderada e colelitíase. Sem sinais de colecistite aguda neste exame.
+laudo_377_us-tireoide.pdf;Laudo de Ultrassonografia;ANDRÉ SALDANHA CRUZ PORTELLA;Ultrassonografia de tireoide sem alterações.
+laudo_378_polissonografia.pdf;Laudo de Polissonografia;HELENA VASCONCELOS FIGUEIRA;Polissonografia sem evidência de apneia obstrutiva do sono clinicamente significativa.
+laudo_379_fundoscopia.pdf;Laudo de Fundoscopia;THIAGO FARIAS NUNES PORTELLA;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_380_campimetria.pdf;Laudo de Campimetria;PEDRO VILELA CAMPOS CAMARGO;Alteração campimétrica sugestiva de glaucoma no olho direito. Correlação com PIO, papila e RNFL.
+laudo_381_acuidade-visual.pdf;Laudo de Acuidade Visual;INGRID SAMPAIO REIS BARRETO;Exame oftalmológico funcional dentro da normalidade, com ametropia leve.
+laudo_382_itb.pdf;Laudo de Índice Tornozelo-Braço;YURI ALBUQUERQUE CAMARGO;ITB dentro da normalidade, sem evidência de doença arterial periférica obstrutiva neste método.
+laudo_383_angio-tc.pdf;Laudo de Angiotomografia;LETÍCIA NAVARRO GOMES LEAL;Tromboembolismo pulmonar agudo segmentar bilateral, com sinais discretos de repercussão no ventrículo direito.
+laudo_384_rx-torax.pdf;Laudo Radiográfico;PATRÍCIA MOURA SENA LEAL;Exame radiológico de aspecto normal.
+laudo_385_rx-coluna-lombar.pdf;Laudo Radiográfico;ALINE GUIMARÃES ROCHA CALDEIRA;Sinais de espondilose lombar e discopatia degenerativa em L4-L5 e L5-S1.
+laudo_386_rx-joelho.pdf;Laudo Radiográfico;VICTOR HUGO CORDEIRO PORTELLA;Radiografia de joelho direito sem alterações evidentes.
+laudo_387_rx-seios-face.pdf;Laudo Radiográfico;ANDRÉ SALDANHA CRUZ LEAL;Radiografia dos seios da face sem alterações significativas.
+laudo_388_eeg.pdf;Laudo de Eletroencefalograma;BRENO TAVARES LINS BARRETO;Traçado com atividade epileptiforme generalizada, compatível com padrão de ausência. Correlação clínica obrigatória.
+laudo_389_ecg.pdf;Laudo de Eletrocardiograma;ISADORA PIMENTEL FAGUNDES;Eletrocardiograma de repouso normal.
+laudo_390_holter.pdf;Laudo de Holter 24 horas;ÉRICA BASTOS ANTUNES MESQUITA;Ectopia supraventricular frequente com taquicardia atrial não sustentada. Correlação com sintomas e avaliação cardiológica.
+laudo_391_mapa.pdf;Laudo de MAPA;EDUARDO FALCÃO NEVES COUTINHO;MAPA dentro dos limites da normalidade, com descenso noturno preservado.
+laudo_392_teste-ergometrico.pdf;Laudo de Teste Ergométrico;RENATO QUEIROZ DIAS FIGUEIRA;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_393_espirometria.pdf;Laudo de Espirometria;DAVI NORONHA VALE COUTINHO;Distúrbio ventilatório obstrutivo moderado, sem resposta broncodilatadora significativa neste exame.
+laudo_394_mamografia.pdf;Laudo de Mamografia;BEATRIZ FURTADO NOGUEIRA BARRETO;BI-RADS 5 — altamente sugestivo de malignidade. Biópsia e avaliação multidisciplinar indicadas.
+laudo_395_tc-cranio.pdf;Laudo de Tomografia Computadorizada;GABRIELA TAVARES MELO MESQUITA;Achados compatíveis com acidente vascular encefálico isquêmico em evolução à esquerda. Correlação clínica e tempo de início dos sintomas são essenciais.
+laudo_396_tc-torax.pdf;Laudo de Tomografia Computadorizada;YURI ALBUQUERQUE VILAR;Opacidades em vidro fosco de padrão inflamatório/infeccioso. Correlação clínica, laboratorial e evolutiva.
+laudo_397_rm-joelho.pdf;Laudo de Ressonância Magnética;BEATRIZ FURTADO NOGUEIRA XAVIER;Ruptura completa do LCA associada a lesão meniscal medial e contusão óssea. Correlação ortopédica.
+laudo_398_rm-coluna.pdf;Laudo de Ressonância Magnética;ALINE GUIMARÃES ROCHA SERPA;RM da coluna lombar sem alterações compressivas ou degenerativas significativas.
+laudo_399_densitometria.pdf;Laudo de Densitometria Óssea;JÚLIA CAVALCANTE DIAS CAMARGO;Osteoporose densitométrica. Avaliação clínica, laboratorial e de risco de fratura indicada.
+laudo_400_us-abdome.pdf;Laudo de Ultrassonografia;YASMIN FIGUEIREDO XAVIER;Ultrassonografia de abdome total sem alterações significativas.
+laudo_401_us-tireoide.pdf;Laudo de Ultrassonografia;LETÍCIA NAVARRO GOMES ANDRADE;Nódulo tireoidiano ACR TI-RADS 3. Seguimento ultrassonográfico conforme protocolo institucional.
+laudo_402_polissonografia.pdf;Laudo de Polissonografia;PEDRO VILELA CAMPOS SERPA;Síndrome da apneia obstrutiva do sono de grau moderado a grave. Avaliação para terapia ventilatória e medidas gerais.
+laudo_403_fundoscopia.pdf;Laudo de Fundoscopia;THIAGO FARIAS NUNES LEAL;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_404_campimetria.pdf;Laudo de Campimetria;ALINE GUIMARÃES ROCHA VILAR;Alteração campimétrica sugestiva de glaucoma no olho direito. Correlação com PIO, papila e RNFL.
+laudo_405_acuidade-visual.pdf;Laudo de Acuidade Visual;ALINE GUIMARÃES ROCHA GOULART;Baixa visual corrigível por erro refracional. Prescrição óptica atualizada recomendada.
+laudo_406_itb.pdf;Laudo de Índice Tornozelo-Braço;GABRIELA TAVARES MELO GOULART;ITB dentro da normalidade, sem evidência de doença arterial periférica obstrutiva neste método.
+laudo_407_angio-tc.pdf;Laudo de Angiotomografia;ÉRICA BASTOS ANTUNES GOULART;Angiotomografia negativa para tromboembolismo pulmonar agudo.
+laudo_408_rx-torax.pdf;Laudo Radiográfico;YASMIN FIGUEIREDO COUTINHO;Sinais radiológicos de hiperinsuflação pulmonar, sugestivos de doença pulmonar obstrutiva. Correlação com espirometria é aconselhável.
+laudo_409_rx-coluna-lombar.pdf;Laudo Radiográfico;ÉRICA BASTOS ANTUNES CAMARGO;Estudo radiográfico da coluna lombar sem alterações significativas.
+laudo_410_rx-joelho.pdf;Laudo Radiográfico;YURI ALBUQUERQUE CAMARGO;Radiografia de joelho direito sem alterações evidentes.
+laudo_411_rx-seios-face.pdf;Laudo Radiográfico;KARINA LOBATO PIRES VILAR;Sinais radiológicos compatíveis com sinusopatia maxilar à esquerda.
+laudo_412_eeg.pdf;Laudo de Eletroencefalograma;CÍNTIA ALENCAR RAMOS LEAL;Discretos sinais de disfunção cortical de caráter inespecífico.
+laudo_413_ecg.pdf;Laudo de Eletrocardiograma;HELENA VASCONCELOS CAMARGO;Bloqueio de ramo direito completo, sem sinais eletrocardiográficos de isquemia aguda.
+laudo_414_holter.pdf;Laudo de Holter 24 horas;LETÍCIA NAVARRO GOMES GOULART;Holter 24 horas sem arritmias clinicamente relevantes.
+laudo_415_mapa.pdf;Laudo de MAPA;NICOLAS AZEVEDO PIRES XAVIER;Hipertensão arterial ao MAPA, com padrão não dipper. Ajuste terapêutico e seguimento clínico indicados.
+laudo_416_teste-ergometrico.pdf;Laudo de Teste Ergométrico;EDUARDO FALCÃO NEVES SERPA;Teste ergométrico positivo para isquemia miocárdica. Avaliação cardiológica complementar é recomendada.
+laudo_417_espirometria.pdf;Laudo de Espirometria;FABRÍCIO GUEDES ANTUNES DAMÁSIO;Prova de função pulmonar dentro dos limites da normalidade.
+laudo_418_mamografia.pdf;Laudo de Mamografia;OLIVIA FARIAS DUTRA BARRETO;BI-RADS 3 — achado provavelmente benigno. Controle em 6 meses ou ultrassonografia complementar.
+laudo_419_tc-cranio.pdf;Laudo de Tomografia Computadorizada;MURILO QUINTELA FIGUEIRA;Achados compatíveis com acidente vascular encefálico isquêmico em evolução à esquerda. Correlação clínica e tempo de início dos sintomas são essenciais.
+laudo_420_tc-torax.pdf;Laudo de Tomografia Computadorizada;BEATRIZ FURTADO NOGUEIRA FIGUEIRA;Opacidades em vidro fosco de padrão inflamatório/infeccioso. Correlação clínica, laboratorial e evolutiva.
+laudo_421_rm-joelho.pdf;Laudo de Ressonância Magnética;JOÃO CÂNDIDO FREITAS CAMARGO;Ressonância magnética do joelho esquerdo sem alterações significativas.
+laudo_422_rm-coluna.pdf;Laudo de Ressonância Magnética;JÚLIA CAVALCANTE DIAS MESQUITA;Doença discal degenerativa com protrusão em L4-L5 e contato radicular à esquerda. Correlação com o quadro álgico.
+laudo_423_densitometria.pdf;Laudo de Densitometria Óssea;RAFAEL MOURA PACHECO COUTINHO;Osteopenia. Recomenda-se correlação com fatores de risco e conduta clínica para prevenção de fraturas.
+laudo_424_us-abdome.pdf;Laudo de Ultrassonografia;OLIVIA FARIAS DUTRA XAVIER;Ultrassonografia de abdome total sem alterações significativas.
+laudo_425_us-tireoide.pdf;Laudo de Ultrassonografia;VANESSA LACERDA CRUZ FAGUNDES;Ultrassonografia de tireoide sem alterações.
+laudo_426_polissonografia.pdf;Laudo de Polissonografia;CAIO BELMONTE FAGUNDES;Síndrome da apneia obstrutiva do sono de grau moderado a grave. Avaliação para terapia ventilatória e medidas gerais.
+laudo_427_fundoscopia.pdf;Laudo de Fundoscopia;ÉRICA BASTOS ANTUNES COUTINHO;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_428_campimetria.pdf;Laudo de Campimetria;LETÍCIA NAVARRO GOMES LEAL;Campimetria computadorizada dentro dos limites da normalidade.
+laudo_429_acuidade-visual.pdf;Laudo de Acuidade Visual;VALENTINA CORREIA LUZ GOULART;Exame oftalmológico funcional dentro da normalidade, com ametropia leve.
+laudo_430_itb.pdf;Laudo de Índice Tornozelo-Braço;YURI ALBUQUERQUE VILAR;ITB dentro da normalidade, sem evidência de doença arterial periférica obstrutiva neste método.
+laudo_431_angio-tc.pdf;Laudo de Angiotomografia;FABRÍCIO GUEDES ANTUNES SERPA;Angiotomografia negativa para tromboembolismo pulmonar agudo.
+laudo_432_rx-torax.pdf;Laudo Radiográfico;ÉRICA BASTOS ANTUNES BARRETO;Exame radiológico de aspecto normal.
+laudo_433_rx-coluna-lombar.pdf;Laudo Radiográfico;YASMIN FIGUEIREDO ANDRADE;Estudo radiográfico da coluna lombar sem alterações significativas.
+laudo_434_rx-joelho.pdf;Laudo Radiográfico;HELOÍSA QUINTANILHA XAVIER;Gonartrose medial moderada. Correlação clínica e, se necessário, ressonância magnética.
+laudo_435_rx-seios-face.pdf;Laudo Radiográfico;PAULO HENRIQUE LACERDA COUTINHO;Radiografia dos seios da face sem alterações significativas.
+laudo_436_eeg.pdf;Laudo de Eletroencefalograma;NATÁLIA RIBEIRO CAMPOS ANDRADE;Eletroencefalograma dentro dos limites da normalidade.
+laudo_437_ecg.pdf;Laudo de Eletrocardiograma;GUSTAVO PENNA ROCHA BARRETO;Sobrecarga ventricular esquerda com alterações inespecíficas da repolarização. Correlação com hipertensão arterial e ecocardiograma, se clinicamente indicado.
+laudo_438_holter.pdf;Laudo de Holter 24 horas;HEITOR ALENCAR PRADO MARANHÃO;Ectopia supraventricular frequente com taquicardia atrial não sustentada. Correlação com sintomas e avaliação cardiológica.
+laudo_439_mapa.pdf;Laudo de MAPA;GUSTAVO PENNA ROCHA XAVIER;MAPA dentro dos limites da normalidade, com descenso noturno preservado.
+laudo_440_teste-ergometrico.pdf;Laudo de Teste Ergométrico;ENZO GALVÃO DUTRA COUTINHO;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_441_espirometria.pdf;Laudo de Espirometria;VICTOR HUGO CORDEIRO COUTINHO;Distúrbio ventilatório restritivo sugestivo. Correlação clínica e radiológica recomendada.
+laudo_442_mamografia.pdf;Laudo de Mamografia;ELISA MONTEIRO CUNHA FAGUNDES;BI-RADS 5 — altamente sugestivo de malignidade. Biópsia e avaliação multidisciplinar indicadas.
+laudo_443_tc-cranio.pdf;Laudo de Tomografia Computadorizada;RAFAEL MOURA PACHECO BARRETO;Hematoma subdural crônico à direita com mínimo efeito de massa. Avaliação neurocirúrgica conforme status clínico.
+laudo_444_tc-torax.pdf;Laudo de Tomografia Computadorizada;TATIANE AMARAL COSTA XAVIER;Opacidades em vidro fosco de padrão inflamatório/infeccioso. Correlação clínica, laboratorial e evolutiva.
+laudo_445_rm-joelho.pdf;Laudo de Ressonância Magnética;THIAGO FARIAS NUNES PORTELLA;Ressonância magnética do joelho esquerdo sem alterações significativas.
+laudo_446_rm-coluna.pdf;Laudo de Ressonância Magnética;HELOÍSA QUINTANILHA LEAL;RM da coluna lombar sem alterações compressivas ou degenerativas significativas.
+laudo_447_densitometria.pdf;Laudo de Densitometria Óssea;SABRINA TEIXEIRA LOPES FAGUNDES;Osteopenia. Recomenda-se correlação com fatores de risco e conduta clínica para prevenção de fraturas.
+laudo_448_us-abdome.pdf;Laudo de Ultrassonografia;PATRÍCIA MOURA SENA GOULART;Ultrassonografia de abdome total sem alterações significativas.
+laudo_449_us-tireoide.pdf;Laudo de Ultrassonografia;VANESSA LACERDA CRUZ MARANHÃO;Ultrassonografia de tireoide sem alterações.
+laudo_450_polissonografia.pdf;Laudo de Polissonografia;FELIPE GUIMARÃES LOBO PORTELLA;Polissonografia sem evidência de apneia obstrutiva do sono clinicamente significativa.
+laudo_451_fundoscopia.pdf;Laudo de Fundoscopia;ANDRÉ SALDANHA CRUZ SERPA;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_452_campimetria.pdf;Laudo de Campimetria;VANESSA LACERDA CRUZ MESQUITA;Campimetria computadorizada dentro dos limites da normalidade.
+laudo_453_acuidade-visual.pdf;Laudo de Acuidade Visual;PAULO HENRIQUE LACERDA MARANHÃO;Baixa visual corrigível por erro refracional. Prescrição óptica atualizada recomendada.
+laudo_454_itb.pdf;Laudo de Índice Tornozelo-Braço;YURI ALBUQUERQUE VILAR;ITB dentro da normalidade, sem evidência de doença arterial periférica obstrutiva neste método.
+laudo_455_angio-tc.pdf;Laudo de Angiotomografia;DAVI NORONHA VALE COUTINHO;Tromboembolismo pulmonar agudo segmentar bilateral, com sinais discretos de repercussão no ventrículo direito.
+laudo_456_rx-torax.pdf;Laudo Radiográfico;LARISSA MENDONÇA PAIVA CALDEIRA;Cardiomegalia discreta associada a sinais de congestão pulmonar leve. Correlação clínica recomendada.
+laudo_457_rx-coluna-lombar.pdf;Laudo Radiográfico;HELENA VASCONCELOS SERPA;Sinais de espondilose lombar e discopatia degenerativa em L4-L5 e L5-S1.
+laudo_458_rx-joelho.pdf;Laudo Radiográfico;MARCELO TELES BRAGA LEAL;Radiografia de joelho direito sem alterações evidentes.
+laudo_459_rx-seios-face.pdf;Laudo Radiográfico;LUCAS AMARANTE FAGUNDES;Sinais radiológicos compatíveis com sinusopatia maxilar à esquerda.
+laudo_460_eeg.pdf;Laudo de Eletroencefalograma;MARINA PEIXOTO ALVES GOULART;Discretos sinais de disfunção cortical de caráter inespecífico.
+laudo_461_ecg.pdf;Laudo de Eletrocardiograma;MURILO QUINTELA DAMÁSIO;Fibrilação atrial com resposta ventricular controlada. Avaliação clínica e de risco tromboembólico recomendada.
+laudo_462_holter.pdf;Laudo de Holter 24 horas;YASMIN FIGUEIREDO SERPA;Ectopia supraventricular frequente com taquicardia atrial não sustentada. Correlação com sintomas e avaliação cardiológica.
+laudo_463_mapa.pdf;Laudo de MAPA;ALINE GUIMARÃES ROCHA LEAL;Hipertensão arterial ao MAPA, com padrão não dipper. Ajuste terapêutico e seguimento clínico indicados.
+laudo_464_teste-ergometrico.pdf;Laudo de Teste Ergométrico;LETÍCIA NAVARRO GOMES ANDRADE;Teste ergométrico positivo para isquemia miocárdica. Avaliação cardiológica complementar é recomendada.
+laudo_465_espirometria.pdf;Laudo de Espirometria;ALINE GUIMARÃES ROCHA FIGUEIRA;Prova de função pulmonar dentro dos limites da normalidade.
+laudo_466_mamografia.pdf;Laudo de Mamografia;DÉBORA PENNA FREITAS CAMARGO;BI-RADS 3 — achado provavelmente benigno. Controle em 6 meses ou ultrassonografia complementar.
+laudo_467_tc-cranio.pdf;Laudo de Tomografia Computadorizada;DAVI NORONHA VALE GOULART;Tomografia de crânio sem alterações agudas evidenciáveis.
+laudo_468_tc-torax.pdf;Laudo de Tomografia Computadorizada;SABRINA TEIXEIRA LOPES MARANHÃO;Opacidades em vidro fosco de padrão inflamatório/infeccioso. Correlação clínica, laboratorial e evolutiva.
+laudo_469_rm-joelho.pdf;Laudo de Ressonância Magnética;NICOLAS AZEVEDO PIRES COUTINHO;Ressonância magnética do joelho esquerdo sem alterações significativas.
+laudo_470_rm-coluna.pdf;Laudo de Ressonância Magnética;HENRIQUE BASTOS MELO ANDRADE;Doença discal degenerativa com protrusão em L4-L5 e contato radicular à esquerda. Correlação com o quadro álgico.
+laudo_471_densitometria.pdf;Laudo de Densitometria Óssea;NICOLAS AZEVEDO PIRES COUTINHO;Osteopenia. Recomenda-se correlação com fatores de risco e conduta clínica para prevenção de fraturas.
+laudo_472_us-abdome.pdf;Laudo de Ultrassonografia;GUSTAVO PENNA ROCHA COUTINHO;Esteatose hepática moderada e colelitíase. Sem sinais de colecistite aguda neste exame.
+laudo_473_us-tireoide.pdf;Laudo de Ultrassonografia;BRENO TAVARES LINS ANDRADE;Ultrassonografia de tireoide sem alterações.
+laudo_474_polissonografia.pdf;Laudo de Polissonografia;SAMUEL FONTES LIMA SERPA;Síndrome da apneia obstrutiva do sono de grau moderado a grave. Avaliação para terapia ventilatória e medidas gerais.
+laudo_475_fundoscopia.pdf;Laudo de Fundoscopia;LETÍCIA NAVARRO GOMES MARANHÃO;Fundoscopia sem alterações significativas em ambos os olhos.
+laudo_476_campimetria.pdf;Laudo de Campimetria;FELIPE GUIMARÃES LOBO CAMARGO;Campimetria computadorizada dentro dos limites da normalidade.
+laudo_477_acuidade-visual.pdf;Laudo de Acuidade Visual;NICOLAS AZEVEDO PIRES MESQUITA;Exame oftalmológico funcional dentro da normalidade, com ametropia leve.
+laudo_478_itb.pdf;Laudo de Índice Tornozelo-Braço;PEDRO VILELA CAMPOS DAMÁSIO;ITB reduzido à direita, compatível com doença arterial periférica moderada. Avaliação vascular recomendada.
+laudo_479_angio-tc.pdf;Laudo de Angiotomografia;IAGO PIMENTEL RIOS XAVIER;Tromboembolismo pulmonar agudo segmentar bilateral, com sinais discretos de repercussão no ventrículo direito.
+laudo_480_rx-torax.pdf;Laudo Radiográfico;KARINA LOBATO PIRES SERPA;Nódulo pulmonar isolado à esquerda. Recomenda-se tomografia de tórax para melhor caracterização.
+laudo_481_rx-coluna-lombar.pdf;Laudo Radiográfico;MARCELO TELES BRAGA SERPA;Escoliose lombar leve. Avaliação clínica e, se indicado, estudo complementar.
+laudo_482_rx-joelho.pdf;Laudo Radiográfico;FERNANDA AGUIAR PRADO LEAL;Gonartrose medial moderada. Correlação clínica e, se necessário, ressonância magnética.
+laudo_483_rx-seios-face.pdf;Laudo Radiográfico;EDUARDO FALCÃO NEVES COUTINHO;Sinais radiológicos compatíveis com sinusopatia maxilar à esquerda.
+laudo_484_eeg.pdf;Laudo de Eletroencefalograma;THIAGO FARIAS NUNES MESQUITA;Traçado com atividade epileptiforme generalizada, compatível com padrão de ausência. Correlação clínica obrigatória.
+laudo_485_ecg.pdf;Laudo de Eletrocardiograma;INGRID SAMPAIO REIS ANDRADE;Fibrilação atrial com resposta ventricular controlada. Avaliação clínica e de risco tromboembólico recomendada.
+laudo_486_holter.pdf;Laudo de Holter 24 horas;ISADORA PIMENTEL DAMÁSIO;Ectopia supraventricular frequente com taquicardia atrial não sustentada. Correlação com sintomas e avaliação cardiológica.
+laudo_487_mapa.pdf;Laudo de MAPA;RAFAELA NUNES BRITO PORTELLA;MAPA dentro dos limites da normalidade, com descenso noturno preservado.
+laudo_488_teste-ergometrico.pdf;Laudo de Teste Ergométrico;ÚRSULA BERNARDES PINTO VILAR;Teste ergométrico máximo, clinicamente e eletrocardiograficamente negativo para isquemia.
+laudo_489_espirometria.pdf;Laudo de Espirometria;SABRINA TEIXEIRA LOPES FIGUEIRA;Distúrbio ventilatório restritivo sugestivo. Correlação clínica e radiológica recomendada.
+laudo_490_mamografia.pdf;Laudo de Mamografia;INGRID SAMPAIO REIS SERPA;BI-RADS 1 — mamografia negativa. Controle habitual conforme rastreamento.
+laudo_491_tc-cranio.pdf;Laudo de Tomografia Computadorizada;ELISA MONTEIRO CUNHA VILAR;Tomografia de crânio sem alterações agudas evidenciáveis.
+laudo_492_tc-torax.pdf;Laudo de Tomografia Computadorizada;MURILO QUINTELA PORTELLA;Tomografia de tórax sem achados significativos.
+laudo_493_rm-joelho.pdf;Laudo de Ressonância Magnética;VICTOR HUGO CORDEIRO BARRETO;Ressonância magnética do joelho esquerdo sem alterações significativas.
+laudo_494_rm-coluna.pdf;Laudo de Ressonância Magnética;IGOR VASQUES PINTO CALDEIRA;RM da coluna lombar sem alterações compressivas ou degenerativas significativas.
+laudo_495_densitometria.pdf;Laudo de Densitometria Óssea;NATÁLIA RIBEIRO CAMPOS ANDRADE;Densidade mineral óssea dentro da faixa de normalidade (OMS).
+laudo_496_us-abdome.pdf;Laudo de Ultrassonografia;HELOÍSA QUINTANILHA BARRETO;Ultrassonografia de abdome total sem alterações significativas.
+laudo_497_us-tireoide.pdf;Laudo de Ultrassonografia;RENATO QUEIROZ DIAS XAVIER;Ultrassonografia de tireoide sem alterações.
+laudo_498_polissonografia.pdf;Laudo de Polissonografia;MARINA PEIXOTO ALVES VILAR;Polissonografia sem evidência de apneia obstrutiva do sono clinicamente significativa.
+laudo_499_fundoscopia.pdf;Laudo de Fundoscopia;YASMIN FIGUEIREDO DAMÁSIO;Retinopatia hipertensiva moderada à direita e leve à esquerda. Controle pressórico e reavaliação oftalmológica.
+laudo_500_campimetria.pdf;Laudo de Campimetria;PEDRO VILELA CAMPOS LEAL;Alteração campimétrica sugestiva de glaucoma no olho direito. Correlação com PIO, papila e RNFL.

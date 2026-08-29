@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Dict, Any, Tuple
 from anyio import Path
 from fastapi import HTTPException, BackgroundTasks
@@ -24,33 +25,30 @@ def _read_json_count(file_path: str) -> int:
         return 0
 
 
-def _report_progress(
-    doc_id: str,
-    last_reported_percentage: int,
-    current_percentage: float,
-    results: Dict[str, Dict[str, int]],
-) -> int:
-    """Atualiza o progresso apenas quando houver avanço real no percentual."""
-    rounded_percentage = int(round(current_percentage))
-    if rounded_percentage > last_reported_percentage:
-        update_preprocess_document(doc_id, results, min(100.0, rounded_percentage))
-        return rounded_percentage
-    return last_reported_percentage
+def _get_relative_path(absolute_path: str) -> str:
+    """Convert absolute path to relative path from backend directory."""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    backend_dir = os.path.abspath(os.path.join(script_dir, "..", ".."))
+    try:
+        return os.path.relpath(absolute_path, backend_dir)
+    except ValueError:
+        # If paths are on different drives, return absolute path
+        return absolute_path
 
 
-def preprocess_data_background(rag_percent: float, doc_id: str) -> None:
+def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> None:
     """
     Pipeline de pré-processamento executada em background.
 
     Etapas:
         1. Download dos datasets (step_one)
-        2. Extração e geração dos arquivos JSON de treino e RAG (step_two)
+        2. Extração e geração dos arquivos JSON (step_two)
+        3. Tradução dos dados QA (step_three)
 
     Atualiza o documento na collection preprocess conforme o progresso,
     rastreando o status de cada step individualmente.
 
     Args:
-        rag_percent: Percentual de dados para RAG (0.0 a 1.0).
         doc_id: ID do documento na collection preprocess.
     """
     try:
@@ -62,14 +60,11 @@ def preprocess_data_background(rag_percent: float, doc_id: str) -> None:
 
         # Inicializar estrutura de resultados
         results = {
-            "QAs": {
-                "train_data": 0,
-                "rag_data": 0
-            },
-            "clinical_protocols": {
-                "train_data": 0,
-                "rag_data": 0
-            }
+            "qas_train_path": None,
+            "qas_train_pt_br_path": None,
+            "clinical_protocols_rag_path": None,
+            "qas_count": 0,
+            "clinical_protocols_count": 0
         }
 
         # Marcar início do processamento
@@ -98,25 +93,17 @@ def preprocess_data_background(rag_percent: float, doc_id: str) -> None:
         update_step_status(doc_id, "two_data_extraction", "in_progress", completion_percentage=0)
         
         try:
-            train_qa_path, rag_qa_path, train_clinical_path, rag_clinical_path = step_two.extract_data(
+            qas_train_path, qas_count, clinical_protocols_rag_path, clinical_protocols_count = step_two.extract_data(
                 doc_id,
                 qas_paths=qas_paths,
                 clinical_protocols_paths=clinical_protocols_paths,
-                rag_percent=rag_percent,
             )
 
-            qa_train_count = _read_json_count(train_qa_path)
-            qa_rag_count = _read_json_count(rag_qa_path)
-            clinical_train_count = _read_json_count(train_clinical_path)
-            clinical_rag_count = _read_json_count(rag_clinical_path)
-            
-            # Atualizar resultados de QAs
-            results["QAs"]["train_data"] = qa_train_count
-            results["QAs"]["rag_data"] = qa_rag_count
-            
-            # Atualizar resultados de Clinical Protocols
-            results["clinical_protocols"]["train_data"] = clinical_train_count
-            results["clinical_protocols"]["rag_data"] = clinical_rag_count
+            # Atualizar resultados com paths e counts
+            results["qas_train_path"] = _get_relative_path(qas_train_path)
+            results["clinical_protocols_rag_path"] = _get_relative_path(clinical_protocols_rag_path)
+            results["qas_count"] = qas_count
+            results["clinical_protocols_count"] = clinical_protocols_count
             
             update_step_status(
                 doc_id,
@@ -138,13 +125,16 @@ def preprocess_data_background(rag_percent: float, doc_id: str) -> None:
         update_step_status(doc_id, "three_translating", "in_progress", completion_percentage=0)
 
         try:
-            translated_train_path, translated_rag_path = step_three.translate(
-                doc_id,
-                (train_qa_path, rag_qa_path),
-            )
-
-            results["QAs"]["train_data"] = _read_json_count(translated_train_path)
-            results["QAs"]["rag_data"] = _read_json_count(translated_rag_path)
+            if skip_translation:
+                print("Step 3: Pulando tradução (utilizando dados fixos)...")
+                fixed_path = os.path.join("datasets", "preprocessed", "fixed", "qas", "qas_train_pt_br.json")
+                results["qas_train_pt_br_path"] = fixed_path
+            else:
+                translated_train_path = step_three.translate(
+                    doc_id,
+                    qas_train_path,
+                )
+                results["qas_train_pt_br_path"] = _get_relative_path(str(translated_train_path))
 
             update_step_status(
                 doc_id,
@@ -164,8 +154,8 @@ def preprocess_data_background(rag_percent: float, doc_id: str) -> None:
         update_preprocess_document(doc_id, results, 100)
         print(
             f"Pipeline concluída com sucesso! "
-            f"QAs: train={results['QAs']['train_data']} | rag={results['QAs']['rag_data']} | "
-            f"Clinical Protocols: train={results['clinical_protocols']['train_data']} | rag={results['clinical_protocols']['rag_data']}"
+            f"QAs: count={results['qas_count']} | "
+            f"Clinical Protocols: count={results['clinical_protocols_count']}"
         )
 
     except Exception as e:
@@ -190,8 +180,8 @@ def preprocess_data_background(rag_percent: float, doc_id: str) -> None:
 
 
 def preprocess_data(
-    rag_percent: float = 0.5,
     background_tasks: BackgroundTasks = None,
+    skip_translation: bool = False,
 ) -> Dict[str, Any]:
     """
     Inicia a pipeline de pré-processamento de dados.
@@ -200,7 +190,6 @@ def preprocess_data(
     em background.
 
     Args:
-        rag_percent: Percentual de dados para RAG (0.0 a 1.0).
         background_tasks: Instância de BackgroundTasks do FastAPI para execução assíncrona.
 
     Returns:
@@ -209,25 +198,14 @@ def preprocess_data(
     Raises:
         HTTPException: Em caso de parâmetros inválidos.
     """
-    if not isinstance(rag_percent, (int, float)):
-        raise HTTPException(
-            status_code=400,
-            detail="rag_percent deve ser um número",
-        )
-    if not 0.0 <= rag_percent <= 1.0:
-        raise HTTPException(
-            status_code=400,
-            detail="rag_percent deve estar entre 0.0 e 1.0",
-        )
-
-    document = create_preprocess_document(rag_percent=rag_percent)
+    document = create_preprocess_document()
     doc_id = document["_id"]
 
     if background_tasks:
-        background_tasks.add_task(preprocess_data_background, rag_percent, doc_id)
+        background_tasks.add_task(preprocess_data_background, doc_id, skip_translation)
     else:
         # Execução síncrona (testes / linha de comando)
-        preprocess_data_background(rag_percent, doc_id)
+        preprocess_data_background(doc_id, skip_translation)
 
     return document
 

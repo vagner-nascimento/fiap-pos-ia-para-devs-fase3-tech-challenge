@@ -131,6 +131,7 @@ cp .env.example .env
 | `DB_NAME` | Nome do banco de dados | `fiap_pos_ia_fase3` |
 | `FINE_TUNING_BASE_MODEL` | Modelo base para fine tuning | `Qwen/Qwen2.5-1.5B-Instruct` |
 | `RAG_EMBEDDING_MODEL` | Modelo de embeddings para a base RAG | `hkunlp/instructor-base` |
+| `HF_TOKEN` | Token opcional para autenticacao no Hugging Face | - |
 
 > Com Docker Compose, o host do MongoDB deve ser `mongodb`, nao `localhost`.
 
@@ -204,14 +205,14 @@ Inicia o pre-processamento dos datasets. O processamento roda em background; a r
 
 | Campo | Tipo | Obrigatorio | Descricao |
 |-------|------|-------------|-----------|
-| `rag_percent` | `float` | Nao | Percentual destinado ao conjunto RAG (0.0 a 1.0). E aplicado tanto ao MedQuAD quanto aos protocolos clinicos. |
+| `skip_translation` | `bool` | Nao | Pula a etapa de tradução usando dataset já traduzido e fixado (padrao: false) |
 
 **Exemplo:**
 
 ```bash
 curl -X POST http://localhost:3000/preprocess/ \
   -H "Content-Type: application/json" \
-  -d '{"rag_percent": 0.5}'
+  -d '{"skip_translation": true}'
 ```
 
 **Resposta:**
@@ -219,14 +220,17 @@ curl -X POST http://localhost:3000/preprocess/ \
 ```json
 {
   "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "rag_percent": 0.5,
   "steps": {
     "one_download_datasets": { "status": "pending", "error_message": null },
-    "step_two_data_extraction": { "status": "pending", "error_message": null }
+    "two_data_extraction": { "status": "pending", "error_message": null },
+    "three_translating": { "status": "pending", "error_message": null }
   },
   "results": {
-    "QAs": { "train_data": 0, "rag_data": 0 },
-    "clinical_protocols": { "train_data": 0, "rag_data": 0 }
+    "qas_train_path": null,
+    "qas_train_pt_br_path": null,
+    "clinical_protocols_rag_path": null,
+    "qas_count": 0,
+    "clinical_protocols_count": 0
   },
   "status": "created",
   "updated_date": "2026-07-31T10:00:00.000000+00:00",
@@ -245,14 +249,17 @@ Consulta o status de uma execucao pelo ID.
 ```json
 {
   "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "rag_percent": 0.5,
   "steps": {
     "one_download_datasets": { "status": "completed" },
-    "step_two_data_extraction": { "status": "completed" }
+    "two_data_extraction": { "status": "completed" },
+    "three_translating": { "status": "completed" }
   },
   "results": {
-    "QAs": { "train_data": 15234, "rag_data": 8765 },
-    "clinical_protocols": { "train_data": 120, "rag_data": 40 }
+    "qas_train_path": "datasets/preprocessed/qas/qas_train.json",
+    "qas_train_pt_br_path": "datasets/preprocessed/qas/qas_train_pt_br.json",
+    "clinical_protocols_rag_path": "datasets/preprocessed/clinical_protocols/clinical_protocols_rag.json",
+    "qas_count": 15234,
+    "clinical_protocols_count": 120
   },
   "status": "completed",
   "updated_date": "2026-07-31T10:05:00.000000+00:00",
@@ -307,7 +314,6 @@ curl -X POST http://localhost:3000/fine-tunning/ \
   "preprocess_snapshot": {
     "_id": "<id>",
     "status": "completed",
-    "rag_percent": 0.5,
     "updated_date": "2026-08-04T10:00:00.000000+00:00"
   },
   "base_model_name": "Qwen/Qwen2.5-1.5B-Instruct",
@@ -444,11 +450,10 @@ curl -X POST http://localhost:3000/rag-database/ \
   "preprocess_snapshot": {
     "_id": "<id>",
     "status": "completed",
-    "rag_percent": 0.5,
     "updated_date": "2026-08-13T10:00:00+00:00"
   },
-  "qas_rag_path": "backend/datasets/preprocessed/qas/rag_pt_br.json",
-  "clinical_protocols_rag_path": "backend/datasets/preprocessed/clinical_protocols/rag.json",
+  "qas_rag_path": "backend/datasets/preprocessed/qas/qas_train_pt_br.json",
+  "clinical_protocols_rag_path": "backend/datasets/preprocessed/clinical_protocols/clinical_protocols_rag.json",
   "embedding_model": "hkunlp/instructor-base",
   "splitter_name": "RecursiveCharacterTextSplitter",
   "splitter_chunk_size": 2400,
@@ -613,19 +618,21 @@ flowchart TD
     E --> F[Baixa protocolos clinicos FHEMIG]
     F --> G[Processa PubMedQA e MedQuAD]
     G --> H[Extrai texto dos PDFs dos protocolos]
-    H --> I[Divide train e RAG]
+    H --> I[Salva qas_train.json e clinical_protocols_rag.json]
     I --> J[Traduz os QAs com o modelo local]
-    J --> K[Salva JSONs em datasets/preprocessed/]
+    J --> K[Salva qas_train_pt_br.json]
     K --> L[Atualiza MongoDB]
 ```
 
-### Regras de divisao dos dados
+### Arquivos gerados
 
-- PubMedQA vai 100% para `train.json`.
-- MedQuAD e protocolos clinicos sao divididos conforme `rag_percent`.
-- Os resultados sao salvos separadamente em:
-  - `datasets/preprocessed/qas/`
-  - `datasets/preprocessed/clinical_protocols/`
+- `datasets/preprocessed/qas/qas_train.json`: registros combinados de PubMedQA e MedQuAD.
+- `datasets/preprocessed/qas/qas_train_pt_br.json`: cópia traduzida dos QAs.
+- `datasets/preprocessed/clinical_protocols/clinical_protocols_rag.json`: protocolos com texto extraído dos PDFs.
+
+Os registros de QA seguem `question`, `contexts`, `answer` e `metadata`. A etapa de tradução processa os itens em lotes de 16, divide textos longos em chunks de até 400 caracteres para evitar truncamento e preserva a estrutura e os metadados.
+
+> **Integração RAG:** o pré-processamento produz `qas_train_pt_br.json`, mas o serviço `services/rag_database.py` ainda mantém `rag_pt_br.json` como caminho padrão. A geração da base RAG precisa receber o caminho atualizado ou ter esse default ajustado antes de ser usada após uma nova execução de pré-processamento.
 
 ### Step 3 - traducao local
 
@@ -633,7 +640,8 @@ A etapa de traducao usa localmente o modelo `Helsinki-NLP/opus-mt-tc-big-en-pt`,
 
 - Se o backend encontrar uma GPU Nvidia disponivel, a inferencia roda em CUDA.
 - Se nao encontrar GPU, o modelo roda em CPU, o que aumenta bastante o tempo de execucao.
-- Os arquivos traduzidos sao gerados com sufixo `_pt_br.json`.
+- A tradução cobre `question`, todos os `contexts` textuais e `answer`; campos não textuais e `metadata` são preservados.
+- **Aviso sobre a Tradução de QAs**: A tradução dos dados de QAs é extremamente demorada e não roda em todos os hardwares. Por isso, foi implementada a opção (`skip_translation`) de pular essa etapa e utilizar o dataset já traduzido que está fixado na pasta `backend/datasets/preprocessed/fixed/qas`.
 
 ## Estrutura do projeto
 

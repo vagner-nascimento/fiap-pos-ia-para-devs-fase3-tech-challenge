@@ -17,12 +17,11 @@ Interface web em React + TypeScript (Vite) para iniciar e acompanhar o pre-proce
 
 O frontend permite:
 
-1. configurar o percentual RAG;
-2. iniciar o pre-processamento;
-3. acompanhar o progresso com polling a cada 5 segundos;
-4. visualizar os resultados separados para `QAs` e `clinical_protocols`;
-5. gerar a base RAG a partir de um pré-processamento concluído;
-6. realizar consultas semânticas por similaridade na base RAG (RAG Query).
+1. iniciar o pré-processamento;
+2. acompanhar o progresso com polling a cada 5 segundos;
+3. visualizar os resultados separados para `QAs` e `clinical_protocols`;
+4. gerar a base RAG a partir de um pré-processamento concluído;
+5. realizar consultas semânticas por similaridade na base RAG (RAG Query).
 
 A aplicacao e uma SPA servida pelo Vite em desenvolvimento e pelo nginx em producao.
 
@@ -127,27 +126,28 @@ Quando o usuario clica em Iniciar preprocessamento:
 
 ```mermaid
 flowchart TD
-    A[Usuario define rag_percent] --> B[Clica em Iniciar]
-    B --> C[POST /preprocess]
-    C --> D[Exibe documento retornado]
-    D --> E[Polling a cada 5s]
-    E --> F{GET /preprocess/id}
-    F -->|created / in_progress| E
-    F -->|completed / error| G[Para polling]
-    G --> H[Exibe resultado final]
+    A[Usuario clica em Iniciar] --> B[POST /preprocess]
+    B --> C[Exibe documento retornado]
+    C --> D[Polling a cada 5s]
+    D --> E{GET /preprocess/id}
+    E -->|created / in_progress| D
+    E -->|completed / error| F[Para polling]
+    F --> G[Exibe resultado final]
 ```
 
 ### Elementos da tela
 
 | Elemento | Descricao |
 |----------|-----------|
-| Slider RAG percent | Percentual destinado ao RAG |
 | Botao Iniciar | Dispara o preprocessamento |
 | Botao Limpar | Reseta o estado da tela |
+| Checkbox Pular Tradução | Envia `skip_translation: true` para a API, pulando a etapa demorada de tradução |
 | Status badge | Mostra o status atual da execucao |
-| Contadores | Exibe `train_data` e `rag_data` em pt-BR |
+| Contadores | Exibe `qas_count` e `clinical_protocols_count` em pt-BR |
 | Barra de progresso | Mostra `completion_percentage` |
 | Resposta da API | JSON bruto retornado pelo backend |
+
+**Aviso sobre a Tradução de QAs**: A tradução dos dados de QAs é extremamente demorada e não roda em todos os hardwares que temos. Por isso, foi implementada a opção de pular essa etapa na interface, utilizando o dataset já traduzido que está fixado na pasta `backend/datasets/preprocessed/fixed/qas`.
 
 ## Integracao com a API
 

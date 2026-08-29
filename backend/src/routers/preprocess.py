@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Dict, Any, Optional
 from services.preprocess_data import preprocess_data
 from infra.database.collections.preprocess import get_preprocess_document
@@ -10,20 +10,7 @@ router = APIRouter(prefix="/preprocess", tags=["preprocess"])
 
 class PreprocessRequest(BaseModel):
     """Modelo para o request de preprocessamento."""
-    
-    rag_percent: float = Field(
-        default=0.5,
-        ge=0.0,
-        le=1.0,
-        description="Percentual de dados para RAG (0.0 a 1.0)"
-    )
-    
-    @field_validator('rag_percent')
-    @classmethod
-    def validate_rag_percent(cls, v):
-        if not 0.0 <= v <= 1.0:
-            raise ValueError('rag_percent deve estar entre 0.0 e 1.0')
-        return v
+    skip_translation: bool = False
 
 
 class StepInfo(BaseModel):
@@ -33,16 +20,13 @@ class StepInfo(BaseModel):
     completion_percentage: Optional[float] = None
 
 
-class ResultsData(BaseModel):
-    """Dados de resultados para um tipo específico."""
-    train_data: int
-    rag_data: int
-
-
 class Results(BaseModel):
     """Resultados do preprocessamento."""
-    QAs: ResultsData
-    clinical_protocols: ResultsData
+    qas_train_path: Optional[str] = None
+    qas_train_pt_br_path: Optional[str] = None
+    clinical_protocols_rag_path: Optional[str] = None
+    qas_count: int = 0
+    clinical_protocols_count: int = 0
 
 
 class PreprocessResponse(BaseModel):
@@ -51,7 +35,6 @@ class PreprocessResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     id: str = Field(validation_alias="_id")
-    rag_percent: float
     steps: Dict[str, StepInfo]
     results: Results
     status: str
@@ -65,11 +48,10 @@ async def preprocess_endpoint(request: PreprocessRequest, background_tasks: Back
     """
     Processa os dados de PubMedQA e MedQuAD.
     
-    Divide os dados entre treinamento e RAG conforme o percentual especificado.
     O processamento é executado em background e retorna imediatamente o documento criado.
     
     Args:
-        request: Objeto contendo o percentual de dados para RAG.
+        request: Objeto vazio (nenhum parâmetro necessário).
         background_tasks: Instância de BackgroundTasks do FastAPI.
         
     Returns:
@@ -79,7 +61,10 @@ async def preprocess_endpoint(request: PreprocessRequest, background_tasks: Back
         HTTPException: Em caso de erro no processamento.
     """
     try:
-        document = preprocess_data(rag_percent=request.rag_percent, background_tasks=background_tasks)        
+        document = preprocess_data(
+            background_tasks=background_tasks,
+            skip_translation=request.skip_translation,
+        )        
         return document
         
     except FileNotFoundError as e:

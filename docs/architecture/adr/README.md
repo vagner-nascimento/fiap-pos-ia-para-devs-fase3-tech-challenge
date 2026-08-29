@@ -16,10 +16,11 @@
 | [ADR-004](ADR-004-mongodb-estado.md) | MongoDB como banco de estado do processamento | ✅ Aceito | 2026-08-18 |
 | [ADR-005](ADR-005-background-tasks-fastapi.md) | Processamento assíncrono via FastAPI BackgroundTasks | ✅ Aceito | 2026-08-18 |
 | [ADR-006](ADR-006-finetuning-google-colab.md) | Fine-tuning executado no Google Colab | ✅ Aceito | 2026-08-18 |
-| [ADR-007](ADR-007-split-train-rag.md) | Split train/RAG configurável via rag_percent | ✅ Aceito | 2026-08-18 |
+| [ADR-007](ADR-007-split-train-rag.md) | Split train/RAG configurável via rag_percent (histórico) | ⚠️ Substituído | 2026-08-18 |
 | [ADR-008](ADR-008-docker-compose.md) | Orquestração local via Docker Compose | ✅ Aceito | 2026-08-18 |
 | [ADR-009](ADR-009-deteccao-gpu-cpu.md) | Detecção automática GPU/CPU no backend | ✅ Aceito | 2026-08-18 |
 | [ADR-010](ADR-010-colab-ngrok-zerogpu.md) | Colab + ngrok e HuggingFace ZeroGPU para servir o modelo | ✅ Aceito | 2026-08-18 |
+| [ADR-011](ADR-011-skip-preprocess-translation.md) | Opção de pular a tradução no pré-processamento | ✅ Aceito | 2026-08-28 |
 
 ---
 

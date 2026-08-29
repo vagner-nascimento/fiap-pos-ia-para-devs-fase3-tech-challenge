@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 
@@ -53,11 +54,9 @@ def test_create_preprocess_document_initializes_new_structure(monkeypatch) -> No
     fake_collection = FakeCollection()
     monkeypatch.setattr(preprocess_collection, "get_collection", lambda _: fake_collection)
 
-    document = preprocess_collection.create_preprocess_document(rag_percent=0.7)
+    document = preprocess_collection.create_preprocess_document()
 
     assert document is not None
-    assert "rag_percent" in document
-    assert document["rag_percent"] == 0.7
     assert "steps" in document
     assert "one_download_datasets" in document["steps"]
     assert "two_data_extraction" in document["steps"]
@@ -67,8 +66,11 @@ def test_create_preprocess_document_initializes_new_structure(monkeypatch) -> No
     assert document["steps"]["two_data_extraction"]["completion_percentage"] == 0
     assert document["steps"]["three_translating"]["completion_percentage"] == 0
     assert "results" in document
-    assert "QAs" in document["results"]
-    assert "clinical_protocols" in document["results"]
+    assert "qas_train_path" in document["results"]
+    assert "qas_train_pt_br_path" in document["results"]
+    assert "clinical_protocols_rag_path" in document["results"]
+    assert "qas_count" in document["results"]
+    assert "clinical_protocols_count" in document["results"]
     assert document["status"] == "created"
     assert document["completion_percentage"] == 0
 
@@ -136,14 +138,11 @@ def test_update_preprocess_document_with_results(monkeypatch) -> None:
     document = preprocess_collection.create_preprocess_document()
     
     results = {
-        "QAs": {
-            "train_data": 100,
-            "rag_data": 50
-        },
-        "clinical_protocols": {
-            "train_data": 80,
-            "rag_data": 40
-        }
+        "qas_train_path": "datasets/preprocessed/qas/qas_train.json",
+        "qas_train_pt_br_path": "datasets/preprocessed/qas/qas_train_pt_br.json",
+        "clinical_protocols_rag_path": "datasets/preprocessed/clinical_protocols/clinical_protocols_rag.json",
+        "qas_count": 150,
+        "clinical_protocols_count": 120
     }
     
     updated = preprocess_collection.update_preprocess_document(
@@ -151,11 +150,25 @@ def test_update_preprocess_document_with_results(monkeypatch) -> None:
     )
 
     assert updated is not None
-    assert updated["results"]["QAs"]["train_data"] == 100
-    assert updated["results"]["QAs"]["rag_data"] == 50
-    assert updated["results"]["clinical_protocols"]["train_data"] == 80
-    assert updated["results"]["clinical_protocols"]["rag_data"] == 40
+    assert updated["results"]["qas_train_path"] == "datasets/preprocessed/qas/qas_train.json"
+    assert updated["results"]["qas_train_pt_br_path"] == "datasets/preprocessed/qas/qas_train_pt_br.json"
+    assert updated["results"]["clinical_protocols_rag_path"] == "datasets/preprocessed/clinical_protocols/clinical_protocols_rag.json"
+    assert updated["results"]["qas_count"] == 150
+    assert updated["results"]["clinical_protocols_count"] == 120
     assert updated["completion_percentage"] == 50
+
+
+def test_get_relative_path_is_relative_to_backend_root(monkeypatch, tmp_path) -> None:
+    backend_root = tmp_path / "backend"
+    source_dir = backend_root / "src" / "services"
+    source_dir.mkdir(parents=True)
+    target_path = backend_root / "datasets" / "preprocessed" / "clinical.json"
+
+    monkeypatch.setattr(preprocess_data, "__file__", str(source_dir / "preprocess_data.py"))
+
+    assert preprocess_data._get_relative_path(str(target_path)) == (
+        os.path.join("datasets", "preprocessed", "clinical.json")
+    )
 
 
 def test_mark_preprocess_document_failed_stores_error_message(monkeypatch) -> None:
@@ -201,19 +214,16 @@ def test_preprocess_data_background_runs_translation_for_qa_only(monkeypatch, tm
         doc_id: str,
         qas_paths: dict,
         clinical_protocols_paths: tuple,
-        rag_percent: float,
-    ) -> tuple[str, str, str, str]:
-        train_qa = tmp_path / "train_qa.json"
-        rag_qa = tmp_path / "rag_qa.json"
-        train_clinical = tmp_path / "train_clinical.json"
-        rag_clinical = tmp_path / "rag_clinical.json"
-        for path in (train_qa, rag_qa, train_clinical, rag_clinical):
+    ) -> tuple[str, int, str, int]:
+        train_qa = tmp_path / "qas_train.json"
+        clinical_rag = tmp_path / "clinical_protocols_rag.json"
+        for path in (train_qa, clinical_rag):
             path.write_text("[]", encoding="utf-8")
-        return str(train_qa), str(rag_qa), str(train_clinical), str(rag_clinical)
+        return str(train_qa), 100, str(clinical_rag), 80
 
-    def fake_translate(doc_id: str, paths: tuple) -> tuple:
-        calls.append(("translate", doc_id, paths))
-        return (tmp_path / "train_qa_pt_br.json", tmp_path / "rag_qa_pt_br.json")
+    def fake_translate(doc_id: str, qa_train_path: str) -> object:
+        calls.append(("translate", doc_id, qa_train_path))
+        return tmp_path / "qas_train_pt_br.json"
 
     monkeypatch.setattr(preprocess_data, "update_preprocess_document", fake_update_preprocess_document)
     monkeypatch.setattr(preprocess_data, "update_step_status", fake_update_step_status)
@@ -221,7 +231,7 @@ def test_preprocess_data_background_runs_translation_for_qa_only(monkeypatch, tm
     monkeypatch.setattr(preprocess_data.step_two, "extract_data", fake_extract_data)
     monkeypatch.setattr(preprocess_data.step_three, "translate", fake_translate)
 
-    preprocess_data.preprocess_data_background(0.5, "doc-123")
+    preprocess_data.preprocess_data_background("doc-123")
 
     assert any(call[0] == "translate" for call in calls)
     assert any(

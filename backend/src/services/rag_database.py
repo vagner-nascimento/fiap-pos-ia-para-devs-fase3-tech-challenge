@@ -4,10 +4,9 @@ import math
 import os
 import re
 import uuid
-from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Final, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Final, List, Optional, Sequence, Tuple
 
 
 from fastapi import HTTPException
@@ -32,10 +31,6 @@ except Exception:  # pragma: no cover - optional dependency fallback
 
 
 BACKEND_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_QAS_RAG_PATH = BACKEND_ROOT / "datasets" / "preprocessed" / "qas" / "rag_pt_br.json"
-DEFAULT_CLINICAL_PROTOCOLS_RAG_PATH = (
-    BACKEND_ROOT / "datasets" / "preprocessed" / "clinical_protocols" / "rag.json"
-)
 DEFAULT_RAG_EMBEDDING_MODEL = os.getenv("RAG_EMBEDDING_MODEL", "hkunlp/instructor-base")
 DEFAULT_PROTOCOL_CHUNK_SIZE = 2400
 DEFAULT_PROTOCOL_CHUNK_OVERLAP = 200
@@ -143,7 +138,7 @@ def _normalize_text(value: Any) -> str:
     return re.sub(r"\s+", " ", value).strip()
 
 
-def _read_json_list(path: Union[str, Path]) -> List[Dict[str, Any]]:
+def _read_json_list(path: str | Path) -> List[Dict[str, Any]]:
     file_path = Path(path)
     if not file_path.exists():
         raise FileNotFoundError(f"Arquivo nao encontrado: {file_path}")
@@ -155,6 +150,17 @@ def _read_json_list(path: Union[str, Path]) -> List[Dict[str, Any]]:
         raise ValueError(f"Formato invalido em {file_path}: esperado uma lista de objetos JSON")
 
     return data
+
+
+def _resolve_clinical_protocols_rag_path(path_value: str) -> Path:
+    path = Path(path_value.strip())
+    if path.is_absolute():
+        return path
+
+    if path.parts and path.parts[0] == BACKEND_ROOT.name:
+        path = Path(*path.parts[1:])
+
+    return BACKEND_ROOT / path
 
 
 def _validate_preprocess_id(preprocess_id: str) -> Dict[str, Any]:
@@ -196,60 +202,6 @@ def _build_embedding_model(model_name: Optional[str] = None) -> Any:
         except Exception:
             pass
     return _FallbackEmbeddingModel(resolved_model_name)
-
-
-def _join_contexts(contexts: Any) -> str:
-    if not isinstance(contexts, list):
-        return ""
-
-    cleaned_contexts: List[str] = []
-    for context in contexts:
-        normalized = _normalize_text(context)
-        if normalized:
-            cleaned_contexts.append(normalized)
-
-    return "\n".join(cleaned_contexts)
-
-
-def _build_qas_document(
-    item: Dict[str, Any],
-    *,
-    preprocess_id: str,
-    batch_id: str,
-    index: int,
-) -> Optional[Dict[str, Any]]:
-    question = _normalize_text(item.get("question"))
-    answer = _normalize_text(item.get("answer"))
-    contexts = _join_contexts(item.get("contexts"))
-
-    if not question and not answer and not contexts:
-        return None
-
-    metadata = item.get("metadata")
-    source_metadata = deepcopy(metadata) if isinstance(metadata, dict) else {}
-
-    content_lines = [
-        "### QAs RAG",
-        f"Pergunta: {question}" if question else None,
-        f"Contexto: {contexts}" if contexts else None,
-        f"Resposta: {answer}" if answer else None,
-    ]
-    content = "\n".join(line for line in content_lines if line)
-
-    return {
-        "_id": f"{batch_id}-qas-{index:06d}",
-        "batch_id": batch_id,
-        "preprocess_id": preprocess_id,
-        "dataset": "qas",
-        "source_type": "qas",
-        "content": content,
-        "metadatas": {
-            "source": source_metadata,
-            "question": question,
-            "answer": answer,
-            "contexts_count": len(item.get("contexts") or []) if isinstance(item.get("contexts"), list) else 0,
-        },
-    }
 
 
 def _build_clinical_protocol_documents(
@@ -336,27 +288,14 @@ def _build_rag_documents(
     *,
     preprocess_id: str,
     batch_id: str,
-    qas_data: Sequence[Dict[str, Any]],
     clinical_protocols_data: Sequence[Dict[str, Any]],
     embedding_model: Any,
     splitter: Any,
 ) -> Tuple[List[Dict[str, Any]], Dict[str, int]]:
     base_documents: List[Dict[str, Any]] = []
     stats = {
-        "qas_documents": 0,
         "clinical_protocol_documents": 0,
     }
-
-    for index, item in enumerate(qas_data, start=1):
-        document = _build_qas_document(
-            item,
-            preprocess_id=preprocess_id,
-            batch_id=batch_id,
-            index=index,
-        )
-        if document is not None:
-            base_documents.append(document)
-            stats["qas_documents"] += 1
 
     for index, item in enumerate(clinical_protocols_data, start=1):
         protocol_documents = _build_clinical_protocol_documents(
@@ -375,17 +314,11 @@ def _build_rag_documents(
 
 def generate_rag_database(
     preprocess_id: str,
-    qas_rag_path: Optional[Union[str, Path]] = None,
-    clinical_protocols_rag_path: Optional[Union[str, Path]] = None,
     *,
     embedding_model_name: Optional[str] = None,
     splitter_chunk_size: int = DEFAULT_PROTOCOL_CHUNK_SIZE,
     splitter_chunk_overlap: int = DEFAULT_PROTOCOL_CHUNK_OVERLAP,
 ) -> Dict[str, Any]:
-    resolved_qas_rag_path = Path(qas_rag_path or DEFAULT_QAS_RAG_PATH)
-    resolved_clinical_protocols_rag_path = Path(
-        clinical_protocols_rag_path or DEFAULT_CLINICAL_PROTOCOLS_RAG_PATH
-    )
     started_at = datetime.now(timezone.utc)
     batch_id = str(uuid.uuid4())
     resolved_embedding_model_name = embedding_model_name or DEFAULT_RAG_EMBEDDING_MODEL
@@ -408,9 +341,19 @@ def generate_rag_database(
             f"status={preprocess_snapshot['status']}"
         )
 
-        print(f"[RAG][SYNC] Lendo QAs em {resolved_qas_rag_path}")
-        qas_data = _read_json_list(resolved_qas_rag_path)
-        print(f"[RAG][SYNC] QAs carregados: {len(qas_data)} registros")
+        results = preprocess.get("results")
+        clinical_protocols_rag_path = (
+            results.get("clinical_protocols_rag_path") if isinstance(results, dict) else None
+        )
+        if not isinstance(clinical_protocols_rag_path, str) or not clinical_protocols_rag_path.strip():
+            raise HTTPException(
+                status_code=422,
+                detail="Preprocessamento concluido sem clinical_protocols_rag_path",
+            )
+
+        resolved_clinical_protocols_rag_path = _resolve_clinical_protocols_rag_path(
+            clinical_protocols_rag_path
+        )
 
         print(f"[RAG][SYNC] Lendo protocolos clinicos em {resolved_clinical_protocols_rag_path}")
         clinical_protocols_data = _read_json_list(resolved_clinical_protocols_rag_path)
@@ -435,7 +378,6 @@ def generate_rag_database(
         documents, stats = _build_rag_documents(
             preprocess_id=preprocess_id,
             batch_id=batch_id,
-            qas_data=qas_data,
             clinical_protocols_data=clinical_protocols_data,
             embedding_model=embedding_model,
             splitter=splitter,
@@ -446,7 +388,7 @@ def generate_rag_database(
 
         print(
             "[RAG][SYNC] Documentos preparados "
-            f"qas={stats['qas_documents']} clinical={stats['clinical_protocol_documents']} "
+            f"clinical={stats['clinical_protocol_documents']} "
             f"total={len(documents)}"
         )
         print("[RAG][SYNC] Persistindo documentos no MongoDB")
@@ -459,7 +401,6 @@ def generate_rag_database(
             "batch_id": batch_id,
             "preprocess_id": preprocess_id,
             "preprocess_snapshot": preprocess_snapshot,
-            "qas_rag_path": str(resolved_qas_rag_path),
             "clinical_protocols_rag_path": str(resolved_clinical_protocols_rag_path),
             "embedding_model": resolved_embedding_model_name,
             "splitter_name": "RecursiveCharacterTextSplitter",
@@ -469,7 +410,6 @@ def generate_rag_database(
             "error_message": None,
             "created_date": started_at.isoformat(),
             "updated_date": finished_at.isoformat(),
-            "qas_documents": stats["qas_documents"],
             "clinical_protocol_documents": stats["clinical_protocol_documents"],
             "total_documents": len(inserted_documents),
         }

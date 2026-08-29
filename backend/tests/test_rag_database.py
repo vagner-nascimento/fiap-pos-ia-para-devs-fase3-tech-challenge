@@ -65,39 +65,14 @@ def test_insert_rag_documents_serializes_documents(monkeypatch) -> None:
 def test_generate_rag_database_creates_documents_with_sources(monkeypatch, tmp_path) -> None:
     collections = _make_collections()
     monkeypatch.setattr(rag_collection, "get_collection", lambda name: collections[name])
-    monkeypatch.setattr(
-        rag_service,
-        "get_preprocess_document",
-        lambda _: {
-            "status": "completed",
-            "rag_percent": 0.5,
-            "updated_date": "2026-08-13T00:00:00+00:00",
-        },
-    )
+    monkeypatch.setattr(rag_service, "BACKEND_ROOT", tmp_path)
     monkeypatch.setattr(
         rag_service,
         "_build_embedding_model",
         lambda model_name=None: DummyEmbeddingModel(model_name or "dummy"),
     )
 
-    qas_path = tmp_path / "qas.json"
     clinical_path = tmp_path / "clinical.json"
-
-    qas_path.write_text(
-        json.dumps(
-            [
-                {
-                    "question": "Qual e a pergunta?",
-                    "contexts": ["Contexto A", "Contexto B"],
-                    "answer": "Resposta A",
-                    "metadata": {"source": "pubmedqa", "url": "https://example.com/q1"},
-                }
-            ],
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
-    )
-
     clinical_path.write_text(
         json.dumps(
             [
@@ -113,35 +88,46 @@ def test_generate_rag_database_creates_documents_with_sources(monkeypatch, tmp_p
         encoding="utf-8",
     )
 
+    monkeypatch.setattr(
+        rag_service,
+        "get_preprocess_document",
+        lambda _: {
+            "status": "completed",
+            "rag_percent": 0.5,
+            "updated_date": "2026-08-13T00:00:00+00:00",
+            "results": {"clinical_protocols_rag_path": "clinical.json"},
+        },
+    )
+    monkeypatch.setattr(
+        rag_service,
+        "_build_embedding_model",
+        lambda model_name=None: DummyEmbeddingModel(model_name or "dummy"),
+    )
+
+    (tmp_path / "qas.json").write_text("not-json", encoding="utf-8")
+
     document = rag_service.generate_rag_database(
         "preprocess-1",
-        qas_path,
-        clinical_path,
         splitter_chunk_size=120,
         splitter_chunk_overlap=20,
     )
 
     assert document["status"] == "completed"
-    assert document["qas_documents"] == 1
     assert document["clinical_protocol_documents"] > 1
-    assert document["total_documents"] == document["qas_documents"] + document["clinical_protocol_documents"]
+    assert document["total_documents"] == document["clinical_protocol_documents"]
+    assert document["clinical_protocols_rag_path"] == str(clinical_path)
     assert document["embedding_model"] == rag_service.DEFAULT_RAG_EMBEDDING_MODEL
     assert document["preprocess_snapshot"]["_id"] == "preprocess-1"
 
     stored_documents = list(collections[rag_collection.RAG_DOCUMENTS_COLLECTION].documents.values())
     assert len(stored_documents) == document["total_documents"]
 
-    qas_document = next(item for item in stored_documents if item["source_type"] == "qas")
-    assert qas_document["metadatas"]["source"] == {
-        "source": "pubmedqa",
-        "url": "https://example.com/q1",
-    }
-    assert qas_document["embedding"]
-
     clinical_documents = [
         item for item in stored_documents if item["source_type"] == "clinical_protocols"
     ]
     assert clinical_documents
+    assert all(item["dataset"] == "clinical_protocols" for item in stored_documents)
+    assert all(item["source_type"] != "qas" for item in stored_documents)
     assert clinical_documents[0]["metadatas"]["source"] == {
         "name": "Protocolo 1.pdf",
         "url": "https://example.com/p1.pdf",
@@ -155,22 +141,14 @@ def test_generate_rag_database_requires_completed_preprocess(monkeypatch, tmp_pa
     monkeypatch.setattr(rag_service, "get_preprocess_document", lambda _: None)
 
     with pytest.raises(HTTPException) as exc_info:
-        rag_service.generate_rag_database(
-            "missing-preprocess",
-            tmp_path / "qas.json",
-            tmp_path / "clinical.json",
-        )
+        rag_service.generate_rag_database("missing-preprocess")
 
     assert exc_info.value.status_code == 404
 
     monkeypatch.setattr(rag_service, "get_preprocess_document", lambda _: {"status": "in_progress"})
 
     with pytest.raises(HTTPException) as exc_info:
-        rag_service.generate_rag_database(
-            "pending-preprocess",
-            tmp_path / "qas.json",
-            tmp_path / "clinical.json",
-        )
+        rag_service.generate_rag_database("pending-preprocess")
 
     assert exc_info.value.status_code == 422
 
@@ -185,6 +163,7 @@ def test_generate_rag_database_raises_on_invalid_json(monkeypatch, tmp_path) -> 
             "status": "completed",
             "rag_percent": 0.5,
             "updated_date": "2026-08-13T00:00:00+00:00",
+            "results": {"clinical_protocols_rag_path": str(tmp_path / "clinical.json")},
         },
     )
     monkeypatch.setattr(
@@ -193,10 +172,69 @@ def test_generate_rag_database_raises_on_invalid_json(monkeypatch, tmp_path) -> 
         lambda model_name=None: DummyEmbeddingModel(model_name or "dummy"),
     )
 
-    qas_path = tmp_path / "qas.json"
     clinical_path = tmp_path / "clinical.json"
-    qas_path.write_text("not-json", encoding="utf-8")
-    clinical_path.write_text("[]", encoding="utf-8")
+    clinical_path.write_text("not-json", encoding="utf-8")
 
     with pytest.raises(json.JSONDecodeError):
-        rag_service.generate_rag_database("preprocess-1", qas_path, clinical_path)
+        rag_service.generate_rag_database("preprocess-1")
+
+
+@pytest.mark.parametrize(
+    "preprocess",
+    [
+        {"status": "completed"},
+        {"status": "completed", "results": {}},
+        {"status": "completed", "results": {"clinical_protocols_rag_path": ""}},
+    ],
+)
+def test_generate_rag_database_requires_clinical_protocol_path(monkeypatch, preprocess) -> None:
+    monkeypatch.setattr(rag_service, "get_preprocess_document", lambda _: preprocess)
+
+    with pytest.raises(HTTPException) as exc_info:
+        rag_service.generate_rag_database("preprocess-1")
+
+    assert exc_info.value.status_code == 422
+
+
+def test_generate_rag_database_raises_when_clinical_protocol_file_is_missing(monkeypatch, tmp_path) -> None:
+    monkeypatch.setattr(
+        rag_service,
+        "get_preprocess_document",
+        lambda _: {
+            "status": "completed",
+            "results": {"clinical_protocols_rag_path": str(tmp_path / "missing.json")},
+        },
+    )
+
+    with pytest.raises(FileNotFoundError):
+        rag_service.generate_rag_database("preprocess-1")
+
+
+def test_generate_rag_database_resolves_legacy_backend_prefix(monkeypatch, tmp_path) -> None:
+    collections = _make_collections()
+    monkeypatch.setattr(rag_collection, "get_collection", lambda name: collections[name])
+    monkeypatch.setattr(rag_service, "BACKEND_ROOT", tmp_path / "app")
+    monkeypatch.setattr(
+        rag_service,
+        "_build_embedding_model",
+        lambda model_name=None: DummyEmbeddingModel(model_name or "dummy"),
+    )
+
+    clinical_path = tmp_path / "app" / "datasets" / "clinical.json"
+    clinical_path.parent.mkdir(parents=True)
+    clinical_path.write_text(
+        json.dumps([{"name": "Protocolo", "content_text": "Conteudo clinico"}]),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        rag_service,
+        "get_preprocess_document",
+        lambda _: {
+            "status": "completed",
+            "results": {"clinical_protocols_rag_path": "app/datasets/clinical.json"},
+        },
+    )
+
+    document = rag_service.generate_rag_database("preprocess-legacy")
+
+    assert document["clinical_protocols_rag_path"] == str(clinical_path)
