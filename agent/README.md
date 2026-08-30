@@ -50,13 +50,13 @@ agent/
     |-- routers/
     |   `-- agent.py         # POST /agent/chat, GET /agent/audit/{session_id}
     |-- services/
-    |   |-- llm_client.py    # Wrapper HuggingFaceEndpoint + fallback HTTP
+    |   |-- llm_client.py    # Cliente LLM unificado (HF Spaces ZeroGPU + FastAPI ngrok)
     |   |-- medical_agent.py # StateGraph LangGraph — orquestrador principal
     |   `-- nodes/
     |       |-- topic_validator.py    # No 1: valida dominio medico
     |       |-- safety_guard.py       # No 2: guardrails de seguranca
     |       |-- rag_retriever.py      # No 3: busca RAG via backend
-    |       |-- llm_generator.py      # No 4: chamada ao modelo fine-tunado
+    |       |-- llm_generator.py      # No 4: chamada ao modelo fine-tunado (template SFT)
     |       |-- response_formatter.py # No 5: formata fontes e disclaimer
     |       `-- audit_logger.py       # No 6: persiste log no MongoDB
     `-- infra/
@@ -102,7 +102,7 @@ sem chamar RAG nem LLM, economizando latência e custo de inferência.
 | `topic_validator`    | Rejeita perguntas fora do domínio médico/saúde (keywords PT/EN + regex contextual)        |
 | `safety_guard`       | Bloqueia pedidos de prescrição com dose, diagnóstico definitivo ou substituição de médico |
 | `rag_retriever`      | Consulta a API `/rag-database/query` do backend e monta o contexto com fontes             |
-| `llm_generator`      | Constrói o prompt no formato ChatML e invoca o modelo Qwen2.5 fine-tunado                 |
+| `llm_generator`      | Constrói o prompt no formato SFT do modelo e invoca o Qwen2.5 (Spaces/ngrok)              |
 | `response_formatter` | Adiciona citações de fontes inline e o disclaimer obrigatório                             |
 | `audit_logger`       | Persiste o log completo da interação na collection `agent_audit_logs`                     |
 
@@ -115,7 +115,7 @@ sem chamar RAG nem LLM, economizando latência e custo de inferência.
 | Python       | 3.10+         | 3.11 recomendado                                         |
 | MongoDB      | 4.x+          | Obrigatorio para o servico subir                         |
 | Backend API  | —             | Necessario para as consultas RAG (`/rag-database/query`) |
-| LLM Endpoint | —             | URL do ngrok (Colab) ou HuggingFace ZeroGPU              |
+| LLM Endpoint | —             | Hugging Face Spaces ZeroGPU (oficial) ou ngrok (dev)      |
 
 Para execução completa via Docker, o backend e o MongoDB precisam estar rodando na mesma rede `fiap-network`.
 
@@ -125,22 +125,21 @@ Para execução completa via Docker, o backend e o MongoDB precisam estar rodand
 
 Definidas em `pyproject.toml`:
 
-| Pacote                     | Uso                                            |
-| -------------------------- | ---------------------------------------------- |
-| `fastapi`                  | Framework web                                  |
-| `uvicorn[standard]`        | Servidor ASGI                                  |
-| `pydantic`                 | Validacao de request/response                  |
-| `python-dotenv`            | Carregamento de variaveis de ambiente          |
-| `pymongo`                  | Cliente MongoDB                                |
-| `langchain`                | Abstrações de cadeia e prompt                  |
-| `langchain-community`      | HuggingFaceEndpoint e outros integradores      |
-| `langchain-mongodb`        | Integracao LangChain com MongoDB               |
-| `langchain-text-splitters` | Chunking de documentos                         |
-| `langgraph`                | Orquestracao do pipeline como grafo dirigido   |
-| `sentence-transformers`    | Embeddings locais (fallback)                   |
-| `InstructorEmbedding`      | Modelo de embeddings hkunlp/instructor-base    |
-| `requests`                 | Chamadas HTTP ao backend e ao endpoint LLM     |
-| `huggingface-hub`          | Autenticacao e download de modelos HuggingFace |
+| Pacote                     | Uso                                                              |
+| -------------------------- | ---------------------------------------------------------------- |
+| `fastapi`                  | Framework web                                                    |
+| `uvicorn[standard]`        | Servidor ASGI                                                    |
+| `pydantic`                 | Validacao de request/response                                    |
+| `python-dotenv`            | Carregamento de variaveis de ambiente                            |
+| `pymongo`                  | Cliente MongoDB                                                  |
+| `langchain`                | Abstrações de cadeia e prompt                                    |
+| `langchain-community`      | Integradores e utilitários LangChain                             |
+| `langchain-mongodb`        | Integracao LangChain com MongoDB                                 |
+| `langchain-text-splitters` | Chunking de documentos                                           |
+| `langgraph`                | Orquestracao do pipeline como grafo dirigido                     |
+| `gradio-client`            | Cliente de inferência para Hugging Face Spaces ZeroGPU (Gradio)  |
+| `requests`                 | Chamadas HTTP ao backend e ao endpoint LLM (FastAPI/ngrok)        |
+| `huggingface-hub`          | Autenticacao e integração com o ecossistema Hugging Face         |
 
 Dependencias de desenvolvimento: `pytest`, `pytest-asyncio`, `black`, `mypy`.
 
@@ -154,41 +153,45 @@ Copie o arquivo de exemplo e ajuste conforme seu ambiente:
 cp agent/.env.example agent/.env
 ```
 
-| Variavel                   | Descricao                                           | Padrao                  |
-| -------------------------- | --------------------------------------------------- | ----------------------- |
-| `PYTHONPATH`               | Diretorio raiz dos modulos Python                   | `src`                   |
-| `MONGODB_USER`             | Usuario do MongoDB                                  | `db_user`               |
-| `MONGODB_PASSWORD`         | Senha do MongoDB                                    | `db_pass`               |
-| `MONGODB_HOST`             | Host do MongoDB                                     | `localhost`             |
-| `MONGODB_PORT`             | Porta do MongoDB                                    | `27017`                 |
-| `DB_NAME`                  | Nome do banco de dados                              | `fiap_pos_ia_fase3`     |
-| `LLM_ENDPOINT_URL`         | URL do endpoint de inferencia do modelo             | —                       |
-| `LLM_API_TOKEN`            | Token de autenticacao HuggingFace                   | —                       |
-| `BACKEND_API_URL`          | URL interna do backend para consultas RAG           | `http://localhost:3000` |
-| `AGENT_MAX_TOKENS`         | Numero maximo de tokens na resposta da LLM          | `512`                   |
-| `AGENT_TEMPERATURE`        | Temperatura de amostragem (0 = deterministico)      | `0.1`                   |
-| `RAG_TOP_K`                | Quantidade maxima de documentos RAG retornados      | `5`                     |
-| `RAG_SIMILARITY_THRESHOLD` | Score minimo de similaridade para incluir documento | `0.25`                  |
+| Variavel                   | Descricao                                                               | Padrao                  |
+| -------------------------- | ----------------------------------------------------------------------- | ----------------------- |
+| `PYTHONPATH`               | Diretorio raiz dos modulos Python                                       | `src`                   |
+| `MONGODB_USER`             | Usuario do MongoDB                                                      | `db_user`               |
+| `MONGODB_PASSWORD`         | Senha do MongoDB                                                        | `db_pass`               |
+| `MONGODB_HOST`             | Host do MongoDB                                                         | `localhost`             |
+| `MONGODB_PORT`             | Porta do MongoDB                                                        | `27017`                 |
+| `DB_NAME`                  | Nome do banco de dados                                                  | `fiap_pos_ia_fase3`     |
+| `LLM_PROVIDER`             | Provedor da LLM (`auto`, `hf_space`, `fastapi`)                         | `auto`                  |
+| `LLM_ENDPOINT_URL`         | URL do Space Gradio ou endpoint FastAPI/ngrok                           | —                       |
+| `LLM_API_TOKEN`            | Token de autenticacao HuggingFace (necessario para Spaces privados)     | —                       |
+| `BACKEND_API_URL`          | URL interna do backend para consultas RAG                               | `http://localhost:3000` |
+| `AGENT_MAX_TOKENS`         | Numero maximo de tokens na resposta da LLM                              | `512`                   |
+| `AGENT_TEMPERATURE`        | Temperatura de amostragem (0 = deterministico)                          | `0.3`                   |
+| `AGENT_TOP_P`              | Amostragem nucleus top_p                                                | `0.9`                   |
+| `RAG_TOP_K`                | Quantidade maxima de documentos RAG retornados                          | `5`                     |
+| `RAG_SIMILARITY_THRESHOLD` | Score minimo de similaridade para incluir documento                     | `0.25`                  |
 
 > Com Docker Compose, `MONGODB_HOST` deve ser `mongodb` e `BACKEND_API_URL` deve ser `http://fiap-pos-ia-backend:3000`.
 
 ### Configurando o endpoint da LLM
 
-O agente suporta dois modos de endpoint:
+O agente implementa uma arquitetura híbrida de inferência que detecta automaticamente ou permite selecionar o provedor:
 
-**Modo desenvolvimento (ngrok + Google Colab):**
-Execute o notebook de fine-tuning no Colab com o túnel ngrok ativo e copie a URL gerada:
+**1. Modo Produção / Oficial (Hugging Face Spaces ZeroGPU — Gradio):**
+Conecta diretamente ao Space da aplicação (`hospital-helper`) utilizando `gradio-client` para acionar o endpoint de inferência (`api_name="/generate"`):
 
 ```env
-LLM_ENDPOINT_URL=https://abcd1234.ngrok-free.app
-LLM_API_TOKEN=hf_seu_token_aqui
+LLM_PROVIDER=auto  # ou hf_space
+LLM_ENDPOINT_URL=https://huggingface.co/spaces/fiap-hospital-helper/hospital-helper
+LLM_API_TOKEN=hf_seu_token_aqui  # opcional, apenas se o Space for privado
 ```
 
-**Modo producao (HuggingFace ZeroGPU / Inference Endpoints):**
+**2. Modo Desenvolvimento / Fallback (FastAPI / ngrok):**
+Utiliza a API REST customizada exposta via túnel ngrok (`POST /generate`), enviando o payload `{"pergunta": "...", "contexto": "...", "max_new_tokens": 512}` com o header `ngrok-skip-browser-warning`:
 
 ```env
-LLM_ENDPOINT_URL=https://seu-usuario-seu-espaco.hf.space
-LLM_API_TOKEN=hf_seu_token_aqui
+LLM_PROVIDER=auto  # ou fastapi
+LLM_ENDPOINT_URL=https://abcd1234.ngrok-free.app
 ```
 
 ---
@@ -237,19 +240,17 @@ docker-compose -f infra-docker-compose.yaml up -d
    # Edite LLM_ENDPOINT_URL, MONGODB_HOST=localhost, BACKEND_API_URL=http://localhost:3000
    ```
 
-3. Crie e ative um ambiente virtual e instale as dependencias:
+3. Instale as dependencias com `uv`:
 
    ```bash
    cd agent
-   python -m venv .venv
-   source .venv/bin/activate
-   pip install -e ".[dev]"
+   uv sync --extra dev
    ```
 
 4. Execute o servico:
 
    ```bash
-   PYTHONPATH=src uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+   uv run python src/main.py
    ```
 
 5. Verifique o health check:
@@ -427,14 +428,21 @@ Detecta via regex padroes proibidos na pergunta do usuario:
 
 Queries bloqueadas tambem nao chegam ao RAG nem a LLM.
 
-### Camada 3 — System prompt
+### Camada 3 — Prompt SFT e contexto clínico
 
-O prompt de sistema enviado a LLM contem instrucoes explicitas:
+O prompt enviado a LLM segue rigorosamente o template do fine-tuning supervisionado (SFT):
 
-- **NUNCA** prescrever medicamentos com doses;
-- **NUNCA** fornecer diagnosticos definitivos;
-- **NUNCA** substituir orientacao medica profissional;
-- citar as fontes RAG inline no formato `[Fonte: <dataset>, score: <X.XX>]`.
+```text
+### Instrucao:
+Responda em pt-BR usando o contexto clinico fornecido.
+
+### Entrada:
+Pergunta: <pergunta do usuario>
+Contexto:
+<contexto RAG recuperado>
+
+### Resposta:
+```
 
 ### Camada 4 — Response formatter
 
@@ -442,7 +450,7 @@ Pos-processamento da resposta bruta da LLM:
 
 - adiciona o disclaimer obrigatorio caso esteja ausente;
 - adiciona rodape de fontes caso a LLM nao tenha citado nenhuma inline;
-- remove artefatos residuais do formato ChatML;
+- remove artefatos residuais e tags especiais da geração;
 - garante `requires_human_validation: true` invariante na resposta.
 
 ---
@@ -482,8 +490,8 @@ Os testes unitarios cobrem os nos criticos do pipeline sem dependencia de banco 
 ```bash
 cd agent
 
-# Com ambiente virtual ativo
-PYTHONPATH=src python -m pytest tests/ -v
+# Com uv
+uv run python -m pytest tests/ -v
 
 # Resultado esperado
 # tests/test_topic_validator.py  15 passed

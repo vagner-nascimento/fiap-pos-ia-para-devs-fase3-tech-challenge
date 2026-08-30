@@ -1,57 +1,41 @@
 # FIAP POS IA - Challenge Fase 3
 
-Este repositório reúne uma aplicação full-stack para pré-processar datasets médicos e acompanhar a execução em uma interface web. A solução está organizada em três partes:
+Este repositório reúne uma aplicação full-stack para pré-processar datasets médicos, servir um agente médico inteligente com RAG e LangGraph, e acompanhar a execução em uma interface web. A solução está organizada em quatro partes:
 
-- backend em FastAPI para processar os dados e persistir o estado em MongoDB;
-- frontend em React + TypeScript para iniciar e acompanhar o processamento;
-- stack completa via Docker Compose para subir tudo com um comando.
+- **Backend** em FastAPI para pré-processamento de datasets, base RAG e persistência de estado em MongoDB (porta 3000);
+- **Agente Médico** em FastAPI + LangGraph para orquestração de assistente clínico com RAG híbrido, guardrails determinísticos e auditoria (porta 8001);
+- **Frontend** em React + TypeScript para iniciar e acompanhar o processamento (porta 8080);
+- **Stack completa** via Docker Compose para subir tudo com um comando.
 
 ## Visão geral
 
 A aplicação permite:
 
 1. iniciar o pré-processamento dos datasets PubMedQA, MedQuAD e protocolos clínicos FHEMIG;
-2. acompanhar o progresso da execução em tempo real;
-3. consultar os arquivos gerados em formato estruturado para fine-tuning e recuperação;
-4. visualizar contagens separadas para `QAs` e `clinical_protocols`.
+2. gerar e consultar a base RAG vetorial/híbrida sobre os dados médicos;
+3. interagir com o agente médico inteligente via chat contextualizado com citações de fontes e avisos legais;
+4. acompanhar o progresso das tarefas em tempo real;
+5. consultar os arquivos gerados em formato estruturado para fine-tuning e recuperação;
+6. visualizar contagens separadas para `QAs` e `clinical_protocols`.
 
 O fluxo principal funciona assim:
 
 - o usuário acessa a interface web no frontend;
-- a tela envia uma requisição ao backend para iniciar o processamento;
-- o backend cria um registro no MongoDB e inicia a tarefa em background;
-- o processamento baixa ou consulta os datasets, extrai texto dos PDFs dos protocolos clínicos, transforma os dados e gera os arquivos de saída;
-- o frontend faz polling do estado da execução até a conclusão.
+- a tela envia uma requisição ao backend para iniciar o processamento ou ao agente médico para tirar dúvidas clínicas;
+- o backend cria um registro no MongoDB e inicia tarefas em background;
+- o processamento baixa datasets, extrai texto de protocolos clínicos (FHEMIG), traduz QAs e gera bases RAG;
+- o agente médico utiliza LangGraph para validar o domínio médico, aplicar guardrails de segurança, recuperar contexto RAG e consultar a LLM fine-tunada (`Qwen2.5-1.5B`), registrando logs de auditoria no MongoDB.
 
-## Como a aplicação funciona
+## Documentação Técnica e Arquitetura
 
-### Arquitetura geral
+Para detalhes aprofundados sobre a arquitetura e decisões de projeto:
 
-- Frontend: interface React para iniciar o processo e visualizar progresso.
-- Backend: API FastAPI que recebe os pedidos, executa o processamento em background e armazena o estado.
-- Banco de dados: MongoDB para persistir o status das execuções.
-- Datasets: os dados são baixados ou consultados automaticamente pelo backend a partir de fontes públicas.
-
-### Fluxo de execução
-
-1. O frontend envia um pedido sem parâmetros para o endpoint de preprocessamento no backend.
-2. O backend cria um documento de execução no MongoDB e retorna um identificador da tarefa.
-3. A tarefa em background:
-   - clona ou reutiliza os datasets necessários;
-   - processa os dados de QA e protocolos clínicos;
-   - extrai texto dos PDFs dos protocolos clínicos;
-   - gera um JSON único de QAs e um JSON único de protocolos clínicos;
-   - traduz os campos textuais dos QAs para pt-BR e grava uma cópia traduzida;
-   - atualiza o status da execução.
-5. O frontend consulta periodicamente o estado da execução e exibe progresso, contadores e resultado final.
-
-## Documentação específica
-
-Para detalhes mais completos, consulte os READMEs específicos de cada parte do projeto:
-
-- Backend: [backend/README.md](backend/README.md)
-- Datasets: [backend/datasets/README.md](backend/datasets/README.md)
-- Frontend: [frontend/README.md](frontend/README.md)
+- **Arquitetura Geral & C4 Models:** [docs/architecture/README.md](docs/architecture/README.md)
+- **Decisões de Arquitetura (ADRs):** [docs/architecture/adr/README.md](docs/architecture/adr/README.md)
+- **Agente Médico (LangGraph):** [agent/README.md](agent/README.md)
+- **Backend API & RAG:** [backend/README.md](backend/README.md)
+- **Datasets:** [backend/datasets/README.md](backend/datasets/README.md)
+- **Frontend:** [frontend/README.md](frontend/README.md)
 
 ## Subindo tudo com Docker Compose
 

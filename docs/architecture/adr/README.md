@@ -20,7 +20,10 @@
 | [ADR-008](ADR-008-docker-compose.md) | Orquestração local via Docker Compose | ✅ Aceito | 2026-08-18 |
 | [ADR-009](ADR-009-deteccao-gpu-cpu.md) | Detecção automática GPU/CPU no backend | ✅ Aceito | 2026-08-18 |
 | [ADR-010](ADR-010-colab-ngrok-zerogpu.md) | Colab + ngrok e HuggingFace ZeroGPU para servir o modelo | ✅ Aceito | 2026-08-18 |
-| [ADR-011](ADR-011-skip-preprocess-translation.md) | Opção de pular a tradução no pré-processamento | ✅ Aceito | 2026-08-28 |
+| [ADR-011](ADR-011-langgraph-medical-agent.md) | LangGraph como orquestrador do agente médico | ✅ Aceito | 2026-08-19 |
+| [ADR-012](ADR-012-arquitetura-hibrida-inferencia-llm.md) | Arquitetura híbrida de inferência LLM (HF Spaces / ngrok) | ✅ Aceito | 2026-08-29 |
+| [ADR-013](ADR-013-desacoplamento-guardrails-template-sft.md) | Desacoplamento de guardrails e preservação do template SFT | ✅ Aceito | 2026-08-29 |
+| [ADR-014](ADR-011-skip-preprocess-translation.md) | Opção de pular a tradução no pré-processamento | ✅ Aceito | 2026-08-28 |
 
 ---
 

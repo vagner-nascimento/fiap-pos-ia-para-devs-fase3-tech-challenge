@@ -344,8 +344,9 @@ sequenceDiagram
     BE-->>RAG: { documents: [...] }
     RAG-->>API: rag_documents, rag_context
     API->>LLM: invoke(state)
-    LLM->>HF: POST /generate { inputs: prompt }
-    HF-->>LLM: { generated_text: "..." }
+    Note over LLM,HF: Template SFT (Instrução/Entrada/Resposta)
+    LLM->>HF: generate(pergunta, contexto, prompt) via Gradio API / FastAPI ngrok
+    HF-->>LLM: resposta gerada pela LLM fine-tunada
     LLM-->>API: llm_response_raw, sources_cited
     API->>FMT: invoke(state)
     FMT-->>API: final_response (com fontes + disclaimer)
@@ -378,3 +379,6 @@ As decisões técnicas que moldaram esta arquitetura estão documentadas como **
 | [ADR-009](adr/ADR-009-deteccao-gpu-cpu.md) | Detecção automática GPU/CPU no backend | ✅ Aceito |
 | [ADR-010](adr/ADR-010-colab-ngrok-zerogpu.md) | Colab + ngrok e HuggingFace ZeroGPU para servir o modelo | ✅ Aceito |
 | [ADR-011](adr/ADR-011-langgraph-medical-agent.md) | LangGraph como orquestrador do agente médico | ✅ Aceito |
+| [ADR-012](adr/ADR-012-arquitetura-hibrida-inferencia-llm.md) | Arquitetura híbrida de inferência LLM (HF Spaces / ngrok) | ✅ Aceito |
+| [ADR-013](adr/ADR-013-desacoplamento-guardrails-template-sft.md) | Desacoplamento de guardrails e preservação do template SFT | ✅ Aceito |
+| [ADR-014](adr/ADR-011-skip-preprocess-translation.md) | Opção de pular a tradução no pré-processamento | ✅ Aceito |
