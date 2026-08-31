@@ -21,13 +21,14 @@ Este documento descreve a arquitetura do sistema desenvolvido para o Tech Challe
 
 ## Visão Geral
 
-A solução é uma aplicação **full-stack** composta por três camadas principais:
+A solução é uma aplicação **full-stack** composta por quatro camadas principais:
 
 | Camada | Tecnologia | Responsabilidade |
 |---|---|---|
 | **Frontend** | React + TypeScript + Vite | Interface web para iniciar e monitorar o processamento |
 | **Backend** | Python + FastAPI | API REST, orquestração das pipelines de dados e fine-tuning |
-| **Banco de dados** | MongoDB | Persistência do estado das execuções |
+| **Agente Médico** | Python + FastAPI + LangGraph | Assistente médico com RAG, guardrails de segurança e auditoria |
+| **Banco de dados** | MongoDB | Persistência do estado das execuções e logs de auditoria |
 
 O fluxo central da aplicação é:
 
@@ -83,18 +84,24 @@ C4Container
     Container_Boundary(sistema, "FIAP POS IA System") {
         Container(frontend, "Frontend", "React + TypeScript + Vite\nNginx (produção)", "Interface web para iniciar e monitorar processamento e fine-tuning")
         Container(backend, "Backend API", "Python 3.11 + FastAPI + Uvicorn", "REST API: orquestra pré-processamento, fine-tuning e rastreamento de estado")
-        ContainerDb(mongodb, "MongoDB", "MongoDB (Docker)", "Armazena documentos de rastreamento de preprocess e fine-tuning")
+        Container(agent, "Agente Médico", "Python 3.11 + FastAPI + LangGraph", "Assistente médico com RAG, guardrails de segurança e audit logging — porta 8001")
+        ContainerDb(mongodb, "MongoDB", "MongoDB (Docker)", "Armazena documentos de rastreamento de preprocess, fine-tuning e agent_audit_logs")
         Container(datasets_fs, "Sistema de Arquivos / Datasets", "Volume Docker", "Armazena datasets brutos, pré-processados e modelos treinados")
     }
 
-    Container_Ext(huggingface, "HuggingFace Hub", "SaaS", "Modelo base e repositório do modelo fine-tunado")
-    Container_Ext(colab, "Google Colab", "SaaS", "Notebooks de fine-tuning com GPU A100/T4")
+    Container_Ext(huggingface, "HuggingFace Hub / ZeroGPU", "SaaS", "Modelo base, repositório do modelo fine-tunado e endpoint de inferência")
+    Container_Ext(colab, "Google Colab", "SaaS", "Notebooks de fine-tuning com GPU A100/T4 e endpoint ngrok")
 
     Rel(usuario, frontend, "Acessa", "HTTPS :8080")
     Rel(frontend, backend, "REST API calls", "HTTP :3000")
+    Rel(frontend, agent, "Consultas ao agente médico", "HTTP :8001")
     Rel(backend, mongodb, "Lê / Grava estado", "MongoDB Wire Protocol :27017")
     Rel(backend, datasets_fs, "Lê/Grava datasets e modelos", "I/O local")
     Rel(backend, huggingface, "Baixa modelo base", "HTTPS / datasets lib")
+    Rel(agent, mongodb, "Persiste audit_logs e consulta RAG", "MongoDB Wire Protocol :27017")
+    Rel(agent, backend, "Consulta base RAG", "HTTP /rag-database/query")
+    Rel(agent, huggingface, "Inferência LLM via ZeroGPU", "HTTPS")
+    Rel(agent, colab, "Inferência LLM via ngrok (dev)", "HTTPS")
     Rel(colab, huggingface, "Publica modelo fine-tunado", "HTTPS / HuggingFace Hub API")
     Rel(usuario, colab, "Executa fine-tuning", "HTTPS")
 ```
@@ -309,6 +316,52 @@ sequenceDiagram
 
 ---
 
+## Diagrama de Sequência — Agente Médico
+
+Fluxo completo de uma consulta ao assistente médico com o pipeline LangGraph.
+
+```mermaid
+sequenceDiagram
+    actor U as Usuário
+    participant API as Agente API (FastAPI :8001)
+    participant TV as topic_validator
+    participant SG as safety_guard
+    participant RAG as rag_retriever
+    participant LLM as llm_generator
+    participant FMT as response_formatter
+    participant AUD as audit_logger
+    participant DB as MongoDB
+    participant BE as Backend API (/rag-database)
+    participant HF as HuggingFace / ngrok
+
+    U->>API: POST /agent/chat { session_id, query }
+    API->>TV: invoke(state)
+    TV-->>API: topic_valid=true
+    API->>SG: invoke(state)
+    SG-->>API: safety_triggered=false
+    API->>RAG: invoke(state)
+    RAG->>BE: POST /rag-database/query { query, top_k }
+    BE-->>RAG: { documents: [...] }
+    RAG-->>API: rag_documents, rag_context
+    API->>LLM: invoke(state)
+    Note over LLM,HF: Template SFT (Instrução/Entrada/Resposta)
+    LLM->>HF: generate(pergunta, contexto, prompt) via Gradio API / FastAPI ngrok
+    HF-->>LLM: resposta gerada pela LLM fine-tunada
+    LLM-->>API: llm_response_raw, sources_cited
+    API->>FMT: invoke(state)
+    FMT-->>API: final_response (com fontes + disclaimer)
+    API->>AUD: invoke(state)
+    AUD->>DB: insert agent_audit_logs
+    DB-->>AUD: { _id: audit_id }
+    AUD-->>API: audit_id, duration_ms
+    API-->>U: { response, sources, topic_valid, audit_id, ... }
+
+    Note over TV,SG: Se query inválida ou guardrail ativado,
+    Note over TV,SG: pula direto para audit_logger (early-exit)
+```
+
+---
+
 ## Decisões de Arquitetura (ADRs)
 
 As decisões técnicas que moldaram esta arquitetura estão documentadas como **ADRs (Architecture Decision Records)** no formato MADR:
@@ -324,4 +377,8 @@ As decisões técnicas que moldaram esta arquitetura estão documentadas como **
 | [ADR-007](adr/ADR-007-split-train-rag.md) | Split train/RAG configurável via rag_percent | ⚠️ Substituído |
 | [ADR-008](adr/ADR-008-docker-compose.md) | Orquestração local via Docker Compose | ✅ Aceito |
 | [ADR-009](adr/ADR-009-deteccao-gpu-cpu.md) | Detecção automática GPU/CPU no backend | ✅ Aceito |
-| [ADR-010](adr/ADR-010-colab-ngrok-zerогpu.md) | Colab + ngrok e HuggingFace ZeroGPU para servir o modelo | ✅ Aceito |
+| [ADR-010](adr/ADR-010-colab-ngrok-zerogpu.md) | Colab + ngrok e HuggingFace ZeroGPU para servir o modelo | ✅ Aceito |
+| [ADR-011](adr/ADR-011-langgraph-medical-agent.md) | LangGraph como orquestrador do agente médico | ✅ Aceito |
+| [ADR-012](adr/ADR-012-arquitetura-hibrida-inferencia-llm.md) | Arquitetura híbrida de inferência LLM (HF Spaces / ngrok) | ✅ Aceito |
+| [ADR-013](adr/ADR-013-desacoplamento-guardrails-template-sft.md) | Desacoplamento de guardrails e preservação do template SFT | ✅ Aceito |
+| [ADR-014](adr/ADR-011-skip-preprocess-translation.md) | Opção de pular a tradução no pré-processamento | ✅ Aceito |

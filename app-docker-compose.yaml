@@ -58,6 +58,36 @@ services:
     networks:
       - fiap-network
 
+  agent:
+    build:
+      context: ./agent
+      dockerfile: Dockerfile
+    container_name: fiap-pos-ia-agent
+    restart: always
+    ports:
+      - "8001:8001"
+    environment:
+      PYTHONPATH: src
+      MONGODB_USER: db_user
+      MONGODB_PASSWORD: db_pass
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      DB_NAME: fiap_pos_ia_fase3
+      # LLM endpoint — configure com URL do ngrok (Colab) ou HuggingFace ZeroGPU
+      LLM_ENDPOINT_URL: ${LLM_ENDPOINT_URL:-}
+      LLM_API_TOKEN: ${LLM_API_TOKEN:-}
+      # URL interna do backend para consultas RAG
+      BACKEND_API_URL: http://fiap-pos-ia-backend:3000
+      AGENT_MAX_TOKENS: 512
+      AGENT_TEMPERATURE: "0.1"
+      RAG_TOP_K: 5
+      RAG_SIMILARITY_THRESHOLD: "0.25"
+    depends_on:
+      - mongodb
+      - backend
+    networks:
+      - fiap-network
+
 volumes:
   mongodb_data:
 
