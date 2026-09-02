@@ -84,17 +84,15 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
             >
               {isStarting ? "Iniciando..." : "Iniciar preprocessamento"}
             </button>
-            {!document && (
-              <label className="skip-translation-label">
-                <input
-                  type="checkbox"
-                  checked={skipTranslation}
-                  onChange={(e) => setSkipTranslation(e.target.checked)}
-                  disabled={isStarting || isPolling}
-                />
-                Pular etapa de tradução (utilizar dados fixos)
-              </label>
-            )}
+            <label className="skip-translation-label">
+              <input
+                type="checkbox"
+                checked={skipTranslation}
+                onChange={(e) => setSkipTranslation(e.target.checked)}
+                disabled={isStarting || isPolling || document !== null}
+              />
+              Pular etapa de tradução (utilizar dados fixos)
+            </label>
           </div>
 
           {document?.status === "completed" && (
