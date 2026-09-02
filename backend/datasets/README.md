@@ -12,10 +12,6 @@ O script [`get_datasets.py`](get_datasets.py) trabalha com cinco entradas:
 4. **PCDT - Protocolos Clinicos e Diretrizes Terapeuticas (Ministerio da Saude)** - PDFs versionados no repositorio em `files/pcdt/pcdt.zip` (Git LFS); o script apenas extrai o ZIP e gera o catalogo `pcdt_protocols.json`
 5. **Dataset estruturado de laudos medicos (pt-BR)** - JSON versionado no repositorio em `files/laudos_medicos/dataset_laudos_medicos.json` (50 laudos ja em formato `{id_laudo, cabecalho_identificador, corpo_tecnico, conclusao}`, ideal para fine-tuning)
 
-O script [`generate_medical_reports.py`](generate_medical_reports.py) gera uma sexta entrada, complementar aos laudos estruturados:
-
-6. **Laudos Médicos Sintéticos em PDF** - 500 PDFs gerados localmente com `reportlab` (SEED determinística), armazenados em `medical_reports/` junto com um `index.csv`. Diferentemente do item 5, aqui os laudos sao **documentos PDF** que simulam laudos reais — uteis para pipelines de RAG / extracao de texto.
-
 ## Estrutura gerada
 
 Arquivos **versionados no repositorio** (fonte de verdade compartilhada):
@@ -31,7 +27,6 @@ Arquivos **gerados em runtime** (ignorados pelo git):
 - `backend/datasets/files/clinical_protocols/data/` (PDFs FHEMIG baixados)
 - `backend/datasets/files/pcdt/pcdt_protocols.json` (catalogo PCDT gerado)
 - `backend/datasets/files/pcdt/data/` (PDFs PCDT extraidos do `pcdt.zip`)
-- `backend/datasets/medical_reports/`
 - `backend/datasets/preprocessed/qas/`
 - `backend/datasets/preprocessed/clinical_protocols/` (FHEMIG + PCDT no mesmo `clinical_protocols_rag.json`)
 - `backend/datasets/preprocessed/laudos_medicos/laudos_medicos.json`
@@ -45,7 +40,6 @@ Para executar os scripts voce precisa de:
 3. **Git LFS** instalado e inicializado (`git lfs install`), para baixar o `pcdt.zip` (~216 MB) durante o `git clone` / `git pull`
 4. A dependencia `beautifulsoup4`, usada para extrair os links dos PDFs da pagina da FHEMIG
 5. A dependencia `requests`, usada para baixar os arquivos
-6. A dependencia `reportlab`, usada pelo script de geração de laudos médicos
 
 
 ### Como o colega obtem os datasets locais
@@ -82,7 +76,6 @@ Os artefatos de runtime (`files/pcdt/data/`, `files/pcdt/pcdt_protocols.json`, t
 ```bash
 cd backend/datasets
 python get_datasets.py
-python generate_medical_reports.py
 ```
 
 ### Saida esperada
@@ -103,7 +96,6 @@ backend/datasets/
 |   |   `-- data/
 |   `-- laudos_medicos/
 |       `-- dataset_laudos_medicos.json
-|-- medical_reports/
 `-- preprocessed/
     |-- qas/
     |-- clinical_protocols/
@@ -116,6 +108,5 @@ backend/datasets/
 - PubMedQA e MedQuAD geram registros no formato de QA.
 - Os protocolos clinicos FHEMIG e os PDFs do PCDT geram registros com o campo `content_text`, extraido dos PDFs, gravados no mesmo arquivo `preprocessed/clinical_protocols/clinical_protocols_rag.json` (com o campo `source` diferenciando a origem).
 - O dataset estruturado de laudos medicos (`dataset_laudos_medicos.json`) ja esta em pt-BR e e apenas normalizado para `preprocessed/laudos_medicos/laudos_medicos.json` (nao passa pela etapa de traducao).
-- Os PDFs em `medical_reports/` sao gerados por `generate_medical_reports.py` e **nao** entram no pipeline `get_datasets.py`/`preprocess`. Eles ficam disponiveis para uso futuro (por exemplo, ingestao em RAG). A geracao usa SEED fixa, entao a saida e reproduzivel.
 - O pré-processamento atual não recebe percentual de split. PubMedQA e MedQuAD são normalizados em `preprocessed/qas/qas_train.json`; os protocolos clínicos (FHEMIG + PCDT) são extraídos dos PDFs e salvos em `preprocessed/clinical_protocols/clinical_protocols_rag.json`.
 - A etapa seguinte traduz todos os QAs para pt-BR e grava `preprocessed/qas/qas_train_pt_br.json`. A tradução preserva `metadata` e traduz `question`, `contexts` textuais e `answer`.
