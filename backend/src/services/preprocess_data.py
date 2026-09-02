@@ -36,6 +36,69 @@ def _get_relative_path(absolute_path: str) -> str:
         return absolute_path
 
 
+def _get_dataset_root() -> str:
+    """Resolve the dataset root for both local and container executions."""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    backend_dir = os.path.abspath(os.path.join(script_dir, "..", ".."))
+    candidates = [
+        os.path.join(backend_dir, "datasets"),
+        os.path.abspath(os.path.join(backend_dir, "..", "datasets")),
+    ]
+    for candidate in candidates:
+        if os.path.isdir(candidate):
+            return candidate
+    return os.path.join(backend_dir, "datasets")
+
+
+def _get_preprocessed_paths() -> Dict[str, str]:
+    """Return the canonical preprocessed artifact paths used by the pipeline."""
+    dataset_root = _get_dataset_root()
+    return {
+        "qas": os.path.join(dataset_root, "preprocessed", "qas", "qas_train.json"),
+        "clinical": os.path.join(
+            dataset_root,
+            "preprocessed",
+            "clinical_protocols",
+            "clinical_protocols_rag.json",
+        ),
+        "laudos": os.path.join(dataset_root, "preprocessed", "laudos_medicos", "laudos_medicos.json"),
+    }
+
+
+def _is_valid_preprocessed_file(file_path: str | None) -> bool:
+    """Return whether a preprocessed JSON artifact is present and non-empty."""
+    if not file_path or not os.path.exists(file_path):
+        return False
+
+    try:
+        with open(file_path, "r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except Exception:
+        return False
+
+    if not isinstance(payload, list):
+        return False
+
+    return len(payload) > 0
+
+
+def _get_valid_preprocessed_cache(expected_laudos: bool = False) -> Dict[str, Any] | None:
+    """Return a valid cache snapshot only when all required preprocessed artifacts exist."""
+    preprocessed_paths = _get_preprocessed_paths()
+    qas_valid = _is_valid_preprocessed_file(preprocessed_paths["qas"])
+    clinical_valid = _is_valid_preprocessed_file(preprocessed_paths["clinical"])
+    laudos_valid = True if not expected_laudos else _is_valid_preprocessed_file(preprocessed_paths["laudos"])
+
+    if not (qas_valid and clinical_valid and laudos_valid):
+        return None
+
+    return {
+        "qas": preprocessed_paths["qas"],
+        "clinical": preprocessed_paths["clinical"],
+        "laudos": preprocessed_paths["laudos"],
+    }
+
+
 def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> None:
     """
     Pipeline de pré-processamento executada em background.
@@ -63,8 +126,10 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
             "qas_train_path": None,
             "qas_train_pt_br_path": None,
             "clinical_protocols_rag_path": None,
+            "laudos_medicos_path": None,
             "qas_count": 0,
-            "clinical_protocols_count": 0
+            "clinical_protocols_count": 0,
+            "laudos_medicos_count": 0
         }
 
         # Marcar início do processamento
@@ -85,6 +150,8 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
 
         qas_paths: Dict[str, str] = datasets["qas"]
         clinical_protocols_paths: Tuple[Path, Path] = datasets["clinical_protocols"]
+        pcdt_paths: Tuple[Path, Path] = datasets.get("pcdt")
+        laudos_path: Path = datasets.get("laudos_medicos")
 
         # ------------------------------------------------------------------
         # Step 2 — Extração e geração dos arquivos JSON
@@ -92,27 +159,90 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
         print("Step 2: Extraindo e processando dados QA...")
         update_step_status(doc_id, "two_data_extraction", "in_progress", completion_percentage=0)
         
+        # Verifica se a saída pré-processada já é um cache válido e reaproveita apenas quando
+        # todos os artefatos críticos foram gerados corretamente.
         try:
-            qas_train_path, qas_count, clinical_protocols_rag_path, clinical_protocols_count = step_two.extract_data(
-                doc_id,
-                qas_paths=qas_paths,
-                clinical_protocols_paths=clinical_protocols_paths,
-            )
+            preprocessed_cache = _get_valid_preprocessed_cache(expected_laudos=laudos_path is not None)
 
-            # Atualizar resultados com paths e counts
-            results["qas_train_path"] = _get_relative_path(qas_train_path)
-            results["clinical_protocols_rag_path"] = _get_relative_path(clinical_protocols_rag_path)
-            results["qas_count"] = qas_count
-            results["clinical_protocols_count"] = clinical_protocols_count
-            
-            update_step_status(
-                doc_id,
-                "two_data_extraction",
-                "completed",
-                completion_percentage=100,
-            )
-            update_preprocess_document(doc_id, results, _current_overall_percentage())
-            
+            if preprocessed_cache is not None:
+                qas_train_path = preprocessed_cache["qas"]
+                qas_count = _read_json_count(qas_train_path)
+
+                clinical_protocols_rag_path = preprocessed_cache["clinical"]
+                clinical_protocols_count = _read_json_count(clinical_protocols_rag_path)
+
+                laudos_medicos_path = preprocessed_cache["laudos"] if preprocessed_cache.get("laudos") else None
+                laudos_medicos_count = _read_json_count(laudos_medicos_path) if laudos_medicos_path else 0
+
+                print(
+                    f"Cache pré-processado válido encontrado em {qas_train_path} e "
+                    f"{clinical_protocols_rag_path}; reutilizando artefatos extraídos."
+                )
+
+                results["qas_train_path"] = _get_relative_path(qas_train_path)
+                results["clinical_protocols_rag_path"] = _get_relative_path(clinical_protocols_rag_path)
+                results["qas_count"] = qas_count
+                results["clinical_protocols_count"] = clinical_protocols_count
+                if laudos_medicos_path:
+                    results["laudos_medicos_path"] = _get_relative_path(laudos_medicos_path)
+                results["laudos_medicos_count"] = laudos_medicos_count
+
+                update_step_status(
+                    doc_id,
+                    "two_data_extraction",
+                    "completed",
+                    completion_percentage=100,
+                )
+                update_preprocess_document(doc_id, results, _current_overall_percentage())
+
+            else:
+                # Nenhum cache válido encontrado — executar extração completa
+                args = [doc_id, qas_paths, clinical_protocols_paths]
+                if pcdt_paths is not None:
+                    args.append(pcdt_paths)
+                if laudos_path is not None:
+                    args.append(laudos_path)
+                extraction = step_two.extract_data(*args)
+
+                # Suporte para duas possíveis assinaturas de retorno de extract_data:
+                # - dicionário com chaves (qas_train_path, qas_count, clinical_protocols_rag_path, clinical_protocols_count, ...)
+                # - tupla/lista com valores (qas_train_path, qas_count, clinical_protocols_rag_path, clinical_protocols_count[, laudos_medicos_path, laudos_medicos_count])
+                if isinstance(extraction, dict):
+                    qas_train_path = extraction.get("qas_train_path")
+                    qas_count = extraction.get("qas_count", 0)
+                    clinical_protocols_rag_path = extraction.get("clinical_protocols_rag_path")
+                    clinical_protocols_count = extraction.get("clinical_protocols_count", 0)
+                    laudos_medicos_path = extraction.get("laudos_medicos_path", "")
+                    laudos_medicos_count = extraction.get("laudos_medicos_count", 0)
+                else:
+                    # seq handling
+                    if len(extraction) >= 4:
+                        qas_train_path, qas_count, clinical_protocols_rag_path, clinical_protocols_count = extraction[:4]
+                        if len(extraction) >= 6:
+                            laudos_medicos_path, laudos_medicos_count = extraction[4], extraction[5]
+                        else:
+                            laudos_medicos_path = ""
+                            laudos_medicos_count = 0
+                    else:
+                        raise ValueError("Unexpected return type from step_two.extract_data")
+
+                # Atualizar resultados com paths e counts
+                results["qas_train_path"] = _get_relative_path(qas_train_path)
+                results["clinical_protocols_rag_path"] = _get_relative_path(clinical_protocols_rag_path)
+                results["qas_count"] = qas_count
+                results["clinical_protocols_count"] = clinical_protocols_count
+                if laudos_medicos_path:
+                    results["laudos_medicos_path"] = _get_relative_path(laudos_medicos_path)
+                results["laudos_medicos_count"] = laudos_medicos_count
+
+                update_step_status(
+                    doc_id,
+                    "two_data_extraction",
+                    "completed",
+                    completion_percentage=100,
+                )
+                update_preprocess_document(doc_id, results, _current_overall_percentage())
+
         except Exception as e:
             error_message = f"Erro na extração de dados: {e}"
             update_step_status(doc_id, "two_data_extraction", "error", error_message, completion_percentage=0)
@@ -155,7 +285,8 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
         print(
             f"Pipeline concluída com sucesso! "
             f"QAs: count={results['qas_count']} | "
-            f"Clinical Protocols: count={results['clinical_protocols_count']}"
+            f"Clinical Protocols: count={results['clinical_protocols_count']} | "
+            f"Laudos Médicos: count={results['laudos_medicos_count']}"
         )
 
     except Exception as e:

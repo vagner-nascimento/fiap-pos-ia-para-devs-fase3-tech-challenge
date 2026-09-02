@@ -1,9 +1,10 @@
 # FIAP POS IA - Backend
 
-API REST em FastAPI responsavel pelo pre-processamento dos datasets medicos e fine tuning de modelos de linguagem. Hoje o fluxo trata duas familias de dados e uma etapa adicional de traducao local:
+API REST em FastAPI responsavel pelo pre-processamento dos datasets medicos, geracao da base RAG e fine tuning de modelos de linguagem. Hoje o fluxo trata varias fontes de dados e uma etapa adicional de traducao local:
 
 - QAs, a partir de PubMedQA e MedQuAD;
-- protocolos clinicos FHEMIG, com extracao de texto dos PDFs;
+- protocolos clinicos FHEMIG e PCDT, com extracao de texto dos PDFs;
+- laudos medicos estruturados e sintaticos, usados como base de conhecimento ou fine-tuning;
 - traducao dos QAs para pt-BR com um modelo local de machine translation;
 - fine tuning do modelo hospital helper com os dados processados.
 
@@ -77,12 +78,12 @@ Quando ha uma GPU Nvidia disponivel com driver/runtime configurados, o backend u
 
 ## Pre-requisitos
 
-| Requisito | Versao minima | Observacao |
-|-----------|---------------|------------|
-| Python | 3.8+ | 3.9 recomendado |
-| uv | - | Gerenciador de dependencias do projeto |
-| MongoDB | 4.x+ | Obrigatorio para a API subir |
-| Git | - | Necessario para clonar os datasets em runtime |
+| Requisito | Versao minima | Observacao                                    |
+|-----------|---------------|-----------------------------------------------|
+| Python    | 3.8+          | 3.9 recomendado                               |
+| uv        | -             | Gerenciador de dependencias do projeto        |
+| MongoDB   | 4.x+          | Obrigatorio para a API subir                  |
+| Git       | -             | Necessario para clonar os datasets em runtime |
 
 Para desenvolvimento local, tambem e util ter Docker e Docker Compose.
 
@@ -90,26 +91,26 @@ Para desenvolvimento local, tambem e util ter Docker e Docker Compose.
 
 Definidas em `pyproject.toml`:
 
-| Pacote | Uso |
-|--------|-----|
-| `fastapi` | Framework web |
-| `uvicorn[standard]` | Servidor ASGI |
-| `pydantic` | Validacao de request/response |
-| `python-dotenv` | Carregamento de variaveis de ambiente |
-| `pymongo` | Cliente MongoDB |
-| `requests` | Download dos protocolos clinicos |
-| `beautifulsoup4` | Parse do HTML com links dos PDFs |
-| `pdfplumber` | Extracao de texto dos PDFs |
-| `transformers` | Carregamento do modelo local de traducao e fine tuning |
-| `torch` | Inferencia e treinamento do modelo com suporte a CPU/GPU |
-| `sentencepiece` | Tokenizacao usada pelo modelo de traducao |
-| `sacremoses` | Pre e pos-processamento de texto para traducao |
-| `peft` | LoRA para fine tuning eficiente |
-| `trl` | SFTTrainer para fine tuning |
-| `datasets` | Manipulacao de datasets para treinamento |
-| `bitsandbytes` | Quantizacao 4-bit (quando disponivel) |
-| `langchain-community` | Embeddings usados na geracao RAG quando disponivel |
-| `langchain-text-splitters` | Chunking recursivo para protocolos clinicos |
+| Pacote                     | Uso                                                      |
+|----------------------------|----------------------------------------------------------|
+| `fastapi`                  | Framework web                                            |
+| `uvicorn[standard]`        | Servidor ASGI                                            |
+| `pydantic`                 | Validacao de request/response                            |
+| `python-dotenv`            | Carregamento de variaveis de ambiente                    |
+| `pymongo`                  | Cliente MongoDB                                          |
+| `requests`                 | Download dos protocolos clinicos                         |
+| `beautifulsoup4`           | Parse do HTML com links dos PDFs                         |
+| `pdfplumber`               | Extracao de texto dos PDFs                               |
+| `transformers`             | Carregamento do modelo local de traducao e fine tuning   |
+| `torch`                    | Inferencia e treinamento do modelo com suporte a CPU/GPU |
+| `sentencepiece`            | Tokenizacao usada pelo modelo de traducao                |
+| `sacremoses`               | Pre e pos-processamento de texto para traducao           |
+| `peft`                     | LoRA para fine tuning eficiente                          |
+| `trl`                      | SFTTrainer para fine tuning                              |
+| `datasets`                 | Manipulacao de datasets para treinamento                 |
+| `bitsandbytes`             | Quantizacao 4-bit (quando disponivel)                    |
+| `langchain-community`      | Embeddings usados na geracao RAG quando disponivel       |
+| `langchain-text-splitters` | Chunking recursivo para protocolos clinicos              |
 
 Dependencias de desenvolvimento: `pytest`, `black`, `mypy`.
 
@@ -121,17 +122,17 @@ Copie o arquivo de exemplo e ajuste conforme seu ambiente:
 cp .env.example .env
 ```
 
-| Variavel | Descricao | Padrao |
-|----------|-----------|--------|
-| `PYTHONPATH` | Diretorio raiz dos modulos Python | `src` |
-| `MONGODB_USER` | Usuario do MongoDB | `db_user` |
-| `MONGODB_PASSWORD` | Senha do MongoDB | `db_pass` |
-| `MONGODB_HOST` | Host do MongoDB | `localhost` |
-| `MONGODB_PORT` | Porta do MongoDB | `27017` |
-| `DB_NAME` | Nome do banco de dados | `fiap_pos_ia_fase3` |
-| `FINE_TUNING_BASE_MODEL` | Modelo base para fine tuning | `Qwen/Qwen2.5-1.5B-Instruct` |
-| `RAG_EMBEDDING_MODEL` | Modelo de embeddings para a base RAG | `hkunlp/instructor-base` |
-| `HF_TOKEN` | Token opcional para autenticacao no Hugging Face | - |
+| Variavel                 | Descricao                                        | Padrao                       |
+|--------------------------|--------------------------------------------------|------------------------------|
+| `PYTHONPATH`             | Diretorio raiz dos modulos Python                | `src`                        |
+| `MONGODB_USER`           | Usuario do MongoDB                               | `db_user`                    |
+| `MONGODB_PASSWORD`       | Senha do MongoDB                                 | `db_pass`                    |
+| `MONGODB_HOST`           | Host do MongoDB                                  | `localhost`                  |
+| `MONGODB_PORT`           | Porta do MongoDB                                 | `27017`                      |
+| `DB_NAME`                | Nome do banco de dados                           | `fiap_pos_ia_fase3`          |
+| `FINE_TUNING_BASE_MODEL` | Modelo base para fine tuning                     | `Qwen/Qwen2.5-1.5B-Instruct` |
+| `RAG_EMBEDDING_MODEL`    | Modelo de embeddings para a base RAG             | `hkunlp/instructor-base`     |
+| `HF_TOKEN`               | Token opcional para autenticacao no Hugging Face | -                            |
 
 > Com Docker Compose, o host do MongoDB deve ser `mongodb`, nao `localhost`.
 
@@ -203,9 +204,9 @@ Inicia o pre-processamento dos datasets. O processamento roda em background; a r
 
 **Body:**
 
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `skip_translation` | `bool` | Nao | Pula a etapa de tradução usando dataset já traduzido e fixado (padrao: false) |
+| Campo              | Tipo   | Obrigatorio | Descricao                                                                     |
+|--------------------|--------|-------------|-------------------------------------------------------------------------------|
+| `skip_translation` | `bool` | Nao         | Pula a etapa de tradução usando dataset já traduzido e fixado (padrao: false) |
 
 **Exemplo:**
 
@@ -282,20 +283,20 @@ Inicia o fine tuning do modelo `hospital_helper` a partir de um `preprocess_id` 
 
 **Body:**
 
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `preprocess_id` | `str` | Sim | ID do preprocessamento anterior |
-| `base_model_name` | `str` | Nao | Override opcional do modelo base |
-| `include_clinical_protocols` | `bool` | Nao | Inclui protocolos clinicos no treino (padrao: true) |
-| `use_4bit` | `bool` | Nao | Habilita 4-bit quando o ambiente suportar (padrao: false) |
-| `max_seq_length` | `int` | Nao | Tamanho maximo da sequencia (padrao: 2048) |
-| `num_train_epochs` | `float` | Nao | Numero de epocas (padrao: 1.0) |
-| `per_device_train_batch_size` | `int` | Nao | Batch size por dispositivo (padrao: 1) |
-| `gradient_accumulation_steps` | `int` | Nao | Passos de acumulacao de gradiente (padrao: 4) |
-| `learning_rate` | `float` | Nao | Taxa de aprendizado (padrao: 2e-4) |
-| `warmup_ratio` | `float` | Nao | Razao de warmup (padrao: 0.03) |
-| `logging_steps` | `int` | Nao | Passos de logging (padrao: 5) |
-| `seed` | `int` | Nao | Semente aleatoria (padrao: 3407) |
+| Campo                         | Tipo    | Obrigatorio | Descricao                                                 |
+|-------------------------------|---------|-------------|-----------------------------------------------------------|
+| `preprocess_id`               | `str`   | Sim         | ID do preprocessamento anterior                           |
+| `base_model_name`             | `str`   | Nao         | Override opcional do modelo base                          |
+| `include_clinical_protocols`  | `bool`  | Nao         | Inclui protocolos clinicos no treino (padrao: true)       |
+| `use_4bit`                    | `bool`  | Nao         | Habilita 4-bit quando o ambiente suportar (padrao: false) |
+| `max_seq_length`              | `int`   | Nao         | Tamanho maximo da sequencia (padrao: 2048)                |
+| `num_train_epochs`            | `float` | Nao         | Numero de epocas (padrao: 1.0)                            |
+| `per_device_train_batch_size` | `int`   | Nao         | Batch size por dispositivo (padrao: 1)                    |
+| `gradient_accumulation_steps` | `int`   | Nao         | Passos de acumulacao de gradiente (padrao: 4)             |
+| `learning_rate`               | `float` | Nao         | Taxa de aprendizado (padrao: 2e-4)                        |
+| `warmup_ratio`                | `float` | Nao         | Razao de warmup (padrao: 0.03)                            |
+| `logging_steps`               | `int`   | Nao         | Passos de logging (padrao: 5)                             |
+| `seed`                        | `int`   | Nao         | Semente aleatoria (padrao: 3407)                          |
 
 **Exemplo:**
 
@@ -317,7 +318,7 @@ curl -X POST http://localhost:3000/fine-tunning/ \
     "updated_date": "2026-08-04T10:00:00.000000+00:00"
   },
   "base_model_name": "Qwen/Qwen2.5-1.5B-Instruct",
-  "status": "pendding",
+  "status": "pending",
   "completion_percentage": 0,
   "error_message": null,
   "created_date": "2026-08-04T10:05:00.000000+00:00",
@@ -428,9 +429,9 @@ Gera e persiste a base RAG a partir dos arquivos preprocessados existentes. A ge
 
 **Body:**
 
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `preprocess_id` | `str` | Sim | ID do preprocessamento concluido |
+| Campo           | Tipo  | Obrigatorio | Descricao                        |
+|-----------------|-------|-------------|----------------------------------|
+| `preprocess_id` | `str` | Sim         | ID do preprocessamento concluido |
 
 **Exemplo:**
 
@@ -474,12 +475,12 @@ Realiza a consulta por similaridade vetorial na base RAG. A rota recebe a query 
 
 **Body:**
 
-| Campo | Tipo | Obrigatorio | Descricao |
-|-------|------|-------------|-----------|
-| `query` | `str` | Sim | Texto da consulta do usuario |
-| `top_k` | `int` | Nao | Quantidade maxima de documentos a retornar (padrao: 5, min: 1, max: 50) |
-| `preprocess_id` | `str` | Nao | Filtro opcional para limitar a busca aos documentos de um preprocessamento especifico |
-| `similarity_threshold` | `float` | Nao | Score minimo de similaridade para filtrar os resultados (ex: 0.2) |
+| Campo                  | Tipo    | Obrigatorio | Descricao                                                                             |
+|------------------------|---------|-------------|---------------------------------------------------------------------------------------|
+| `query`                | `str`   | Sim         | Texto da consulta do usuario                                                          |
+| `top_k`                | `int`   | Nao         | Quantidade maxima de documentos a retornar (padrao: 5, min: 1, max: 50)               |
+| `preprocess_id`        | `str`   | Nao         | Filtro opcional para limitar a busca aos documentos de um preprocessamento especifico |
+| `similarity_threshold` | `float` | Nao         | Score minimo de similaridade para filtrar os resultados (ex: 0.2)                     |
 
 **Exemplo:**
 
@@ -568,7 +569,7 @@ Para garantir a precisao da busca vetorial e contornar limitacoes de ambiente se
 O fluxo de fine tuning segue estes passos:
 
 1. **Validacao**: Verifica se o `preprocess_id` existe e esta com status `completed`
-2. **Criacao do documento**: Cria um documento na collection `fine_tunning` com status `pendding`
+2. **Criacao do documento**: Cria um documento na collection `fine_tunning` com status `pending`
 3. **Retorno imediato**: Retorna o documento criado com ID para o cliente
 4. **Treinamento em background**: Inicia o treinamento em background task
 5. **Atualizacao de progresso**: Callback do Trainer atualiza status, completion_percentage e loss_history a cada 5 segundos
@@ -598,7 +599,7 @@ flowchart TD
 
 **Campos de progresso monitorados:**
 
-- `status`: `pendding` → `in_progress` → `completed` ou `error`
+- `status`: `pending` → `in_progress` → `completed` ou `error`
 - `completion_percentage`: 0 a 100, calculado baseado em `current_step / estimated_total_steps`
 - `current_loss`: Loss atual do treinamento
 - `loss_history`: Array com historico de loss por step/epoch para acompanhar eficiencia
@@ -661,7 +662,7 @@ backend/
 
 Com a API rodando:
 
-| URL | Descricao |
-|-----|-----------|
-| http://localhost:3000/docs | Swagger UI |
-| http://localhost:3000/redoc | ReDoc |
+| URL                         | Descricao  |
+|-----------------------------|------------|
+| http://localhost:3000/docs  | Swagger UI |
+| http://localhost:3000/redoc | ReDoc      |

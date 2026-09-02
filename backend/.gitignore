@@ -219,9 +219,21 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Dataset files
-datasets/files
+#   Regra base: ignora tudo dentro de datasets/files/ e datasets/preprocessed/.
+#   Excecoes abaixo permitem versionar apenas os datasets pequenos e/ou canonicos
+#   (laudos medicos como JSON pequeno; PCDT como ZIP unico via Git LFS).
+datasets/files/*
 datasets/preprocessed/clinical_protocols
 datasets/preprocessed/qas
+
+# Excecoes: datasets versionados no repositorio (fonte de verdade compartilhada)
+!datasets/files/laudos_medicos/
+!datasets/files/pcdt/
+
+# Dentro de pcdt/, versionamos apenas o ZIP (Git LFS). O data/ extraido e o
+# catalogo gerado sao artefatos de runtime e NAO devem ser commitados.
+datasets/files/pcdt/data/
+datasets/files/pcdt/pcdt_protocols.json
 
 # Codex tests
 .tmp-tests

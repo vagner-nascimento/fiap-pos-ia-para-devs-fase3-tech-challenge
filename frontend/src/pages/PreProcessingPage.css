@@ -100,6 +100,12 @@
   gap: 1rem;
 }
 
+.status-section > * {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .status-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -161,7 +167,8 @@
 }
 
 .status-created,
-.status-in_progress {
+.status-in_progress,
+.status-pending {
   background: #dbeafe;
   color: #1d4ed8;
 }
@@ -171,7 +178,8 @@
   color: #15803d;
 }
 
-.status-error {
+.status-error,
+.status-failed {
   background: #fee2e2;
   color: #b91c1c;
 }
