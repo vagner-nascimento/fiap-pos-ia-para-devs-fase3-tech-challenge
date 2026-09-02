@@ -10,7 +10,7 @@ O script [`get_datasets.py`](get_datasets.py) trabalha com cinco entradas:
 2. **MedQuAD** - [https://github.com/abachaa/MedQuAD](https://github.com/abachaa/MedQuAD) (clonado via `git`)
 3. **Protocolos clinicos FHEMIG** - [https://www.fhemig.mg.gov.br/index.php/acesso-rapido/protocolos-clinicos](https://www.fhemig.mg.gov.br/index.php/acesso-rapido/protocolos-clinicos) (download HTTP)
 4. **PCDT - Protocolos Clinicos e Diretrizes Terapeuticas (Ministerio da Saude)** - PDFs versionados no repositorio em `files/pcdt/pcdt.zip` (Git LFS); o script apenas extrai o ZIP e gera o catalogo `pcdt_protocols.json`
-5. **Dataset estruturado de laudos medicos (pt-BR)** - JSON versionado no repositorio em `files/laudos_medicos/dataset_laudos_medicos.json` (50 laudos ja em formato `{id_laudo, cabecalho_identificador, corpo_tecnico, conclusao}`, ideal para fine-tuning)
+5. **Dataset estruturado de laudos medicos (pt-BR)** - JSON versionado no repositorio em `files/laudos_medicos/dataset_laudos_medicos.json`, disponivel para usos independentes da pipeline
 
 ## Estrutura gerada
 
@@ -29,7 +29,6 @@ Arquivos **gerados em runtime** (ignorados pelo git):
 - `backend/datasets/files/pcdt/data/` (PDFs PCDT extraidos do `pcdt.zip`)
 - `backend/datasets/preprocessed/qas/`
 - `backend/datasets/preprocessed/clinical_protocols/` (FHEMIG + PCDT no mesmo `clinical_protocols_rag.json`)
-- `backend/datasets/preprocessed/laudos_medicos/laudos_medicos.json`
 
 ## Pre-requisitos
 
@@ -104,9 +103,9 @@ backend/datasets/
 
 ## Observacoes
 
-- O backend processa PubMedQA, MedQuAD, protocolos clinicos FHEMIG, PCDT e o dataset estruturado de laudos medicos em etapas separadas.
+- O backend processa PubMedQA, MedQuAD, protocolos clinicos FHEMIG e PCDT em etapas separadas.
 - PubMedQA e MedQuAD geram registros no formato de QA.
 - Os protocolos clinicos FHEMIG e os PDFs do PCDT geram registros com o campo `content_text`, extraido dos PDFs, gravados no mesmo arquivo `preprocessed/clinical_protocols/clinical_protocols_rag.json` (com o campo `source` diferenciando a origem).
-- O dataset estruturado de laudos medicos (`dataset_laudos_medicos.json`) ja esta em pt-BR e e apenas normalizado para `preprocessed/laudos_medicos/laudos_medicos.json` (nao passa pela etapa de traducao).
+- O dataset estruturado de laudos medicos (`dataset_laudos_medicos.json`) permanece disponivel como fonte versionada para usos independentes da pipeline.
 - O pré-processamento atual não recebe percentual de split. PubMedQA e MedQuAD são normalizados em `preprocessed/qas/qas_train.json`; os protocolos clínicos (FHEMIG + PCDT) são extraídos dos PDFs e salvos em `preprocessed/clinical_protocols/clinical_protocols_rag.json`.
 - A etapa seguinte traduz todos os QAs para pt-BR e grava `preprocessed/qas/qas_train_pt_br.json`. A tradução preserva `metadata` e traduz `question`, `contexts` textuais e `answer`.

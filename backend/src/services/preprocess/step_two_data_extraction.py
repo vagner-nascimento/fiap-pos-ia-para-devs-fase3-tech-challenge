@@ -424,60 +424,11 @@ def _extract_pcdt_data(
     return len(combined)
 
 
-def _extract_laudos_medicos_data(
-    doc_id: str,
-    laudos_path: Path,
-) -> Tuple[str, int]:
-    """
-    Process the synthetic medical reports dataset (pt-BR). The dataset is
-    already in Portuguese and structured; here we normalize it into a stable
-    schema and copy it into ``preprocessed/laudos_medicos/laudos_medicos.json``
-    so downstream consumers can use it without touching source files.
-    """
-    output_dir = os.path.join(_datasets_dir, "preprocessed", "laudos_medicos")
-    os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, "laudos_medicos.json")
-
-    print(f"Processando laudos médicos de {laudos_path}...")
-    try:
-        with Path(laudos_path).open("r", encoding="utf-8") as handle:
-            raw = json.load(handle)
-    except json.JSONDecodeError as exc:
-        raise ValueError(f"Erro ao ler dataset de laudos: JSON inválido - {exc}") from exc
-
-    if not isinstance(raw, list):
-        raise ValueError("Dataset de laudos médicos deve conter uma lista de registros")
-
-    normalized: List[Dict[str, Any]] = []
-    for entry in raw:
-        if not isinstance(entry, dict):
-            continue
-        normalized.append(
-            {
-                "id_laudo": entry.get("id_laudo", ""),
-                "cabecalho_identificador": entry.get("cabecalho_identificador", {}),
-                "corpo_tecnico": entry.get("corpo_tecnico", {}),
-                "conclusao": entry.get("conclusao", {}),
-                "metadata": {
-                    "source": "laudos_medicos_sinteticos",
-                    "language": "pt-BR",
-                },
-            }
-        )
-
-    with open(output_path, "w", encoding="utf-8") as handle:
-        json.dump(normalized, handle, ensure_ascii=False, indent=4)
-
-    print(f"Laudos médicos processados: {len(normalized)} registros salvos em {output_path}")
-    return output_path, len(normalized)
-
-
 def extract_data(
     doc_id: str,
     qas_paths: Dict[str, str],
     clinical_protocols_paths: Tuple[Path, Path],
     pcdt_paths: Optional[Tuple[Path, Path]] = None,
-    laudos_path: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """
     Process all datasets and generate JSON files.
@@ -485,7 +436,6 @@ def extract_data(
     Returns a dict with keys:
         - qas_train_path, qas_count
         - clinical_protocols_rag_path, clinical_protocols_count
-        - laudos_medicos_path, laudos_medicos_count
     """
     qas_train_path, qas_count = _extract_qas_data(
         doc_id,
@@ -505,19 +455,9 @@ def extract_data(
             clinical_protocols_count,
         )
 
-    laudos_medicos_path: str = ""
-    laudos_medicos_count: int = 0
-    if laudos_path is not None:
-        laudos_medicos_path, laudos_medicos_count = _extract_laudos_medicos_data(
-            doc_id,
-            laudos_path,
-        )
-
     return {
         "qas_train_path": qas_train_path,
         "qas_count": qas_count,
         "clinical_protocols_rag_path": clinical_protocols_rag_path,
         "clinical_protocols_count": clinical_protocols_count,
-        "laudos_medicos_path": laudos_medicos_path,
-        "laudos_medicos_count": laudos_medicos_count,
     }

@@ -34,7 +34,7 @@ O fluxo central da aplicação é:
 
 1. O usuário acessa o frontend e inicia o pré-processamento sem parâmetros.
 2. O backend recebe a requisição, cria um documento de rastreamento no MongoDB e dispara a pipeline em background.
-3. A pipeline baixa ou reutiliza os datasets (PubMedQA, MedQuAD, protocolos FHEMIG, PCDT e laudos médicos), extrai cada família em artefatos JSON/PDF e traduz os QAs para português quando necessário.
+3. A pipeline baixa ou reutiliza os datasets (PubMedQA, MedQuAD, protocolos FHEMIG e PCDT), extrai os dados em artefatos JSON/PDF e traduz os QAs para português quando necessário.
 4. O usuário pode acompanhar o progresso em tempo real via polling do frontend e, em seguida, gerar e consultar a base RAG.
 5. Com os dados pré-processados, é possível iniciar o fine-tuning do modelo Qwen2.5-1.5B-Instruct diretamente pela aplicação (com GPU) ou via Jupyter Notebooks no Google Colab.
 

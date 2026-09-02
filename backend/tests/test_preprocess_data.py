@@ -262,15 +262,13 @@ def test_preprocess_data_background_reuses_valid_preprocessed_cache(monkeypatch,
 
     qas_path = tmp_path / "qas_train.json"
     clinical_path = tmp_path / "clinical_protocols_rag.json"
-    laudos_path = tmp_path / "laudos_medicos.json"
     qas_path.write_text(json.dumps([{"question": "Pergunta", "answer": "Resposta"}]), encoding="utf-8")
     clinical_path.write_text(json.dumps([{"name": "protocolo", "content_text": "conteudo"}]), encoding="utf-8")
-    laudos_path.write_text(json.dumps([{"id_laudo": "123"}]), encoding="utf-8")
 
     monkeypatch.setattr(
         preprocess_data,
         "_get_preprocessed_paths",
-        lambda: {"qas": str(qas_path), "clinical": str(clinical_path), "laudos": str(laudos_path)},
+        lambda: {"qas": str(qas_path), "clinical": str(clinical_path)},
     )
 
     def fake_update_preprocess_document(doc_id: str, results: dict, percentage: int) -> None:
@@ -292,7 +290,6 @@ def test_preprocess_data_background_reuses_valid_preprocessed_cache(monkeypatch,
         return {
             "qas": {"pubmedqa": str(tmp_path / "qa_repo")},
             "clinical_protocols": (tmp_path / "protocols.json", tmp_path / "pdfs"),
-            "laudos_medicos": laudos_path,
         }
 
     def fake_extract_data(*args, **kwargs):
@@ -310,6 +307,10 @@ def test_preprocess_data_background_reuses_valid_preprocessed_cache(monkeypatch,
 
     preprocess_data.preprocess_data_background("doc-cache")
 
+    result_updates = [call for call in calls if call[0] == "update_preprocess_document"]
+    assert result_updates
+    assert all("laudos_medicos_path" not in call[1][1] for call in result_updates)
+    assert all("laudos_medicos_count" not in call[1][1] for call in result_updates)
     assert any(call[0] == "translate" for call in calls)
     assert any(
         call[0] == "update_step_status"
@@ -327,7 +328,7 @@ def test_preprocess_data_background_rebuilds_when_cache_is_incomplete(monkeypatc
     monkeypatch.setattr(
         preprocess_data,
         "_get_preprocessed_paths",
-        lambda: {"qas": str(qas_path), "clinical": str(clinical_path), "laudos": str(tmp_path / "laudos_medicos.json")},
+        lambda: {"qas": str(qas_path), "clinical": str(clinical_path)},
     )
 
     def fake_download_datasets(doc_id: str) -> dict:
@@ -346,8 +347,6 @@ def test_preprocess_data_background_rebuilds_when_cache_is_incomplete(monkeypatc
             "qas_count": 1,
             "clinical_protocols_rag_path": str(extracted_clinical),
             "clinical_protocols_count": 1,
-            "laudos_medicos_path": "",
-            "laudos_medicos_count": 0,
         }
 
     def fake_translate(doc_id: str, qa_train_path: str):
