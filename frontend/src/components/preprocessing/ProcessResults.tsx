@@ -30,6 +30,10 @@ export function ProcessResults({ results }: Props) {
             <span>Total de laudos a processar</span>
             <strong>{results.medical_reports_count.toLocaleString("pt-BR")}</strong>
           </div>
+          <div className="result-item">
+            <span>Arquivo</span>
+            <strong>{results.medical_reports_path || "Não gerado"}</strong>
+          </div>
         </div>
         <div className="result-group">
           <h4>Clinical Protocols</h4>
