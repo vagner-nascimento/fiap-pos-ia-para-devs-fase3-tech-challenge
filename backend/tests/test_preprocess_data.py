@@ -67,12 +67,16 @@ def test_create_preprocess_document_initializes_new_structure(monkeypatch) -> No
     assert document["steps"]["one_download_datasets"]["completion_percentage"] == 0
     assert document["steps"]["two_data_extraction"]["completion_percentage"] == 0
     assert document["steps"]["three_translating"]["completion_percentage"] == 0
+    assert "four_anonymization" in document["steps"]
+    assert document["steps"]["four_anonymization"]["completion_percentage"] == 0
     assert "results" in document
     assert "qas_train_path" in document["results"]
     assert "qas_train_pt_br_path" in document["results"]
     assert "clinical_protocols_rag_path" in document["results"]
     assert "qas_count" in document["results"]
     assert "clinical_protocols_count" in document["results"]
+    assert "medical_reports_path" in document["results"]
+    assert "medical_reports_count" in document["results"]
     assert document["status"] == "created"
     assert document["completion_percentage"] == 0
 
@@ -125,11 +129,15 @@ def test_update_step_status_completed_updates_overall_status(monkeypatch) -> Non
     updated = preprocess_collection.update_step_status(
         document["_id"], "three_translating", "completed"
     )
+    updated = preprocess_collection.update_step_status(
+        document["_id"], "four_anonymization", "completed"
+    )
 
     assert updated is not None
     assert updated["steps"]["one_download_datasets"]["status"] == "completed"
     assert updated["steps"]["two_data_extraction"]["status"] == "completed"
     assert updated["steps"]["three_translating"]["status"] == "completed"
+    assert updated["steps"]["four_anonymization"]["status"] == "completed"
     assert updated["status"] == "completed"
 
 
@@ -145,6 +153,8 @@ def test_update_preprocess_document_with_results(monkeypatch) -> None:
         "clinical_protocols_rag_path": "datasets/preprocessed/clinical_protocols/clinical_protocols_rag.json",
         "qas_count": 150,
         "clinical_protocols_count": 120
+        ,"medical_reports_path": "datasets/files/laudos_medicos/dataset_laudos_medicos.json"
+        ,"medical_reports_count": 120
     }
     
     updated = preprocess_collection.update_preprocess_document(
@@ -210,6 +220,7 @@ def test_preprocess_data_background_runs_translation_for_qa_only(monkeypatch, tm
         return {
             "qas": {"pubmedqa": str(tmp_path / "qa_repo")},
             "clinical_protocols": (tmp_path / "protocols.json", tmp_path / "pdfs"),
+            "laudos_medicos": tmp_path / "medical_reports.json",
         }
 
     def fake_extract_data(
@@ -227,15 +238,21 @@ def test_preprocess_data_background_runs_translation_for_qa_only(monkeypatch, tm
         calls.append(("translate", doc_id, qa_train_path))
         return tmp_path / "qas_train_pt_br.json"
 
+    def fake_anonymization(doc_id: str, medical_reports_path: str) -> object:
+        calls.append(("anonymization", doc_id, medical_reports_path))
+        return tmp_path / "anonymizated_medical_report.json"
+
     monkeypatch.setattr(preprocess_data, "update_preprocess_document", fake_update_preprocess_document)
     monkeypatch.setattr(preprocess_data, "update_step_status", fake_update_step_status)
     monkeypatch.setattr(preprocess_data.step_one, "download_datasets", fake_download_datasets)
     monkeypatch.setattr(preprocess_data.step_two, "extract_data", fake_extract_data)
     monkeypatch.setattr(preprocess_data.step_three, "translate", fake_translate)
+    monkeypatch.setattr(preprocess_data.step_four, "anonymization", fake_anonymization)
 
     preprocess_data.preprocess_data_background("doc-123")
 
     assert any(call[0] == "translate" for call in calls)
+    assert any(call[0] == "anonymization" for call in calls)
     assert any(
         call[0] == "update_step_status"
         and call[1][1] == "three_translating"
@@ -290,6 +307,7 @@ def test_preprocess_data_background_reuses_valid_preprocessed_cache(monkeypatch,
         return {
             "qas": {"pubmedqa": str(tmp_path / "qa_repo")},
             "clinical_protocols": (tmp_path / "protocols.json", tmp_path / "pdfs"),
+                "laudos_medicos": tmp_path / "medical_reports.json",
         }
 
     def fake_extract_data(*args, **kwargs):
@@ -299,18 +317,23 @@ def test_preprocess_data_background_reuses_valid_preprocessed_cache(monkeypatch,
         calls.append(("translate", doc_id, qa_train_path))
         return tmp_path / "qas_train_pt_br.json"
 
+    def fake_anonymization(doc_id: str, medical_reports_path: str) -> object:
+        calls.append(("anonymization", doc_id, medical_reports_path))
+        return tmp_path / "anonymizated_medical_report.json"
+
     monkeypatch.setattr(preprocess_data, "update_preprocess_document", fake_update_preprocess_document)
     monkeypatch.setattr(preprocess_data, "update_step_status", fake_update_step_status)
     monkeypatch.setattr(preprocess_data.step_one, "download_datasets", fake_download_datasets)
     monkeypatch.setattr(preprocess_data.step_two, "extract_data", fake_extract_data)
     monkeypatch.setattr(preprocess_data.step_three, "translate", fake_translate)
+    monkeypatch.setattr(preprocess_data.step_four, "anonymization", fake_anonymization)
 
     preprocess_data.preprocess_data_background("doc-cache")
 
     result_updates = [call for call in calls if call[0] == "update_preprocess_document"]
     assert result_updates
-    assert all("laudos_medicos_path" not in call[1][1] for call in result_updates)
-    assert all("laudos_medicos_count" not in call[1][1] for call in result_updates)
+    assert any("medical_reports_path" in call[1][1] for call in result_updates)
+    assert any("medical_reports_count" in call[1][1] for call in result_updates)
     assert any(call[0] == "translate" for call in calls)
     assert any(
         call[0] == "update_step_status"
@@ -335,6 +358,7 @@ def test_preprocess_data_background_rebuilds_when_cache_is_incomplete(monkeypatc
         return {
             "qas": {"pubmedqa": str(tmp_path / "qa_repo")},
             "clinical_protocols": (tmp_path / "protocols.json", tmp_path / "pdfs"),
+            "laudos_medicos": tmp_path / "medical_reports.json",
         }
 
     def fake_extract_data(*args, **kwargs):
@@ -355,6 +379,11 @@ def test_preprocess_data_background_rebuilds_when_cache_is_incomplete(monkeypatc
     monkeypatch.setattr(preprocess_data.step_one, "download_datasets", fake_download_datasets)
     monkeypatch.setattr(preprocess_data.step_two, "extract_data", fake_extract_data)
     monkeypatch.setattr(preprocess_data.step_three, "translate", fake_translate)
+    monkeypatch.setattr(
+        preprocess_data.step_four,
+        "anonymization",
+        lambda doc_id, medical_reports_path: tmp_path / "anonymizated_medical_report.json",
+    )
     monkeypatch.setattr(preprocess_data, "update_preprocess_document", lambda *args, **kwargs: None)
     monkeypatch.setattr(preprocess_data, "update_step_status", lambda *args, **kwargs: None)
 

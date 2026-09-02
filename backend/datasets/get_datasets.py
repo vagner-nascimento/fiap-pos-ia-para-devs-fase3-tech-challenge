@@ -264,27 +264,7 @@ def prepare_pcdt_protocols() -> Tuple[Path, Path]:
     return catalog_path, pdfs_dir
 
 
-def prepare_laudos_medicos_dataset() -> Path:
-    """
-    Return the path to the local synthetic medical reports dataset (pt-BR).
-
-    The JSON file is shipped with the repository under
-    ``backend/datasets/files/laudos_medicos/dataset_laudos_medicos.json``.
-    """
-    script_dir = Path(__file__).resolve().parent
-    dataset_path = script_dir / "files" / "laudos_medicos" / "dataset_laudos_medicos.json"
-
-    if not dataset_path.exists():
-        raise FileNotFoundError(
-            f"Dataset de laudos médicos não encontrado em {dataset_path}."
-        )
-
-    print(f"Dataset de laudos médicos disponível em {dataset_path}")
-    return dataset_path
-
-
 if __name__ == "__main__":
     print(clone_qa_repositories())
     print(download_fhemig_clinical_protocols())
     print(prepare_pcdt_protocols())
-    print(prepare_laudos_medicos_dataset())

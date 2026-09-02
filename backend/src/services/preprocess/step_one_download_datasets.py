@@ -31,6 +31,7 @@ def download_datasets(
             "qas": dict[str, str] mapeando nome do repositório -> path local
             "clinical_protocols": tuple[Path, Path] com (json_path, pdfs_dir) (FHEMIG)
             "pcdt": tuple[Path, Path] com (json_path, pdfs_dir) (PCDT local)
+            "laudos_medicos": Path do JSON local de laudos médicos
     """
     update_step_status(doc_id, "one_download_datasets", "in_progress", completion_percentage=0)
     qas_paths = clone_qa_repositories()
@@ -41,10 +42,14 @@ def download_datasets(
 
     # PCDT é um arquivo local versionado no repositório; apenas valida existência
     pcdt_paths = prepare_pcdt_protocols()
+    medical_reports_path = Path(datasets_dir) / "files" / "laudos_medicos" / "dataset_laudos_medicos.json"
+    if not medical_reports_path.exists():
+        raise FileNotFoundError(f"Dataset de laudos médicos não encontrado em {medical_reports_path}.")
     update_step_status(doc_id, "one_download_datasets", "completed", completion_percentage=100)
 
     return {
         "qas": qas_paths,
         "clinical_protocols": clinical_protocols_paths,
         "pcdt": pcdt_paths,
+        "laudos_medicos": medical_reports_path,
     }

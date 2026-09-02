@@ -2,7 +2,7 @@ import json
 import os
 from typing import Dict, Any, Tuple
 from anyio import Path
-from fastapi import HTTPException, BackgroundTasks
+from fastapi import BackgroundTasks
 
 from infra.database.collections.preprocess import (
     create_preprocess_document,
@@ -14,6 +14,7 @@ from infra.database.collections.preprocess import (
 from services.preprocess import step_one_download_datasets as step_one
 from services.preprocess import step_two_data_extraction as step_two
 from services.preprocess import step_three_translation as step_three
+from services.preprocess import step_four_anonymization as step_four
 
 
 def _read_json_count(file_path: str) -> int:
@@ -103,6 +104,7 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
         1. Download dos datasets (step_one)
         2. Extração e geração dos arquivos JSON (step_two)
         3. Tradução dos dados QA (step_three)
+    4. Anonimização dos laudos médicos (step_four)
 
     Atualiza o documento na collection preprocess conforme o progresso,
     rastreando o status de cada step individualmente.
@@ -122,6 +124,8 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
             "qas_train_path": None,
             "qas_train_pt_br_path": None,
             "clinical_protocols_rag_path": None,
+                        "medical_reports_path": None,
+            "medical_reports_count": 0,
             "qas_count": 0,
             "clinical_protocols_count": 0,
         }
@@ -145,6 +149,8 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
         qas_paths: Dict[str, str] = datasets["qas"]
         clinical_protocols_paths: Tuple[Path, Path] = datasets["clinical_protocols"]
         pcdt_paths: Tuple[Path, Path] = datasets.get("pcdt")
+        medical_reports_path = datasets["laudos_medicos"]
+        results["medical_reports_count"] = _read_json_count(str(medical_reports_path))
 
         # ------------------------------------------------------------------
         # Step 2 — Extração e geração dos arquivos JSON
@@ -249,6 +255,27 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
         except Exception as e:
             error_message = f"Erro na tradução de dados QA: {e}"
             update_step_status(doc_id, "three_translating", "error", error_message, completion_percentage=0)
+            raise
+
+        # ------------------------------------------------------------------
+        # Step 4 — Anonimização dos laudos médicos
+        # ------------------------------------------------------------------
+        print("Step 4: Anonimizando laudos médicos...")
+        update_step_status(doc_id, "four_anonymization", "in_progress", completion_percentage=0)
+
+        try:
+            anonymized_reports_path = step_four.anonymization(doc_id, medical_reports_path)
+            results["medical_reports_path"] = _get_relative_path(str(anonymized_reports_path))
+            update_step_status(
+                doc_id,
+                "four_anonymization",
+                "completed",
+                completion_percentage=100,
+            )
+            update_preprocess_document(doc_id, results, _current_overall_percentage())
+        except Exception as e:
+            error_message = f"Erro na anonimização dos laudos médicos: {e}"
+            update_step_status(doc_id, "four_anonymization", "error", error_message, completion_percentage=0)
             raise
 
         # ------------------------------------------------------------------

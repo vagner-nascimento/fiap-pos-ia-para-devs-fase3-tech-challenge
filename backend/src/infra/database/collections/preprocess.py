@@ -7,9 +7,10 @@ from infra.database.mongodb import get_collection
 PREPROCESS_COLLECTION: Final[str] = "preprocess"
 
 STEP_WEIGHTS: Final[Dict[str, float]] = {
-    "one_download_datasets": 0.2,
-    "two_data_extraction": 0.4,
-    "three_translating": 0.4,
+    "one_download_datasets": 0.15,
+    "two_data_extraction": 0.35,
+    "three_translating": 0.35,
+    "four_anonymization": 0.15,
 }
 
 
@@ -100,12 +101,19 @@ def create_preprocess_document() -> Dict[str, Any]:
                 "status": "pending",
                 "completion_percentage": 0,
                 "error_message": None
+            },
+            "four_anonymization": {
+                "status": "pending",
+                "completion_percentage": 0,
+                "error_message": None
             }
         },
         "results": {
             "qas_train_path": None,
             "qas_train_pt_br_path": None,
             "clinical_protocols_rag_path": None,
+            "medical_reports_path": None,
+            "medical_reports_count": 0,
             "qas_count": 0,
             "clinical_protocols_count": 0
         },

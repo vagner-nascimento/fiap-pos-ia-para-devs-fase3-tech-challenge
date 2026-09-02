@@ -17,6 +17,8 @@ export interface Results {
   qas_train_path?: string;
   qas_train_pt_br_path?: string;
   clinical_protocols_rag_path?: string;
+  medical_reports_path?: string;
+  medical_reports_count: number;
   qas_count: number;
   clinical_protocols_count: number;
 }

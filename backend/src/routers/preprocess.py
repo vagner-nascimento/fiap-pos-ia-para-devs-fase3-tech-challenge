@@ -26,6 +26,8 @@ class Results(BaseModel):
     qas_train_path: Optional[str] = None
     qas_train_pt_br_path: Optional[str] = None
     clinical_protocols_rag_path: Optional[str] = None
+    medical_reports_path: Optional[str] = None
+    medical_reports_count: int = 0
     qas_count: int = 0
     clinical_protocols_count: int = 0
 
