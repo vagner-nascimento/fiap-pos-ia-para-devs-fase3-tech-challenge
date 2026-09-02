@@ -225,6 +225,7 @@ __marimo__/
 datasets/files/*
 datasets/preprocessed/clinical_protocols
 datasets/preprocessed/qas
+datasets/preprocessed/laudos_medicos
 
 # Excecoes: datasets versionados no repositorio (fonte de verdade compartilhada)
 !datasets/files/laudos_medicos/
