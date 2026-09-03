@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_BACKEND_URL: http://localhost:3000
+        VITE_AGENT_URL: http://localhost:8001
     container_name: fiap-pos-ia-frontend
     restart: always
     ports:
@@ -69,22 +70,12 @@ services:
     restart: always
     ports:
       - "8001:8001"
+    env_file:
+      - ./agent/.env
     environment:
-      PYTHONPATH: src
-      MONGODB_USER: db_user
-      MONGODB_PASSWORD: db_pass
+      # Dentro da rede Docker, localhost não aponta para estes serviços.
       MONGODB_HOST: mongodb
-      MONGODB_PORT: 27017
-      DB_NAME: fiap_pos_ia_fase3
-      # LLM endpoint — configure com URL do ngrok (Colab) ou HuggingFace ZeroGPU
-      LLM_ENDPOINT_URL: ${LLM_ENDPOINT_URL:-}
-      LLM_API_TOKEN: ${LLM_API_TOKEN:-}
-      # URL interna do backend para consultas RAG
       BACKEND_API_URL: http://fiap-pos-ia-backend:3000
-      AGENT_MAX_TOKENS: 512
-      AGENT_TEMPERATURE: "0.1"
-      RAG_TOP_K: 5
-      RAG_SIMILARITY_THRESHOLD: "0.25"
     depends_on:
       - mongodb
       - backend

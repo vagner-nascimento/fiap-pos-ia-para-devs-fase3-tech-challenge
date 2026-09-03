@@ -29,43 +29,43 @@ PROHIBITED_PATTERNS: Final[List[ProhibitedPattern]] = [
     # Prescrição direta com dose
     ProhibitedPattern(
         pattern=r"\b(prescrev|receit|indic|recomend).{0,40}\b(\d+\s*mg|\d+\s*ml|\d+\s*g\b|\d+\s*mcg|\d+\s*ui)\b",
-        description="Solicitação de prescrição com dose específica",
+        description="O pedido solicita a prescrição de um medicamento com dose específica, algo que exige avaliação de um profissional de saúde.",
     ),
     ProhibitedPattern(
         pattern=r"\b(tome|tomar|usar|aplicar|inject).{0,60}\b(\d+\s*mg|\d+\s*ml|\d+\s*(comprimido|ampola|capsula|cápsula)|comprimido(s)?)",
-        description="Instrução de administração com dose ou unidade específica",
+        description="O pedido solicita instruções personalizadas para administrar um medicamento, incluindo dose ou quantidade.",
     ),
     ProhibitedPattern(
         pattern=r"\bme (prescrev|receit).{0,60}(medicament|remedio|remédio|antibiotico|antibiótico)\b",
-        description="Pedido direto de prescrição",
+        description="O pedido solicita uma receita ou prescrição personalizada de medicamento.",
     ),
     ProhibitedPattern(
         pattern=r"\bqual (o |a )?(remedio|remédio|medicament|antibiotico|antibiótico|droga).{0,30}(para|que trata|que cura)\b",
-        description="Pedido de indicação de medicamento específico para condição",
+        description="O pedido solicita a indicação de um medicamento específico para tratar uma condição, o que requer avaliação profissional.",
     ),
 
     # Diagnóstico definitivo
     ProhibitedPattern(
         pattern=r"\b(eu tenho|tenho|estou com).{0,60}(diagnostico|diagnóstico|confirmad|certez)\b",
-        description="Pedido de diagnóstico definitivo",
+        description="O pedido solicita a confirmação de um diagnóstico definitivo, que só pode ser feita por um profissional após avaliação clínica.",
     ),
     ProhibitedPattern(
         pattern=r"\b(diga|confirme|certifique).{0,40}(que tenho|que estou com|meu diagnostico|minha doenca|minha doença)\b",
-        description="Pedido de confirmação de diagnóstico",
+        description="O pedido solicita confirmar uma doença ou diagnóstico pessoal sem uma avaliação clínica profissional.",
     ),
     ProhibitedPattern(
         pattern=r"\b(qual|o que).{0,20}(minha|meu).{0,30}(doenca|doença|condicao|condição|diagnostico|diagnóstico)\b",
-        description="Diagnóstico personalizado baseado em sintomas",
+        description="O pedido solicita um diagnóstico personalizado com base em sintomas, algo que requer avaliação clínica profissional.",
     ),
 
     # Substituição de médico
     ProhibitedPattern(
         pattern=r"\b(sem (ir ao|consultar|ver).{0,20}medico|medico|médico).{0,40}(o que (devo|posso|fazer))\b",
-        description="Substituição de consulta médica",
+        description="O pedido tenta substituir uma consulta médica e solicita uma orientação personalizada sem avaliação profissional.",
     ),
     ProhibitedPattern(
         pattern=r"\bnao (preciso|quero).{0,20}(medico|médico|hospital|consulta)\b",
-        description="Tentativa de evitar consulta médica",
+        description="O pedido indica que pretende evitar atendimento médico, mas orientações personalizadas exigem avaliação de um profissional.",
     ),
 ]
 

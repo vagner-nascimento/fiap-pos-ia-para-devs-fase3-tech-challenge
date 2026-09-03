@@ -19,8 +19,9 @@ async function parseError(response: Response): Promise<string> {
 export async function apiFetch<T>(
   path: string,
   options?: RequestInit,
+  baseUrl: string = API_BASE_URL,
 ): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${baseUrl.replace(/\/$/, "")}${path}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",

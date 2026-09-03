@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import "./Layout.css";
 
-export type ViewType = "preprocess" | "rag_generation" | "rag_query";
+export type ViewType = "agent" | "preprocess" | "rag_generation" | "rag_query";
 
 interface LayoutProps {
   children: ReactNode;
@@ -39,6 +39,13 @@ export function Layout({ children, activeView, onNavigate }: LayoutProps) {
             onClick={() => onNavigate("rag_query")}
           >
             RAG Query
+          </button>
+          <button
+            type="button"
+            className={`nav-item ${activeView === "agent" ? "active" : ""}`}
+            onClick={() => onNavigate("agent")}
+          >
+            Assistente Médico
           </button>
         </nav>
       </aside>
