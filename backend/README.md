@@ -455,6 +455,7 @@ curl -X POST http://localhost:3000/rag-database/ \
   },
   "qas_rag_path": "backend/datasets/preprocessed/qas/qas_train_pt_br.json",
   "clinical_protocols_rag_path": "backend/datasets/preprocessed/clinical_protocols/clinical_protocols_rag.json",
+  "medical_reports_path": "backend/datasets/preprocessed/medical_reports/anonymizated_medical_reports.json",
   "embedding_model": "hkunlp/instructor-base",
   "splitter_name": "RecursiveCharacterTextSplitter",
   "splitter_chunk_size": 2400,
@@ -465,7 +466,8 @@ curl -X POST http://localhost:3000/rag-database/ \
   "updated_date": "2026-08-13T10:00:02+00:00",
   "qas_documents": 8703,
   "clinical_protocol_documents": 42,
-  "total_documents": 8745
+  "medical_report_documents": 120,
+  "total_documents": 8865
 }
 ```
 
@@ -525,11 +527,13 @@ curl -X POST http://localhost:3000/rag-database/query \
 Os documentos gravados em `rag_documents` seguem uma estrutura pensada para recuperacao e citacao:
 
 - `content`: texto normalizado usado na indexacao;
-- `dataset` / `source_type`: identifica se o documento veio de `qas` ou `clinical_protocols`;
+- `dataset` / `source_type`: identifica se o documento veio de `qas`, `clinical_protocols` ou `medical_reports`;
 - `embedding`: vetor gerado para recuperar o documento no futuro;
 - `metadatas.source`: guarda a origem que o agente pode exibir ao responder.
 
 Para `qas`, `metadatas.source` replica o objeto `metadata` original do dataset. Para `clinical_protocols`, `metadatas.source` contem `name`, `url` e `source`.
+
+Para `medical_reports`, o texto e os metadados usam apenas os campos clinicos do laudo anonimizado. Identificadores do laudo, nome do paciente, medico solicitante e CRM nao sao indexados.
 
 Se um protocolo for dividido em varios chunks, todos os chunks herdam a mesma `metadatas.source`, preservando a citacao do documento original.
 

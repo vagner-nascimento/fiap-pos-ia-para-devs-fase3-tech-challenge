@@ -87,6 +87,11 @@ def test_generate_rag_database_creates_documents_with_sources(monkeypatch, tmp_p
         ),
         encoding="utf-8",
     )
+    medical_reports_path = tmp_path / "medical_reports.json"
+    medical_reports_path.write_text(
+        json.dumps([{"corpo_tecnico": {"tipo_exame": "EEG", "descricao_tecnica": "Atividade normal"}}]),
+        encoding="utf-8",
+    )
 
     monkeypatch.setattr(
         rag_service,
@@ -95,7 +100,10 @@ def test_generate_rag_database_creates_documents_with_sources(monkeypatch, tmp_p
             "status": "completed",
             "rag_percent": 0.5,
             "updated_date": "2026-08-13T00:00:00+00:00",
-            "results": {"clinical_protocols_rag_path": "clinical.json"},
+                "results": {
+                    "clinical_protocols_rag_path": "clinical.json",
+                    "medical_reports_path": "medical_reports.json",
+                },
         },
     )
     monkeypatch.setattr(
@@ -114,8 +122,10 @@ def test_generate_rag_database_creates_documents_with_sources(monkeypatch, tmp_p
 
     assert document["status"] == "completed"
     assert document["clinical_protocol_documents"] > 1
-    assert document["total_documents"] == document["clinical_protocol_documents"]
+    assert document["medical_report_documents"] == 1
+    assert document["total_documents"] == document["clinical_protocol_documents"] + document["medical_report_documents"]
     assert document["clinical_protocols_rag_path"] == str(clinical_path)
+    assert document["medical_reports_path"] == str(medical_reports_path)
     assert document["embedding_model"] == rag_service.DEFAULT_RAG_EMBEDDING_MODEL
     assert document["preprocess_snapshot"]["_id"] == "preprocess-1"
 
@@ -126,8 +136,12 @@ def test_generate_rag_database_creates_documents_with_sources(monkeypatch, tmp_p
         item for item in stored_documents if item["source_type"] == "clinical_protocols"
     ]
     assert clinical_documents
-    assert all(item["dataset"] == "clinical_protocols" for item in stored_documents)
+    assert all(
+        item["dataset"] in {"clinical_protocols", "medical_reports"}
+        for item in stored_documents
+    )
     assert all(item["source_type"] != "qas" for item in stored_documents)
+    assert any(item["source_type"] == "medical_reports" for item in stored_documents)
     assert clinical_documents[0]["metadatas"]["source"] == {
         "name": "Protocolo 1.pdf",
         "url": "https://example.com/p1.pdf",
@@ -135,6 +149,11 @@ def test_generate_rag_database_creates_documents_with_sources(monkeypatch, tmp_p
     }
     assert all(item["batch_id"] == document["batch_id"] for item in stored_documents)
     assert all(len(item["embedding"]) == 4 for item in stored_documents)
+    medical_documents = [
+        item for item in stored_documents if item["source_type"] == "medical_reports"
+    ]
+    assert "8c67207c" not in medical_documents[0]["content"]
+    assert "nome_paciente" not in medical_documents[0]["content"]
 
 
 def test_generate_rag_database_requires_completed_preprocess(monkeypatch, tmp_path) -> None:
@@ -163,7 +182,10 @@ def test_generate_rag_database_raises_on_invalid_json(monkeypatch, tmp_path) -> 
             "status": "completed",
             "rag_percent": 0.5,
             "updated_date": "2026-08-13T00:00:00+00:00",
-            "results": {"clinical_protocols_rag_path": str(tmp_path / "clinical.json")},
+            "results": {
+                "clinical_protocols_rag_path": str(tmp_path / "clinical.json"),
+                "medical_reports_path": str(tmp_path / "medical_reports.json"),
+            },
         },
     )
     monkeypatch.setattr(
@@ -174,6 +196,7 @@ def test_generate_rag_database_raises_on_invalid_json(monkeypatch, tmp_path) -> 
 
     clinical_path = tmp_path / "clinical.json"
     clinical_path.write_text("not-json", encoding="utf-8")
+    (tmp_path / "medical_reports.json").write_text("[]", encoding="utf-8")
 
     with pytest.raises(json.JSONDecodeError):
         rag_service.generate_rag_database("preprocess-1")
@@ -202,12 +225,28 @@ def test_generate_rag_database_raises_when_clinical_protocol_file_is_missing(mon
         "get_preprocess_document",
         lambda _: {
             "status": "completed",
-            "results": {"clinical_protocols_rag_path": str(tmp_path / "missing.json")},
+            "results": {
+                "clinical_protocols_rag_path": str(tmp_path / "missing.json"),
+                "medical_reports_path": str(tmp_path / "medical_reports.json"),
+            },
         },
     )
 
     with pytest.raises(FileNotFoundError):
         rag_service.generate_rag_database("preprocess-1")
+
+
+def test_generate_rag_database_requires_medical_reports_path(monkeypatch) -> None:
+    monkeypatch.setattr(
+        rag_service,
+        "get_preprocess_document",
+        lambda _: {"status": "completed", "results": {"clinical_protocols_rag_path": "clinical.json"}},
+    )
+
+    with pytest.raises(HTTPException) as exc_info:
+        rag_service.generate_rag_database("preprocess-1")
+
+    assert exc_info.value.status_code == 422
 
 
 def test_generate_rag_database_resolves_legacy_backend_prefix(monkeypatch, tmp_path) -> None:
@@ -226,12 +265,20 @@ def test_generate_rag_database_resolves_legacy_backend_prefix(monkeypatch, tmp_p
         json.dumps([{"name": "Protocolo", "content_text": "Conteudo clinico"}]),
         encoding="utf-8",
     )
+    medical_reports_path = tmp_path / "app" / "datasets" / "medical_reports.json"
+    medical_reports_path.write_text(
+        json.dumps([{"corpo_tecnico": {"tipo_exame": "EEG"}}]),
+        encoding="utf-8",
+    )
     monkeypatch.setattr(
         rag_service,
         "get_preprocess_document",
         lambda _: {
             "status": "completed",
-            "results": {"clinical_protocols_rag_path": "app/datasets/clinical.json"},
+                "results": {
+                    "clinical_protocols_rag_path": "app/datasets/clinical.json",
+                    "medical_reports_path": "app/datasets/medical_reports.json",
+                },
         },
     )
 

@@ -19,6 +19,7 @@ class RagDatabaseResponse(BaseModel):
     preprocess_id: str
     preprocess_snapshot: Dict[str, Any]
     clinical_protocols_rag_path: str
+    medical_reports_path: str
     embedding_model: str
     splitter_name: str
     splitter_chunk_size: int
@@ -28,6 +29,7 @@ class RagDatabaseResponse(BaseModel):
     created_date: str
     updated_date: str
     clinical_protocol_documents: int
+    medical_report_documents: int
     total_documents: int
 
 

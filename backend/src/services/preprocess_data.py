@@ -62,6 +62,12 @@ def _get_preprocessed_paths() -> Dict[str, str]:
             "clinical_protocols",
             "clinical_protocols_rag.json",
         ),
+        "medical_reports": os.path.join(
+            dataset_root,
+            "preprocessed",
+            "medical_reports",
+            "anonymizated_medical_reports.json",
+        ),
     }
 
 
@@ -87,12 +93,14 @@ def _get_valid_preprocessed_cache() -> Dict[str, Any] | None:
     preprocessed_paths = _get_preprocessed_paths()
     qas_valid = _is_valid_preprocessed_file(preprocessed_paths["qas"])
     clinical_valid = _is_valid_preprocessed_file(preprocessed_paths["clinical"])
-    if not (qas_valid and clinical_valid):
+    medical_reports_valid = _is_valid_preprocessed_file(preprocessed_paths["medical_reports"])
+    if not (qas_valid and clinical_valid and medical_reports_valid):
         return None
 
     return {
         "qas": preprocessed_paths["qas"],
         "clinical": preprocessed_paths["clinical"],
+        "medical_reports": preprocessed_paths["medical_reports"],
     }
 
 

@@ -279,13 +279,19 @@ def test_preprocess_data_background_reuses_valid_preprocessed_cache(monkeypatch,
 
     qas_path = tmp_path / "qas_train.json"
     clinical_path = tmp_path / "clinical_protocols_rag.json"
+    medical_reports_path = tmp_path / "anonymizated_medical_reports.json"
     qas_path.write_text(json.dumps([{"question": "Pergunta", "answer": "Resposta"}]), encoding="utf-8")
     clinical_path.write_text(json.dumps([{"name": "protocolo", "content_text": "conteudo"}]), encoding="utf-8")
+    medical_reports_path.write_text(json.dumps([{"corpo_tecnico": {"tipo_exame": "EEG"}}]), encoding="utf-8")
 
     monkeypatch.setattr(
         preprocess_data,
         "_get_preprocessed_paths",
-        lambda: {"qas": str(qas_path), "clinical": str(clinical_path)},
+        lambda: {
+            "qas": str(qas_path),
+            "clinical": str(clinical_path),
+            "medical_reports": str(medical_reports_path),
+        },
     )
 
     def fake_update_preprocess_document(doc_id: str, results: dict, percentage: int) -> None:
@@ -347,11 +353,16 @@ def test_preprocess_data_background_rebuilds_when_cache_is_incomplete(monkeypatc
     qas_path = tmp_path / "qas_train.json"
     qas_path.write_text(json.dumps([{"question": "Pergunta", "answer": "Resposta"}]), encoding="utf-8")
     clinical_path = tmp_path / "clinical_protocols_rag.json"
+    medical_reports_path = tmp_path / "anonymizated_medical_reports.json"
 
     monkeypatch.setattr(
         preprocess_data,
         "_get_preprocessed_paths",
-        lambda: {"qas": str(qas_path), "clinical": str(clinical_path)},
+        lambda: {
+            "qas": str(qas_path),
+            "clinical": str(clinical_path),
+            "medical_reports": str(medical_reports_path),
+        },
     )
 
     def fake_download_datasets(doc_id: str) -> dict:

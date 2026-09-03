@@ -66,8 +66,16 @@ export function RagGenerationResults({ document }: Props) {
           value={document.clinical_protocols_rag_path}
         />
         <ResultCard
+          label="Arquivo de Laudos Médicos"
+          value={document.medical_reports_path}
+        />
+        <ResultCard
           label="Documentos Clínicos"
           value={document.clinical_protocol_documents.toLocaleString("pt-BR")}
+        />
+        <ResultCard
+          label="Documentos de Laudos"
+          value={document.medical_report_documents.toLocaleString("pt-BR")}
         />
         <ResultCard
           label="Total Documents"

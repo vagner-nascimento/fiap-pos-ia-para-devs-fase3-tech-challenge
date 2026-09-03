@@ -13,6 +13,7 @@ export interface RagGenerationDocument {
   preprocess_id: string;
   preprocess_snapshot: RagGenerationPreprocessSnapshot;
   clinical_protocols_rag_path: string;
+  medical_reports_path: string;
   embedding_model: string;
   splitter_name: string;
   splitter_chunk_size: number;
@@ -22,6 +23,7 @@ export interface RagGenerationDocument {
   created_date: string;
   updated_date: string;
   clinical_protocol_documents: number;
+  medical_report_documents: number;
   total_documents: number;
 }
 

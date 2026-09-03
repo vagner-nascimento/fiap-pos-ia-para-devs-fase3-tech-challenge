@@ -266,6 +266,101 @@ def _build_clinical_protocol_documents(
     return documents
 
 
+def _build_medical_report_documents(
+    item: Dict[str, Any],
+    *,
+    preprocess_id: str,
+    batch_id: str,
+    index: int,
+    splitter: Any,
+) -> List[Dict[str, Any]]:
+    header = item.get("cabecalho_identificador")
+    technical_body = item.get("corpo_tecnico")
+    conclusion = item.get("conclusao")
+    if not isinstance(header, dict):
+        header = {}
+    if not isinstance(technical_body, dict):
+        technical_body = {}
+    if not isinstance(conclusion, dict):
+        conclusion = {}
+
+    exam_type = _normalize_text(technical_body.get("tipo_exame"))
+    technical_description = _normalize_text(technical_body.get("descricao_tecnica"))
+    clinical_evolution = _normalize_text(technical_body.get("evolucao_clinica"))
+    diagnostic_impression = _normalize_text(conclusion.get("impressao_diagnostica"))
+    cid_10 = _normalize_text(conclusion.get("cid_10"))
+    therapeutic_conduct = _normalize_text(conclusion.get("conduta_terapeutica"))
+    rest_days = conclusion.get("tempo_repouso_estimado_dias")
+    exam_date = _normalize_text(header.get("data_exame"))
+    exam_location = _normalize_text(header.get("local_exame"))
+
+    content_lines = [
+        "### Laudo medico RAG",
+        f"Tipo de exame: {exam_type or 'nao informado'}",
+    ]
+    if exam_date:
+        content_lines.append(f"Data do exame: {exam_date}")
+    if exam_location:
+        content_lines.append(f"Local do exame: {exam_location}")
+    if technical_description:
+        content_lines.append(f"Descricao tecnica: {technical_description}")
+    if clinical_evolution:
+        content_lines.append(f"Evolucao clinica: {clinical_evolution}")
+    if diagnostic_impression:
+        content_lines.append(f"Impressao diagnostica: {diagnostic_impression}")
+    if cid_10:
+        content_lines.append(f"CID-10: {cid_10}")
+    if therapeutic_conduct:
+        content_lines.append(f"Conduta terapeutica: {therapeutic_conduct}")
+    if rest_days is not None:
+        content_lines.append(f"Tempo de repouso estimado em dias: {rest_days}")
+
+    content_text = "\n".join(content_lines)
+    if not any(
+        value
+        for value in (
+            exam_type,
+            technical_description,
+            clinical_evolution,
+            diagnostic_impression,
+            cid_10,
+            therapeutic_conduct,
+        )
+    ):
+        return []
+
+    chunks = splitter.split_text(content_text)
+    if not chunks:
+        return []
+
+    source_metadata = {
+        "name": "laudo_medico_anonimizado",
+        "date": exam_date,
+        "location": exam_location,
+    }
+    total_chunks = len(chunks)
+    return [
+        {
+            "_id": f"{batch_id}-medical-report-{index:06d}-{chunk_index:03d}",
+            "batch_id": batch_id,
+            "preprocess_id": preprocess_id,
+            "dataset": "medical_reports",
+            "source_type": "medical_reports",
+            "chunk_index": chunk_index,
+            "chunk_total": total_chunks,
+            "content": chunk,
+            "metadatas": {
+                "source": source_metadata,
+                "name": source_metadata["name"],
+                "source_label": "laudo_medico_anonimizado",
+                "exam_type": exam_type,
+                "cid_10": cid_10,
+            },
+        }
+        for chunk_index, chunk in enumerate(chunks, start=1)
+    ]
+
+
 def _embed_documents(documents: List[Dict[str, Any]], embedding_model: Any) -> List[Dict[str, Any]]:
     if not documents:
         return []
@@ -289,12 +384,14 @@ def _build_rag_documents(
     preprocess_id: str,
     batch_id: str,
     clinical_protocols_data: Sequence[Dict[str, Any]],
+    medical_reports_data: Sequence[Dict[str, Any]],
     embedding_model: Any,
     splitter: Any,
 ) -> Tuple[List[Dict[str, Any]], Dict[str, int]]:
     base_documents: List[Dict[str, Any]] = []
     stats = {
         "clinical_protocol_documents": 0,
+        "medical_report_documents": 0,
     }
 
     for index, item in enumerate(clinical_protocols_data, start=1):
@@ -307,6 +404,17 @@ def _build_rag_documents(
         )
         base_documents.extend(protocol_documents)
         stats["clinical_protocol_documents"] += len(protocol_documents)
+
+    for index, item in enumerate(medical_reports_data, start=1):
+        report_documents = _build_medical_report_documents(
+            item,
+            preprocess_id=preprocess_id,
+            batch_id=batch_id,
+            index=index,
+            splitter=splitter,
+        )
+        base_documents.extend(report_documents)
+        stats["medical_report_documents"] += len(report_documents)
 
     enriched_documents = _embed_documents(base_documents, embedding_model)
     return enriched_documents, stats
@@ -345,6 +453,7 @@ def generate_rag_database(
         clinical_protocols_rag_path = (
             results.get("clinical_protocols_rag_path") if isinstance(results, dict) else None
         )
+        medical_reports_path = results.get("medical_reports_path") if isinstance(results, dict) else None
         if not isinstance(clinical_protocols_rag_path, str) or not clinical_protocols_rag_path.strip():
             raise HTTPException(
                 status_code=422,
@@ -354,9 +463,17 @@ def generate_rag_database(
         resolved_clinical_protocols_rag_path = _resolve_clinical_protocols_rag_path(
             clinical_protocols_rag_path
         )
+        if not isinstance(medical_reports_path, str) or not medical_reports_path.strip():
+            raise HTTPException(
+                status_code=422,
+                detail="Preprocessamento concluido sem medical_reports_path",
+            )
+        resolved_medical_reports_path = _resolve_clinical_protocols_rag_path(medical_reports_path)
 
         print(f"[RAG][SYNC] Lendo protocolos clinicos em {resolved_clinical_protocols_rag_path}")
         clinical_protocols_data = _read_json_list(resolved_clinical_protocols_rag_path)
+        print(f"[RAG][SYNC] Lendo laudos medicos em {resolved_medical_reports_path}")
+        medical_reports_data = _read_json_list(resolved_medical_reports_path)
         print(
             "[RAG][SYNC] Protocolos clinicos carregados: "
             f"{len(clinical_protocols_data)} registros"
@@ -379,6 +496,7 @@ def generate_rag_database(
             preprocess_id=preprocess_id,
             batch_id=batch_id,
             clinical_protocols_data=clinical_protocols_data,
+            medical_reports_data=medical_reports_data,
             embedding_model=embedding_model,
             splitter=splitter,
         )
@@ -389,6 +507,7 @@ def generate_rag_database(
         print(
             "[RAG][SYNC] Documentos preparados "
             f"clinical={stats['clinical_protocol_documents']} "
+            f"medical_reports={stats['medical_report_documents']} "
             f"total={len(documents)}"
         )
         print("[RAG][SYNC] Persistindo documentos no MongoDB")
@@ -402,6 +521,7 @@ def generate_rag_database(
             "preprocess_id": preprocess_id,
             "preprocess_snapshot": preprocess_snapshot,
             "clinical_protocols_rag_path": str(resolved_clinical_protocols_rag_path),
+            "medical_reports_path": str(resolved_medical_reports_path),
             "embedding_model": resolved_embedding_model_name,
             "splitter_name": "RecursiveCharacterTextSplitter",
             "splitter_chunk_size": splitter_chunk_size,
@@ -411,6 +531,7 @@ def generate_rag_database(
             "created_date": started_at.isoformat(),
             "updated_date": finished_at.isoformat(),
             "clinical_protocol_documents": stats["clinical_protocol_documents"],
+            "medical_report_documents": stats["medical_report_documents"],
             "total_documents": len(inserted_documents),
         }
         print(
