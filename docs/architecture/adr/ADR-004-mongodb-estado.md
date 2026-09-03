@@ -38,13 +38,16 @@ Utilizamos **MongoDB** como banco de dados para persistência do estado das pipe
     "one_download_datasets": { "status": "completed", "completion_percentage": 100 },
     "two_data_extraction": { "status": "completed", "completion_percentage": 100 },
     "three_translating": { "status": "completed", "completion_percentage": 100 }
+    ,"four_anonymization": { "status": "completed", "completion_percentage": 100 }
   },
   "results": {
     "qas_train_path": "datasets/preprocessed/qas/qas_train.json",
     "qas_train_pt_br_path": "datasets/preprocessed/qas/qas_train_pt_br.json",
     "clinical_protocols_rag_path": "datasets/preprocessed/clinical_protocols/clinical_protocols_rag.json",
+    "medical_reports_path": "datasets/preprocessed/medical_reports/anonymizated_medical_reports.json",
     "qas_count": 4500,
-    "clinical_protocols_count": 120
+    "clinical_protocols_count": 120,
+    "medical_reports_count": 120
   },
   "updated_date": "2026-08-18T12:00:00Z"
 }

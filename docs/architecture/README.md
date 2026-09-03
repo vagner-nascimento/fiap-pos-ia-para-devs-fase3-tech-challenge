@@ -122,12 +122,14 @@ C4Component
         Component(router_preprocess, "routers/preprocess.py", "APIRouter", "POST /preprocess — inicia pipeline\nGET /preprocess/{id} — consulta status")
         Component(router_finetuning, "routers/fine_tunning.py", "APIRouter", "POST /fine-tunning — inicia treinamento\nGET /fine-tunning/{id} — consulta status")
 
-        Component(svc_preprocess, "services/preprocess_data.py", "Service", "Orquestra a pipeline de 3 steps em background")
+        Component(svc_preprocess, "services/preprocess_data.py", "Service", "Orquestra a pipeline de 4 steps em background")
         Component(svc_finetuning, "services/fine_tunning.py", "Service", "Carrega modelo, aplica LoRA, executa SFTTrainer em background")
 
-        Component(step1, "services/preprocess/step_one_download_datasets.py", "Step", "Baixa PubMedQA, MedQuAD e PDFs FHEMIG")
+        Component(step1, "services/preprocess/step_one_download_datasets.py", "Step", "Baixa PubMedQA, MedQuAD, PDFs FHEMIG e carrega laudos locais")
         Component(step2, "services/preprocess/step_two_data_extraction.py", "Step", "Extrai QAs e protocolos em arquivos JSON únicos")
         Component(step3, "services/preprocess/step_three_translation.py", "Step", "Traduz question, contexts e answer dos QAs para pt-BR")
+        Component(step4, "services/preprocess/step_four_anonymization.py", "Step", "Anonimiza campos pessoais dos laudos médicos")
+        Component(svc_rag, "services/rag_database.py", "Service", "Serializa, divide, embeda e persiste protocolos e laudos anonimizados")
 
         Component(infra_db, "infra/database/mongodb.py", "Infrastructure", "Gerencia conexão com MongoDB (pymongo)")
         Component(col_preprocess, "infra/database/collections/preprocess.py", "Repository", "CRUD da collection preprocess")
@@ -143,6 +145,8 @@ C4Component
     Rel(svc_preprocess, step1, "Executa Step 1")
     Rel(svc_preprocess, step2, "Executa Step 2")
     Rel(svc_preprocess, step3, "Executa Step 3")
+    Rel(svc_preprocess, step4, "Executa Step 4")
+    Rel(server, svc_rag, "Gera e consulta RAG")
     Rel(svc_preprocess, col_preprocess, "Lê/Grava estado")
     Rel(svc_finetuning, col_finetuning, "Lê/Grava estado")
     Rel(svc_finetuning, col_preprocess, "Valida preprocess_id")
@@ -213,7 +217,7 @@ graph TB
 
 ## Diagrama de Sequência — Pipeline de Pré-processamento
 
-Fluxo completo desde a requisição do usuário até a conclusão da pipeline de 3 steps.
+Fluxo completo desde a requisição do usuário até a conclusão da pipeline de 4 steps.
 
 ```mermaid
 sequenceDiagram
@@ -224,6 +228,7 @@ sequenceDiagram
     participant S1 as Step 1: Download
     participant S2 as Step 2: Extração
     participant S3 as Step 3: Tradução
+    participant S4 as Step 4: Anonimização
     participant DB as MongoDB
 
     U->>FE: Clica em "Iniciar Processamento"
@@ -246,12 +251,12 @@ sequenceDiagram
 
     BG->>DB: update_step_status("one_download_datasets", "in_progress")
     BG->>S1: download_datasets(doc_id)
-    S1-->>BG: { qas_paths, clinical_protocols_paths }
+    S1-->>BG: { qas_paths, clinical_protocols_paths, medical_reports_path }
     BG->>DB: update_step_status("one_download_datasets", "completed")
 
     BG->>DB: update_step_status("two_data_extraction", "in_progress")
     BG->>S2: extract_data(doc_id, qas_paths, clinical_protocols_paths)
-    S2-->>BG: qas_train_path, qas_count, clinical_protocols_rag_path, clinical_protocols_count
+    S2-->>BG: qas_train_path, qas_count, clinical_protocols_rag_path, clinical_protocols_count, medical_reports_path
     BG->>DB: update_step_status("two_data_extraction", "completed")
 
     BG->>DB: update_step_status("three_translating", "in_progress")
@@ -259,10 +264,15 @@ sequenceDiagram
     S3-->>BG: qas_train_pt_br_path
     BG->>DB: update_step_status("three_translating", "completed")
 
+    BG->>DB: update_step_status("four_anonymization", "in_progress")
+    BG->>S4: anonymization(doc_id, medical_reports_path)
+    S4-->>BG: anonymizated_medical_reports.json
+    BG->>DB: update_step_status("four_anonymization", "completed")
+
     BG->>DB: update_preprocess_document(doc_id, results, 100%)
     FE->>API: GET /preprocess/{id}
     API-->>FE: status: "completed", completion_percentage: 100
-    FE-->>U: Exibe resultados finais (contagens QAs e clinical_protocols)
+    FE-->>U: Exibe resultados finais (QAs, clinical_protocols e laudos anonimizados)
 ```
 
 ---

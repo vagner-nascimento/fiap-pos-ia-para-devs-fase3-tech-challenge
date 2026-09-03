@@ -621,12 +621,13 @@ flowchart TD
     B --> D[Background task]
     D --> E[Download PubMedQA e MedQuAD]
     E --> F[Baixa protocolos clinicos FHEMIG]
-    F --> G[Processa PubMedQA e MedQuAD]
-    G --> H[Extrai texto dos PDFs dos protocolos]
+    F --> G[Le dataset files/laudos_medicos/dataset_laudos_medicos.json]
+    G --> H[Processa QAs e extrai PDFs]
     H --> I[Salva qas_train.json e clinical_protocols_rag.json]
     I --> J[Traduz os QAs com o modelo local]
-    J --> K[Salva qas_train_pt_br.json]
-    K --> L[Atualiza MongoDB]
+    J --> K[Anonimiza nomes e medico solicitante]
+    K --> L[Salva anonymizated_medical_reports.json]
+    L --> M[Atualiza MongoDB]
 ```
 
 ### Arquivos gerados
@@ -634,6 +635,13 @@ flowchart TD
 - `datasets/preprocessed/qas/qas_train.json`: registros combinados de PubMedQA e MedQuAD.
 - `datasets/preprocessed/qas/qas_train_pt_br.json`: cópia traduzida dos QAs.
 - `datasets/preprocessed/clinical_protocols/clinical_protocols_rag.json`: protocolos com texto extraído dos PDFs.
+- `datasets/preprocessed/medical_reports/anonymizated_medical_reports.json`: laudos anonimizados gerados a partir de `datasets/files/laudos_medicos/dataset_laudos_medicos.json`.
+
+### Laudos médicos e anonimização
+
+O arquivo de entrada versionado fica em `backend/datasets/files/laudos_medicos/dataset_laudos_medicos.json`. No Step 4 (`services/preprocess/step_four_anonymization.py`), o backend lê a lista JSON, preserva a estrutura dos registros e mascara os campos pessoais do cabeçalho: `nome_paciente` recebe asteriscos na mesma extensão do valor original e `medico_solicitante` mantém o prefixo `Dr(a).` seguido por asteriscos.
+
+O resultado é gravado em `backend/datasets/preprocessed/medical_reports/anonymizated_medical_reports.json` e seu caminho é salvo em `results.medical_reports_path`. Na geração da RAG, o serviço lê esse caminho, transforma os campos clínicos aninhados em texto, aplica o mesmo splitter recursivo, gera embeddings e persiste chunks em `rag_documents` com `dataset` e `source_type` iguais a `medical_reports`. `id_laudo`, `nome_paciente`, `medico_solicitante` e `crm_solicitante` ficam fora do conteúdo e dos metadados indexados.
 
 Os registros de QA seguem `question`, `contexts`, `answer` e `metadata`. A etapa de tradução processa os itens em lotes de 16, divide textos longos em chunks de até 400 caracteres para evitar truncamento e preserva a estrutura e os metadados.
 

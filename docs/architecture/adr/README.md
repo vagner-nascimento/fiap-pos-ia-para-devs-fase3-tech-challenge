@@ -24,6 +24,7 @@
 | [ADR-012](ADR-012-arquitetura-hibrida-inferencia-llm.md) | Arquitetura híbrida de inferência LLM (HF Spaces / ngrok) | ✅ Aceito | 2026-08-29 |
 | [ADR-013](ADR-013-desacoplamento-guardrails-template-sft.md) | Desacoplamento de guardrails e preservação do template SFT | ✅ Aceito | 2026-08-29 |
 | [ADR-014](ADR-011-skip-preprocess-translation.md) | Opção de pular a tradução no pré-processamento | ✅ Aceito | 2026-08-28 |
+| [ADR-015](ADR-015-anonimizacao-laudos-lgpd.md) | Anonimização de laudos médicos antes da RAG | ✅ Aceito | 2026-09-03 |
 
 ---
 

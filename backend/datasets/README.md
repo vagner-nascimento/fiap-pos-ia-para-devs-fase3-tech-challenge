@@ -10,7 +10,7 @@ O script [`get_datasets.py`](get_datasets.py) trabalha com cinco entradas:
 2. **MedQuAD** - [https://github.com/abachaa/MedQuAD](https://github.com/abachaa/MedQuAD) (clonado via `git`)
 3. **Protocolos clinicos FHEMIG** - [https://www.fhemig.mg.gov.br/index.php/acesso-rapido/protocolos-clinicos](https://www.fhemig.mg.gov.br/index.php/acesso-rapido/protocolos-clinicos) (download HTTP)
 4. **PCDT - Protocolos Clinicos e Diretrizes Terapeuticas (Ministerio da Saude)** - PDFs versionados no repositorio em `files/pcdt/pcdt.zip` (Git LFS); o script apenas extrai o ZIP e gera o catalogo `pcdt_protocols.json`
-5. **Dataset estruturado de laudos medicos (pt-BR)** - JSON versionado no repositorio em `files/laudos_medicos/dataset_laudos_medicos.json`, disponivel para usos independentes da pipeline
+5. **Dataset estruturado de laudos medicos (pt-BR)** - JSON versionado no repositorio em `files/laudos_medicos/dataset_laudos_medicos.json`, usado como entrada do Step 4 de anonimização
 
 ## Estrutura gerada
 
@@ -29,6 +29,7 @@ Arquivos **gerados em runtime** (ignorados pelo git):
 - `backend/datasets/files/pcdt/data/` (PDFs PCDT extraidos do `pcdt.zip`)
 - `backend/datasets/preprocessed/qas/`
 - `backend/datasets/preprocessed/clinical_protocols/` (FHEMIG + PCDT no mesmo `clinical_protocols_rag.json`)
+- `backend/datasets/preprocessed/medical_reports/anonymizated_medical_reports.json` (laudos anonimizados usados na base RAG)
 
 ## Pre-requisitos
 
@@ -106,6 +107,9 @@ backend/datasets/
 - O backend processa PubMedQA, MedQuAD, protocolos clinicos FHEMIG e PCDT em etapas separadas.
 - PubMedQA e MedQuAD geram registros no formato de QA.
 - Os protocolos clinicos FHEMIG e os PDFs do PCDT geram registros com o campo `content_text`, extraido dos PDFs, gravados no mesmo arquivo `preprocessed/clinical_protocols/clinical_protocols_rag.json` (com o campo `source` diferenciando a origem).
-- O dataset estruturado de laudos medicos (`dataset_laudos_medicos.json`) permanece disponivel como fonte versionada para usos independentes da pipeline.
+- O dataset estruturado de laudos medicos (`files/laudos_medicos/dataset_laudos_medicos.json`) e lido no Step 4, que gera `preprocessed/medical_reports/anonymizated_medical_reports.json`.
+- A anonimização substitui o nome do paciente por asteriscos e mascara o medico solicitante, preservando a estrutura clinica necessaria para busca. O arquivo anonimizado e a unica versao de laudos enviada para a base RAG.
+- A geração da RAG lê o arquivo anonimizado, serializa campos clínicos de exame, descrição, evolução, impressão diagnóstica, CID e conduta, divide o texto em chunks, gera embeddings e persiste os documentos na coleção MongoDB `rag_documents` com `dataset/source_type` igual a `medical_reports`.
+- Identificadores do laudo, nome do paciente, medico solicitante e CRM nao sao indexados. O arquivo bruto permanece somente como fonte de entrada do processamento e deve ser tratado conforme os controles de acesso e armazenamento do projeto.
 - O pré-processamento atual não recebe percentual de split. PubMedQA e MedQuAD são normalizados em `preprocessed/qas/qas_train.json`; os protocolos clínicos (FHEMIG + PCDT) são extraídos dos PDFs e salvos em `preprocessed/clinical_protocols/clinical_protocols_rag.json`.
 - A etapa seguinte traduz todos os QAs para pt-BR e grava `preprocessed/qas/qas_train_pt_br.json`. A tradução preserva `metadata` e traduz `question`, `contexts` textuais e `answer`.

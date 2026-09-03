@@ -17,9 +17,9 @@ Interface web em React + TypeScript (Vite) para iniciar e acompanhar o pre-proce
 
 O frontend permite:
 
-1. iniciar o pré-processamento de QAs (PubMedQA, MedQuAD) e protocolos clínicos (FHEMIG e PCDT);
+1. iniciar o pré-processamento de QAs (PubMedQA, MedQuAD), protocolos clínicos (FHEMIG e PCDT) e laudos médicos;
 2. acompanhar o progresso com polling a cada 5 segundos;
-3. visualizar os resultados separados para `QAs` e `clinical_protocols`;
+3. visualizar os resultados separados para `QAs`, `clinical_protocols` e laudos anonimizados;
 4. gerar a base RAG a partir de um pré-processamento concluído;
 5. realizar consultas semânticas por similaridade na base RAG (RAG Query).
 
@@ -189,6 +189,8 @@ frontend/
 
 O frontend contem a tela de `RAG Generation`, que faz uma chamada sincrona para `POST /rag-database/`.
 
+A resposta informa `medical_reports_path` e `medical_report_documents`, permitindo conferir que o arquivo anonimizado foi incluído no batch RAG junto dos protocolos clínicos. Os identificadores pessoais removidos no backend não são enviados para a consulta RAG.
+
 ### Fluxo
 
 ```mermaid
@@ -197,7 +199,7 @@ flowchart TD
     B --> C[POST /rag-database]
     C --> D[Backend valida preprocess concluido]
     D --> E[Lê os JSONs preprocessados]
-    E --> F[Normaliza metadados e gera embeddings]
+    E --> F[Normaliza campos clínicos, gera chunks e embeddings]
     F --> G[Persiste os documentos em MongoDB]
     G --> H[Exibe resposta final na tela]
 ```
