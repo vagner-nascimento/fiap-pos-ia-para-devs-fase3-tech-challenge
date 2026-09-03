@@ -1,6 +1,6 @@
 # FIAP POS IA - Frontend
 
-Interface web em React + TypeScript (Vite) para iniciar e acompanhar o pre-processamento dos datasets medicos via API REST do backend. A tela principal mostra o progresso em tempo real com polling automatico.
+Interface web em React + TypeScript (Vite) para iniciar e acompanhar o pre-processamento dos datasets medicos, gerar e consultar a base RAG e conversar com o Assistente Medico via APIs REST do backend e do agente.
 
 ## Sumario
 
@@ -21,7 +21,9 @@ O frontend permite:
 2. acompanhar o progresso com polling a cada 5 segundos;
 3. visualizar os resultados separados para `QAs`, `clinical_protocols` e laudos anonimizados;
 4. gerar a base RAG a partir de um pré-processamento concluído;
-5. realizar consultas semânticas por similaridade na base RAG (RAG Query).
+5. realizar consultas semânticas por similaridade na base RAG (RAG Query);
+6. enviar perguntas ao Assistente Médico, com filtro opcional por `preprocess_id`, resposta contextualizada e fontes consultadas;
+7. visualizar bloqueios de segurança quando a solicitação exigir avaliação de um profissional de saúde.
 
 A aplicacao e uma SPA servida pelo Vite em desenvolvimento e pelo nginx em producao.
 
@@ -34,16 +36,19 @@ src/
 |-- components/
 |   `-- Layout.tsx
 |-- pages/
+|   |-- AgentPage.tsx
 |   |-- PreProcessingPage.tsx
 |   |-- RagGenerationPage.tsx
 |   `-- RagQueryPage.tsx
 |-- api/
 |   |-- client.ts
+|   |-- agent.ts
 |   |-- preprocess.ts
 |   `-- ragDatabase.ts
 |-- hooks/
 |   `-- usePreprocessPolling.ts
 `-- types/
+    |-- agent.ts
     |-- preprocess.ts
     `-- ragDatabase.ts
 ```
@@ -56,6 +61,7 @@ src/
 | Node.js | 20+ | Usado no Dockerfile |
 | npm | - | Gerenciador de dependencias |
 | Backend | - | API FastAPI rodando em `http://localhost:3000` |
+| Agente | - | API FastAPI rodando em `http://localhost:8001` |
 
 ### Dependencias npm
 
@@ -79,6 +85,7 @@ cp .env.example .env
 | Variavel | Descricao | Padrao |
 |----------|-----------|--------|
 | `VITE_BACKEND_URL` | URL base da API do backend | `http://localhost:3000` |
+| `VITE_AGENT_URL` | URL base da API do Assistente Médico | `http://localhost:8001` |
 
 ## Como subir a aplicacao
 
@@ -157,6 +164,7 @@ O frontend consome os endpoints do backend:
 | `GET` | `/preprocess/{id}` | Faz polling de progresso do pre-processamento |
 | `POST` | `/rag-database/` | Gera a base RAG de forma sincrona |
 | `POST` | `/rag-database/query` | Realiza consultas semanticas por similaridade vetorial |
+| `POST` | `/agent/chat` | Envia uma pergunta ao Assistente Médico |
 
 ### Status terminais
 
@@ -237,4 +245,34 @@ flowchart TD
 | Filtro Threshold | Filtra documentos com score minimo de similaridade (opcional) |
 | Cards de Resultados | Exibe badges de dataset (`QAs` / `Protocolo`), score %, origem e texto completo |
 | Visualizador JSON | Bloco expansivel para inspecionar o JSON bruto devolvido pela API |
+
+## Assistente Médico
+
+O frontend inclui a tela de `Assistente Médico` como último item do menu lateral. Ela envia perguntas à API do agente em `POST /agent/chat` e apresenta a resposta contextualizada pela base RAG.
+
+### Fluxo
+
+```mermaid
+flowchart TD
+    A[Usuario digita uma pergunta] --> B[Informa preprocess_id opcional]
+    B --> C[Clica em Consultar assistente]
+    C --> D[POST /agent/chat]
+    D --> E{Solicitacao segura e medica?}
+    E -->|nao| F[Exibe bloqueio e motivo de seguranca]
+    E -->|sim| G[Agente consulta RAG e gera resposta]
+    G --> H[Exibe resposta e fontes com score de similaridade]
+```
+
+### Elementos da tela de Assistente Médico
+
+| Elemento | Descricao |
+|----------|-----------|
+| Campo Sua pergunta | Recebe a pergunta textual obrigatoria |
+| Campo Preprocess ID | Filtra a base RAG por um preprocessamento especifico (opcional) |
+| Botao Consultar assistente | Envia a pergunta ao agente e indica o estado de consulta |
+| Resposta do assistente | Exibe o texto retornado pelo agente |
+| Alerta de seguranca | Informa quando a solicitacao foi bloqueada e mostra o motivo |
+| Fontes consultadas | Lista dataset, tipo de fonte, previa do conteudo e similaridade |
+
+O agente adiciona disclaimer e indica quando e necessaria validacao humana. A URL do servico pode ser alterada com `VITE_AGENT_URL`.
 

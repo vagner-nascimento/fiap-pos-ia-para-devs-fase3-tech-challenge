@@ -38,6 +38,21 @@ O fluxo completo acontece em etapas encadeadas:
 
 O modelo fine-tunado utilizado pelo agente está disponível no [Hugging Face](https://huggingface.co/fiap-hospital-helper/hospital-helper-qwen2.5-1.5b). O endpoint de inferência pode ser o [Space do projeto](https://huggingface.co/spaces/fiap-hospital-helper/hospital-helper) ou uma URL FastAPI exposta via ngrok.
 
+## Tela do Assistente Médico
+
+O frontend possui a tela `Assistente Médico`, disponível como último item do menu lateral. Ela permite enviar perguntas sobre saúde ao agente médico e receber respostas contextualizadas pela base RAG.
+
+Para usar a tela:
+
+1. Suba o backend, o agente, o MongoDB e o frontend com o Docker Compose.
+2. Garanta que o agente esteja configurado com uma URL de inferência da LLM em `LLM_ENDPOINT_URL`.
+3. Acesse `http://localhost:8080` e selecione `Assistente Médico`.
+4. Digite uma pergunta e, se necessário, informe um `preprocess_id` para limitar a consulta a uma execução específica.
+
+A tela chama `POST http://localhost:8001/agent/chat`. A resposta apresenta o texto do assistente e, quando disponíveis, as fontes consultadas, o dataset, o tipo de fonte, a prévia do conteúdo e o score de similaridade. Solicitações bloqueadas pelos guardrails exibem o motivo de segurança. As respostas do agente incluem disclaimer e indicação de validação humana, conforme descrito em [agent/README.md](agent/README.md).
+
+Em desenvolvimento local, a URL do agente no frontend pode ser ajustada pela variável `VITE_AGENT_URL`, cujo padrão é `http://localhost:8001`.
+
 ## Quick Start para Avaliadores
 
 No terminal Bash, a partir da raiz do repositório:
