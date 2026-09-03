@@ -9,7 +9,7 @@
 
 ## Contexto
 
-Embora o backend da aplicação implemente um endpoint `/fine-tunning` capaz de executar o treinamento localmente (quando há GPU disponível), na prática **as máquinas locais dos desenvolvedores do projeto não possuem GPU dedicada** suficiente para treinar o modelo Qwen2.5-1.5B com os datasets médicos em tempo razoável.
+Foi revertida a decisão de manter uma execução local de fine-tuning na aplicação. **O fine-tuning não será implementado localmente**, pois as máquinas dos desenvolvedores não possuem GPU dedicada suficiente para treinar o modelo Qwen2.5-1.5B com os datasets médicos em tempo razoável.
 
 Alternativas avaliadas para contornar esta restrição de hardware:
 
@@ -52,7 +52,7 @@ O modelo treinado é publicado como **repositório privado no HuggingFace Hub** 
 - Sessões do Colab gratuito têm limite de tempo (desconecta após ~12h inativas).
 
 **Neutras:**
-- O endpoint `/fine-tunning` da aplicação permanece funcional para ambientes com GPU disponível, servindo como alternativa para produção ou ambientes corporativos.
+- Não haverá endpoint ou tela para iniciar e monitorar fine-tuning localmente. O treinamento será realizado somente no Google Colab, através dos notebooks versionados no repositório.
 
 ## Referências
 

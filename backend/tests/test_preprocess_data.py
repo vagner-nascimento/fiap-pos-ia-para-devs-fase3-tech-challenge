@@ -403,26 +403,7 @@ def test_preprocess_data_background_rebuilds_when_cache_is_incomplete(monkeypatc
     assert (tmp_path / "clinical_protocols_rag.json").exists()
 
 
-def test_create_fine_tunning_document_initializes_pending_status(monkeypatch) -> None:
-    class FakeCollection:
-        def __init__(self) -> None:
-            self.documents = {}
 
-        def insert_one(self, document: dict) -> object:
-            document_id = str(uuid.uuid4())
-            document["_id"] = document_id
-            self.documents[document_id] = document.copy()
-            return type("Result", (), {"inserted_id": document_id})()
 
-        def find_one(self, query: dict) -> dict | None:
-            return self.documents.get(query.get("_id"))
 
-    fake_collection = FakeCollection()
 
-    from src.infra.database.collections import fine_tunning as fine_tunning_collection
-
-    monkeypatch.setattr(fine_tunning_collection, "get_collection", lambda _: fake_collection)
-
-    document = fine_tunning_collection.create_fine_tunning_document({"preprocess_id": "pre-123"})
-
-    assert document["status"] == "pending"

@@ -2,17 +2,17 @@
 
 **Status:** Aceito  
 **Data:** 2026-08-18  
-**Contexto:** Projeto FIAP POS IA Fase 3 — Rastreamento de estado das pipelines de pré-processamento e fine-tuning  
+**Contexto:** Projeto FIAP POS IA Fase 3 — Rastreamento de estado da pipeline de pré-processamento
 **Decisores:** Equipe do projeto  
 
 ---
 
 ## Contexto
 
-As pipelines de pré-processamento e fine-tuning são tarefas de longa duração (minutos a horas) executadas em background. O sistema precisa:
+A pipeline de pré-processamento é uma tarefa de longa duração executada em background. O sistema precisa:
 
 - Persistir o estado das tarefas (status, progresso, resultados, erros) para que o frontend possa fazer polling;
-- Armazenar documentos com estrutura variável (steps com sub-documentos, listas de `loss_history`, métricas de treino);
+- Armazenar documentos com estrutura variável (steps, resultados e métricas do processamento);
 - Rastrear múltiplas execuções independentes (cada execução gera um documento com `_id` único);
 - Ser facilmente executável via Docker sem configuração complexa.
 
@@ -25,7 +25,6 @@ Utilizamos **MongoDB** como banco de dados para persistência do estado das pipe
 | Coleção | Finalidade |
 |---|---|
 | `preprocess` | Documentos de rastreamento do pré-processamento (steps, progresso, resultados) |
-| `fine_tunning` | Documentos de rastreamento do fine-tuning (epochs, loss, métricas, caminhos de saída) |
 
 ### Exemplo de documento `preprocess`
 

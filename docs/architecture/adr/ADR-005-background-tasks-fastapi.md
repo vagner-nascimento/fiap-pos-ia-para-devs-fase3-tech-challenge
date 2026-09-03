@@ -9,12 +9,12 @@
 
 ## Contexto
 
-As pipelines de pré-processamento (download, extração, tradução) e fine-tuning (treinamento de LLM) são tarefas que levam de **minutos a horas** para completar. Se executadas de forma síncrona, a requisição HTTP ficaria bloqueada durante todo esse tempo, o que é inaceitável tanto do ponto de vista técnico (timeouts) quanto de experiência do usuário.
+As etapas de pré-processamento (download, extração e tradução) podem levar de **minutos a horas** para completar. Se executadas de forma síncrona, a requisição HTTP ficaria bloqueada durante todo esse tempo, o que é inaceitável tanto do ponto de vista técnico (timeouts) quanto de experiência do usuário. O fine-tuning não faz parte da aplicação: é executado exclusivamente nos notebooks do Google Colab.
 
 O sistema precisa:
 
 1. Aceitar a requisição imediatamente e retornar uma resposta com o ID da tarefa;
-2. Executar a pipeline em segundo plano, atualizando o estado no MongoDB conforme avança;
+2. Executar a pipeline de pré-processamento em segundo plano, atualizando o estado no MongoDB conforme avança;
 3. Permitir que o frontend faça polling do status via `GET /{resource}/{id}`.
 
 ## Decisão
@@ -77,4 +77,4 @@ O MongoDB é o meio de comunicação entre a background task e o endpoint de con
 - Tasks CPU-bound muito intensas podem impactar o loop de eventos do Uvicorn.
 
 **Neutras:**
-- O design com `preprocess_id` e `fine_tunning_id` no MongoDB viabiliza retomada manual de uma execução interrompida, se necessário.
+- O design com `preprocess_id` no MongoDB viabiliza retomada manual de uma execução interrompida, se necessário.

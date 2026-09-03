@@ -40,13 +40,11 @@ src/
 |-- api/
 |   |-- client.ts
 |   |-- preprocess.ts
-|   |-- fineTuning.ts
 |   `-- ragDatabase.ts
 |-- hooks/
 |   `-- usePreprocessPolling.ts
 `-- types/
     |-- preprocess.ts
-    |-- fineTuning.ts
     `-- ragDatabase.ts
 ```
 
@@ -157,8 +155,6 @@ O frontend consome os endpoints do backend:
 |--------|----------|-----|
 | `POST` | `/preprocess/` | Inicia a execucao do pre-processamento |
 | `GET` | `/preprocess/{id}` | Faz polling de progresso do pre-processamento |
-| `POST` | `/fine-tunning/` | Inicia a execucao do fine-tuning |
-| `GET` | `/fine-tunning/{id}` | Faz polling de progresso do fine-tuning |
 | `POST` | `/rag-database/` | Gera a base RAG de forma sincrona |
 | `POST` | `/rag-database/query` | Realiza consultas semanticas por similaridade vetorial |
 

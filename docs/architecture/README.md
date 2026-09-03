@@ -14,8 +14,7 @@ Este documento descreve a arquitetura do sistema desenvolvido para o Tech Challe
 4. [C4 Level 3 — Diagrama de Componentes](#c4-level-3--diagrama-de-componentes)
 5. [Diagrama de Deployment](#diagrama-de-deployment)
 6. [Diagrama de Sequência — Pipeline de Pré-processamento](#diagrama-de-sequência--pipeline-de-pré-processamento)
-7. [Diagrama de Sequência — Fine-tuning Local](#diagrama-de-sequência--fine-tuning-local)
-8. [Decisões de Arquitetura (ADRs)](#decisões-de-arquitetura-adrs)
+7. [Decisões de Arquitetura (ADRs)](#decisões-de-arquitetura-adrs)
 
 ---
 
@@ -36,7 +35,7 @@ O fluxo central da aplicação é:
 2. O backend recebe a requisição, cria um documento de rastreamento no MongoDB e dispara a pipeline em background.
 3. A pipeline baixa ou reutiliza os datasets (PubMedQA, MedQuAD, protocolos FHEMIG e PCDT), extrai os dados em artefatos JSON/PDF e traduz os QAs para português quando necessário.
 4. O usuário pode acompanhar o progresso em tempo real via polling do frontend e, em seguida, gerar e consultar a base RAG.
-5. Com os dados pré-processados, é possível iniciar o fine-tuning do modelo Qwen2.5-1.5B-Instruct diretamente pela aplicação (com GPU) ou via Jupyter Notebooks no Google Colab.
+5. Com os dados pré-processados, o fine-tuning do modelo Qwen2.5-1.5B-Instruct é executado exclusivamente via Jupyter Notebooks no Google Colab.
 
 > **Nota sobre fine-tuning:** Devido a restrições de hardware local, o fine-tuning do modelo foi executado no Google Colab. O modelo treinado está disponível como repositório privado no HuggingFace. Para servir o modelo em produção, utiliza-se HuggingFace Spaces com ZeroGPU.
 
@@ -50,9 +49,9 @@ Visão de mais alto nível: quem usa o sistema e com quais sistemas externos ele
 C4Context
     title Diagrama de Contexto — FIAP POS IA Fase 3
 
-    Person(usuario, "Usuário / Pesquisador", "Acessa a interface web para disparar e monitorar o pré-processamento e o fine-tuning")
+    Person(usuario, "Usuário / Pesquisador", "Acessa a interface web para disparar e monitorar o pré-processamento e a base RAG")
 
-    System(sistema, "FIAP POS IA — Sistema de Processamento", "Pré-processa datasets médicos e realiza fine-tuning de LLM para o domínio de saúde")
+    System(sistema, "FIAP POS IA — Sistema de Processamento", "Pré-processa datasets médicos e gera a base RAG para o domínio de saúde")
 
     System_Ext(pubmedqa, "PubMedQA", "Dataset público de Q&A médico baseado em artigos do PubMed")
     System_Ext(medquad, "MedQuAD", "Dataset de Q&A médico derivado de fontes do NIH")
@@ -82,11 +81,11 @@ C4Container
     Person(usuario, "Usuário", "Acessa via navegador")
 
     Container_Boundary(sistema, "FIAP POS IA System") {
-        Container(frontend, "Frontend", "React + TypeScript + Vite\nNginx (produção)", "Interface web para iniciar e monitorar processamento e fine-tuning")
-        Container(backend, "Backend API", "Python 3.11 + FastAPI + Uvicorn", "REST API: orquestra pré-processamento, fine-tuning e rastreamento de estado")
+        Container(frontend, "Frontend", "React + TypeScript + Vite\nNginx (produção)", "Interface web para iniciar e monitorar processamento e consultar a base RAG")
+        Container(backend, "Backend API", "Python 3.11 + FastAPI + Uvicorn", "REST API: orquestra pré-processamento, RAG e rastreamento de estado")
         Container(agent, "Agente Médico", "Python 3.11 + FastAPI + LangGraph", "Assistente médico com RAG, guardrails de segurança e audit logging — porta 8001")
-        ContainerDb(mongodb, "MongoDB", "MongoDB (Docker)", "Armazena documentos de rastreamento de preprocess, fine-tuning e agent_audit_logs")
-        Container(datasets_fs, "Sistema de Arquivos / Datasets", "Volume Docker", "Armazena datasets brutos, pré-processados e modelos treinados")
+        ContainerDb(mongodb, "MongoDB", "MongoDB (Docker)", "Armazena documentos de rastreamento de preprocess e agent_audit_logs")
+        Container(datasets_fs, "Sistema de Arquivos / Datasets", "Volume Docker", "Armazena datasets brutos e pré-processados")
     }
 
     Container_Ext(huggingface, "HuggingFace Hub / ZeroGPU", "SaaS", "Modelo base, repositório do modelo fine-tunado e endpoint de inferência")
@@ -96,8 +95,7 @@ C4Container
     Rel(frontend, backend, "REST API calls", "HTTP :3000")
     Rel(frontend, agent, "Consultas ao agente médico", "HTTP :8001")
     Rel(backend, mongodb, "Lê / Grava estado", "MongoDB Wire Protocol :27017")
-    Rel(backend, datasets_fs, "Lê/Grava datasets e modelos", "I/O local")
-    Rel(backend, huggingface, "Baixa modelo base", "HTTPS / datasets lib")
+    Rel(backend, datasets_fs, "Lê/Grava datasets", "I/O local")
     Rel(agent, mongodb, "Persiste audit_logs e consulta RAG", "MongoDB Wire Protocol :27017")
     Rel(agent, backend, "Consulta base RAG", "HTTP /rag-database/query")
     Rel(agent, huggingface, "Inferência LLM via ZeroGPU", "HTTPS")
@@ -120,10 +118,7 @@ C4Component
         Component(server, "server.py", "FastAPI Application Factory", "Cria a app, configura CORS, lifespan e carrega routers dinamicamente")
 
         Component(router_preprocess, "routers/preprocess.py", "APIRouter", "POST /preprocess — inicia pipeline\nGET /preprocess/{id} — consulta status")
-        Component(router_finetuning, "routers/fine_tunning.py", "APIRouter", "POST /fine-tunning — inicia treinamento\nGET /fine-tunning/{id} — consulta status")
-
         Component(svc_preprocess, "services/preprocess_data.py", "Service", "Orquestra a pipeline de 4 steps em background")
-        Component(svc_finetuning, "services/fine_tunning.py", "Service", "Carrega modelo, aplica LoRA, executa SFTTrainer em background")
 
         Component(step1, "services/preprocess/step_one_download_datasets.py", "Step", "Baixa PubMedQA, MedQuAD, PDFs FHEMIG e carrega laudos locais")
         Component(step2, "services/preprocess/step_two_data_extraction.py", "Step", "Extrai QAs e protocolos em arquivos JSON únicos")
@@ -133,25 +128,19 @@ C4Component
 
         Component(infra_db, "infra/database/mongodb.py", "Infrastructure", "Gerencia conexão com MongoDB (pymongo)")
         Component(col_preprocess, "infra/database/collections/preprocess.py", "Repository", "CRUD da collection preprocess")
-        Component(col_finetuning, "infra/database/collections/fine_tunning.py", "Repository", "CRUD da collection fine_tunning")
     }
 
     ContainerDb(mongodb, "MongoDB", "MongoDB")
 
     Rel(server, router_preprocess, "Registra router")
-    Rel(server, router_finetuning, "Registra router")
     Rel(router_preprocess, svc_preprocess, "Chama")
-    Rel(router_finetuning, svc_finetuning, "Chama")
     Rel(svc_preprocess, step1, "Executa Step 1")
     Rel(svc_preprocess, step2, "Executa Step 2")
     Rel(svc_preprocess, step3, "Executa Step 3")
     Rel(svc_preprocess, step4, "Executa Step 4")
     Rel(server, svc_rag, "Gera e consulta RAG")
     Rel(svc_preprocess, col_preprocess, "Lê/Grava estado")
-    Rel(svc_finetuning, col_finetuning, "Lê/Grava estado")
-    Rel(svc_finetuning, col_preprocess, "Valida preprocess_id")
     Rel(col_preprocess, infra_db, "Usa conexão")
-    Rel(col_finetuning, infra_db, "Usa conexão")
     Rel(infra_db, mongodb, "Conecta", "pymongo :27017")
 ```
 
@@ -276,53 +265,6 @@ sequenceDiagram
 ```
 
 ---
-
-## Diagrama de Sequência — Fine-tuning Local
-
-Fluxo do fine-tuning executado localmente via API (requer GPU).
-
-```mermaid
-sequenceDiagram
-    actor U as Usuário
-    participant FE as Frontend (React)
-    participant API as Backend API (FastAPI)
-    participant BG as Background Task
-    participant SVC as FineTunning Service
-    participant DB as MongoDB
-    participant FS as Sistema de Arquivos
-    participant HF as HuggingFace Hub
-
-    U->>FE: Clica em "Iniciar Fine-tuning"\n(informa preprocess_id)
-    FE->>API: POST /fine-tunning\n{ preprocess_id, ... params }
-    API->>DB: Valida preprocess_id (status == "completed")
-    DB-->>API: preprocess document OK
-    API->>DB: create_fine_tunning_document(payload)
-    DB-->>API: { _id, status: "pending" }
-    API->>BG: background_tasks.add_task(_training_job, doc_id)
-    API-->>FE: 200 OK — { _id, status: "pending" }
-
-    Note over BG,FS: Execução em background (pode levar horas)
-
-    BG->>SVC: _training_job(doc_id)
-    SVC->>FS: Lê qas_train_pt_br.json e clinical_protocols_rag.json
-    SVC->>SVC: _build_training_texts() — formata exemplos para SFTTrainer
-    SVC->>HF: AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-1.5B-Instruct")
-    HF-->>SVC: Modelo base carregado
-    SVC->>SVC: _apply_lora() — configura LoRA (r=16, alpha=16)
-    SVC->>DB: Atualiza device, dataset_size, estimated_total_steps
-
-    loop A cada logging_step (padrão: 5 steps)
-        SVC->>DB: FineTunningProgressCallback._persist()\n(status, completion%, loss, epoch)
-    end
-
-    SVC->>FS: model.save_pretrained(model_output_dir)
-    SVC->>FS: tokenizer.save_pretrained(tokenizer_output_dir)
-    SVC->>FS: Salva training_summary.json
-    SVC->>DB: mark_fine_tunning_document_completed()
-    FE->>API: GET /fine-tunning/{id}
-    API-->>FE: status: "completed", training_metrics
-    FE-->>U: Exibe métricas finais (loss, epochs, steps)
-```
 
 ---
 

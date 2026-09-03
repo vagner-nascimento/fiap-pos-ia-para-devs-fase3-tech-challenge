@@ -9,16 +9,14 @@
 
 ## Contexto
 
-O backend precisa executar duas categorias de operações intensivas de computação:
+O backend precisa executar uma operação intensiva de computação:
 
-1. **Tradução dos datasets** (Step 3 do pré-processamento) — inferência de modelo de tradução;
-2. **Fine-tuning do LLM** — treinamento com PyTorch/SFTTrainer.
+1. **Tradução dos datasets** (Step 3 do pré-processamento) — inferência de modelo de tradução.
 
-Ambas as operações se beneficiam enormemente de GPU Nvidia (speedup de 10x–100x vs CPU), mas o ambiente de execução pode variar:
+Essa operação se beneficia enormemente de GPU Nvidia (speedup de 10x–100x vs CPU), mas o ambiente de execução pode variar:
 
 - Máquina de desenvolvimento local (geralmente sem GPU dedicada);
 - Container Docker com `runtime: nvidia` (GPU disponível);
-- Google Colab (GPU gratuita via sessão);
 - Servidor de produção (com ou sem GPU).
 
 Forçar a dependência de GPU tornaria a aplicação inutilizável em ambientes sem GPU, enquanto ignorar a GPU disponível desperdiçaria recursos.
@@ -32,10 +30,7 @@ def _resolve_device() -> torch.device:
     return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ```
 
-Essa lógica é aplicada:
-
-1. **No fine-tuning** (`services/fine_tunning.py`): determina o device e adapta as estratégias de carregamento do modelo (QLoRA em GPU, fp32 em CPU);
-2. **Na tradução** (`services/preprocess/step_three_translation.py`): o modelo de tradução é movido para o device disponível.
+Essa lógica é aplicada na tradução (`services/preprocess/step_three_translation.py`), cujo modelo é movido para o device disponível.
 
 ### Estratégia de precisão numérica por device
 
@@ -70,7 +65,7 @@ A detecção automática é preferível a configuração manual pois:
 |---|---|
 | Variável de ambiente `DEVICE=cuda/cpu` | Configuração manual propensa a erros; não detecta se a GPU está realmente disponível |
 | Forçar GPU (falhar se não encontrar) | Quebra em ambientes sem GPU; inacessível para desenvolvimento local |
-| Forçar CPU sempre | Desperdiça GPU disponível; treino muito lento |
+| Forçar CPU sempre | Desperdiça GPU disponível; tradução muito lenta |
 | Suporte apenas a CUDA (sem CPU) | Exclui usuários sem GPU |
 
 ## Consequências
@@ -81,9 +76,8 @@ A detecção automática é preferível a configuração manual pois:
 - A precisão numérica é ajustada conforme a geração da GPU (bf16 vs fp16).
 
 **Negativas:**
-- Em CPU, a tradução e o fine-tuning são ordens de magnitude mais lentos;
-- O comportamento diferente entre GPU e CPU pode gerar resultados de treino ligeiramente distintos (bf16 vs fp32 têm precisões diferentes);
+- Em CPU, a tradução é ordens de magnitude mais lenta;
+- O comportamento diferente entre GPU e CPU pode gerar resultados de tradução ligeiramente distintos;
 - `torch.cuda.is_available()` retorna `False` mesmo se a GPU existe mas o driver não está instalado corretamente.
 
 **Neutras:**
-- O device detectado é registrado no documento de fine-tuning no MongoDB (`device` field), permitindo rastreabilidade do ambiente de execução de cada run.
