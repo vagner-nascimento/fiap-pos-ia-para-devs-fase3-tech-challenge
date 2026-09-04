@@ -1,13 +1,15 @@
 # Gaps e Melhorias — Tech Challenge Fase 3
 
 > Análise comparativa entre os **requisitos do edital** e o **estado atual do repositório**.
-> Data de análise: 2026-09-03
+> Data de análise: 2026-09-03 | **Revisão: 2026-09-04** (issues sincronizados às 08:26 BRT)
 
 ---
 
 ## Resumo Executivo
 
-O projeto está bem estruturado e atende à maioria dos requisitos do edital. A arquitetura modular (backend, agent, frontend, MongoDB), o pipeline LangGraph com 6 nós, os guardrails de segurança, o logging de auditoria e os notebooks de fine-tuning cobrem os pilares principais da entrega. No entanto, foram identificados **6 gaps críticos para a nota** e diversas melhorias que podem elevar a qualidade da apresentação.
+O projeto está bem estruturado e atende à maioria dos requisitos do edital. Desde a análise anterior (2026-09-03), **5 gaps foram totalmente resolvidos** (M01, M02, M06, M07, M08, G04) e os issues do GitHub foram sincronizados para refletir o estado atual.
+
+A arquitetura modular (backend, agent, frontend, MongoDB), o pipeline LangGraph com 6 nós, os guardrails de segurança, o logging de auditoria e os notebooks de fine-tuning cobrem os pilares principais da entrega. Permanecem **3 gaps críticos** (G01, G02, G03) e melhorias que podem elevar a qualidade da apresentação final.
 
 ---
 
@@ -28,6 +30,8 @@ O projeto está bem estruturado e atende à maioria dos requisitos do edital. A 
 
 **Ação recomendada:** Criar `docs/relatorio-tecnico.md` consolidando os pontos acima de forma narrativa, com exemplos de I/O do modelo e métricas de avaliação extraídas dos notebooks.
 
+**Issue GitHub:** [#32 [G01] Relatório técnico detalhado](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/32) — **aberto**
+
 ---
 
 ### G02 — Avaliação do Modelo Fine-tunado sem métricas formais
@@ -36,7 +40,7 @@ O projeto está bem estruturado e atende à maioria dos requisitos do edital. A 
 > "Avaliação do modelo e análise dos resultados."
 
 **Situação atual:**
-- Há um notebook `FIAP_PosTech_IA4Devs_Fase3_TechChallenge_TestesValidacoes.ipynb` (3.8 KB — muito pequeno, possivelmente incompleto).
+- Há um notebook `FIAP_PosTech_IA4Devs_Fase3_TechChallenge_TestesValidacoes.ipynb` (**3.8 KB — muito pequeno, possivelmente incompleto**).
 - Não há no repositório principal nenhum arquivo com métricas de avaliação formais (BLEU, ROUGE, eval loss, perplexidade).
 - A comparação "antes vs. depois do fine-tuning" não está documentada de forma acessível.
 
@@ -44,6 +48,8 @@ O projeto está bem estruturado e atende à maioria dos requisitos do edital. A 
 - Expandir o notebook de validação com avaliação quantitativa no conjunto de teste;
 - Exportar as métricas como artefato (ex.: `backend/datasets/evaluation/metrics.json` ou tabela no relatório técnico);
 - Incluir 3–5 exemplos de respostas do modelo base versus o modelo fine-tunado sobre perguntas médicas reais.
+
+**Issue GitHub:** [#33 [G02] Avaliação do modelo fine-tunado](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/33) — **aberto**
 
 ---
 
@@ -59,23 +65,20 @@ O projeto está bem estruturado e atende à maioria dos requisitos do edital. A 
 
 **Ação recomendada:** Adicionar uma imagem exportada (PNG/SVG) do diagrama LangGraph em `docs/architecture/` ou no relatório técnico para facilitar referência no vídeo e na entrega.
 
+**Issue GitHub:** [#34 [G03] Diagrama LangGraph ausente como imagem](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/34) — **aberto**
+
 ---
 
-### G04 — Dataset anonimizado ou sintético não explicitado no repositório raiz
+### ~~G04~~ — ~~Dataset anonimizado ou sintético não explicitado no repositório raiz~~ ✅ Resolvido
 
-**Requisito do edital:**
-> "Dataset anonimizado ou exemplo de dados sintéticos."
+**Situação atual (fechado no GitHub em 2026-09-04):**
+- Os datasets PubMedQA e MedQuAD são datasets públicos já anonimizados por natureza. ✅
+- O papel do `generate_medical_reports.py` foi documentado. ✅
+- Issue #35 foi fechado pela equipe.
 
-**Situação atual:**
-- Os datasets PubMedQA e MedQuAD são datasets públicos (não requerem anonimização).
-- Os protocolos FHEMIG/PCDT são documentos públicos.
-- O script `generate_medical_reports.py` (58 KB) existe no `backend/datasets/`, mas não está claro se ele gera dados sintéticos ou é apenas para geração de relatórios para fine-tuning.
-- **Não há na documentação do repositório raiz** uma referência clara a "dados sintéticos" ou à estratégia de anonimização aplicada.
+**Pendente ainda:** Incluir seção "Dataset" no relatório técnico (G01) descrevendo fontes, volumes e estratégia de curadoria.
 
-**Ação recomendada:**
-- Clarificar no README principal e no relatório técnico que PubMedQA/MedQuAD são datasets públicos já anonimizados por natureza;
-- Documentar o papel do `generate_medical_reports.py` — se gera dados sintéticos, isso precisa ser explicitado como entregável;
-- Adicionar uma seção "Dataset" no relatório técnico descrevendo fontes, volumes e estratégia de anonimização/curadoria.
+**Issue GitHub:** [#35 [G04] Estratégia de dataset/anonimização](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/35) — **fechado** ✅
 
 ---
 
@@ -83,8 +86,8 @@ O projeto está bem estruturado e atende à maioria dos requisitos do edital. A 
 
 **Situação atual:**
 - O modelo está **público** no HuggingFace: [`fiap-hospital-helper/hospital-helper-qwen2.5-1.5b`](https://huggingface.co/fiap-hospital-helper/hospital-helper-qwen2.5-1.5b). ✅
-- O `README.md` raiz agora possui link clicável e navegável para o modelo. ✅
-- O `agent/.env.example` foi atualizado com as 3 opções de configuração (`LLM_API_TOKEN` documentado para cada modo). ✅
+- O `README.md` raiz possui link clicável e navegável para o modelo. ✅
+- O `agent/.env.example` documenta claramente as 3 opções de configuração (`LLM_API_TOKEN` documentado para cada modo). ✅
 - Os notebooks de fine-tuning estão em `backend/src/notebooks/` (v1 a v4 + RuntimeModelo).
 
 **Pendente ainda:**
@@ -100,37 +103,36 @@ O projeto está bem estruturado e atende à maioria dos requisitos do edital. A 
 **Situação atual:**
 - O `session_id` é registrado nos logs de auditoria, mas **não há memória de conversa** — cada chamada ao `/agent/chat` é stateless.
 - O agente não "lembra" de interações anteriores da sessão, o que limita a capacidade de contextualizar respostas com o histórico clínico do paciente.
+- Verificado em `medical_agent.py`: `initial_state` é criado do zero a cada invocação sem recuperar histórico do MongoDB.
 
 **Ação recomendada:**
 - Implementar memória de sessão usando a coleção `agent_audit_logs` existente: ao receber uma query, recuperar as últimas N interações da mesma `session_id` e injetá-las como contexto adicional no prompt;
 - Alternativamente, usar `LangGraph Checkpointer` (ex.: `MongoDBSaver`) para persistência nativa de estado entre invocações.
 
+**Issue GitHub:** [#36 [G06] Agente stateless — sem memória de sessão](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/36) — **aberto**
+
 ---
 
 ## 🟡 Melhorias Importantes (Qualidade, Robustez e Apresentação)
 
-### M01 — Página de Chat com o Agente Médico ausente no Frontend
+### ~~M01~~ — ~~Página de Chat com o Agente Médico ausente no Frontend~~ ✅ Resolvido
 
-**Situação atual:**
-- O frontend tem páginas para: Pré-processamento, Geração de RAG e Consulta RAG (`/rag-query`).
-- **Não há uma página de chat** dedicada ao agente médico (`/agent/chat`).
-- O endpoint `POST /agent/chat` existe no backend do agente (porta 8001), mas não está integrado à interface.
+**Situação atual (atualizada em 2026-09-04):**
+- `frontend/src/pages/AgentPage.tsx` implementado com interface de chat completa. ✅
+- Integrado ao `App.tsx` como view `"agent"` (view padrão ao abrir o frontend). ✅
+- Exibe resposta do assistente, fontes consultadas expansíveis com score de similaridade e preview de conteúdo, alerta de segurança quando guardrail é ativado. ✅
+- README documenta a tela e os passos para uso. ✅
 
-**Ação recomendada:**
-- Criar `frontend/src/pages/AgentChatPage.tsx` com interface de chat (input de pergunta, exibição de resposta formatada com fontes e disclaimer, histórico de sessão);
-- Adicionar rota `/chat` no `App.tsx` e link no layout de navegação.
-- Esta é a funcionalidade mais visível para demonstração no vídeo.
+**Issue GitHub:** [#37 [M01] Página de chat com o agente](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/37) — **deve ser fechado**
 
 ---
 
-### M02 — Página de Fine-tuning incompleta no Frontend
+### ~~M02~~ — ~~Página de Fine-tuning incompleta no Frontend~~ ✅ Resolvido
 
-**Situação atual:**
-- Existe `frontend/src/pages/FineTuningPage.css` (5.2 KB) mas **não há** `FineTuningPage.tsx` correspondente — a página está incompleta ou removida.
+**Situação atual (fechado no GitHub em 2026-09-04):**
+- Issue #38 foi fechado pela equipe.
 
-**Ação recomendada:**
-- Criar o componente `FineTuningPage.tsx` que permita disparar e acompanhar o fine-tuning local via API (`POST /fine-tuning/start`, `GET /fine-tuning/{id}`);
-- Adicionar à rota e ao menu de navegação.
+**Issue GitHub:** [#38 [M02] Página de fine-tuning no frontend](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/38) — **fechado** ✅
 
 ---
 
@@ -144,6 +146,8 @@ O projeto está bem estruturado e atende à maioria dos requisitos do edital. A 
 - Adicionar como segunda camada de validação uma chamada leve à LLM para classificar a intenção da query (ex.: zero-shot: *"Esta query solicita prescrição direta? Responda sim/não."*);
 - Documentar a decisão de usar regex por desempenho/latência (já existe ADR-013, expandir para mencionar a limitação conhecida).
 
+**Issue GitHub:** [#42 [M03] Guardrails baseados apenas em regex](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/42) — **aberto**
+
 ---
 
 ### M04 — Ausência de testes de integração end-to-end
@@ -156,6 +160,8 @@ O projeto está bem estruturado e atende à maioria dos requisitos do edital. A 
 **Ação recomendada:**
 - Adicionar ao menos um teste de integração que suba o Docker Compose e execute um fluxo real de ponta a ponta;
 - Ou adicionar testes de contrato de API (ex.: verificar que `/agent/chat` retorna o schema correto com dados reais).
+
+**Issue GitHub:** [#43 [M04] Ausência de testes de integração](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/43) — **aberto**
 
 ---
 
@@ -172,69 +178,75 @@ O projeto está bem estruturado e atende à maioria dos requisitos do edital. A 
 - Documentar no relatório técnico os critérios de curadoria aplicados (mínimo de caracteres por QA, filtragem de respostas vazias, validação manual de amostras);
 - Incluir estatísticas: quantos registros foram descartados e por quê.
 
+**Issue GitHub:** [#44 [M05] Curadoria dos dados não documentada](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/44) — **aberto**
+
 ---
 
-### M06 — Explainability limitada a citação de fontes
+### ~~M06~~ — ~~Explainability limitada a citação de fontes~~ ✅ Resolvido
 
 **Requisito do edital:**
 > "Garantir explainability das respostas da LLM (exemplo: indicar a fonte da informação utilizada)."
 
-**Situação atual:**
-- As fontes são indicadas no `response_formatter.py` via rodapé ou inline — requisito básico atendido. ✅
-- **Faltam:** indicar qual trecho específico do documento RAG embasou a resposta e mostrar o score de similaridade ao usuário final.
+**Situação atual (fechado no GitHub em 2026-09-04):**
+- As fontes são indicadas no `response_formatter.py` via rodapé ou inline. ✅
+- A `AgentPage.tsx` exibe `content_preview` e `similarity_score` como "Fontes consultadas" expansíveis por `<details>`. ✅
+- Quando um guardrail é ativado, o `safety_reason` é exibido em linguagem natural no frontend. ✅
+- Issue #41 foi fechado pela equipe.
 
-**Ação recomendada:**
-- Expor os `content_preview` e `similarity_score` dos documentos RAG na resposta da API (já existem nos dados) e exibi-los no frontend como "Fontes consultadas" expansíveis;
-- Quando um guardrail é ativado, retornar o `safety_reason` em linguagem natural amigável.
-
----
-
-### M07 — README principal incompleto
-
-**Situação atual:**
-- O `README.md` na raiz do projeto tem a seção **"## Como a aplicação funciona"** com título mas **sem conteúdo**.
-- Não há um quickstart passo-a-passo para avaliadores.
-
-**Ação recomendada:**
-- Preencher a seção vazia com o fluxo end-to-end em linguagem simples;
-- Adicionar uma seção "Quick Start para Avaliadores" com os 3–5 comandos mínimos para subir e testar o sistema;
-- Adicionar link direto para o vídeo de demonstração e para o modelo no HuggingFace.
+**Issue GitHub:** [#41 [M06] Explainability limitada a citação de fontes](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/41) — **fechado** ✅
 
 ---
 
-### M08 — Instrução de configuração do HF_TOKEN ausente no .env.example
+### ~~M07~~ — ~~README principal incompleto~~ ✅ Resolvido
 
-**Situação atual:**
-- O modelo `fiap-hospital-helper/hospital-helper-qwen2.5-1.5b` já está **público** no HuggingFace. ✅
-- Porém, o `.env.example` do agente não documenta claramente para que serve o `HF_TOKEN` e quando ele é necessário (endpoint de inferência pago vs. Space ZeroGPU gratuito).
+**Situação atual (atualizada em 2026-09-04):**
+- A seção `"Como a aplicação funciona"` está preenchida com o fluxo completo em 5 etapas. ✅
+- Adicionada seção `"Quick Start para Avaliadores"` com os 4 comandos mínimos para subir e testar. ✅
+- Adicionada seção `"Tela do Assistente Médico"` com instruções de uso. ✅
+- Link direto para o modelo no HuggingFace presente. ✅
 
-**Ação recomendada:**
-- Adicionar comentários explicativos no `.env.example` do agente sobre quando o `HF_TOKEN` é obrigatório;
-- Documentar no README a diferença entre rodar via HF Spaces ZeroGPU (gratuito, sem token) e via Inference API (requer token com créditos).
+**Issue GitHub:** [#39 [M07] README raiz incompleto](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/39) — **deve ser fechado**
+
+---
+
+### ~~M08~~ — ~~Instrução de configuração do HF_TOKEN ausente no .env.example~~ ✅ Resolvido
+
+**Situação atual (atualizada em 2026-09-04):**
+- O `agent/.env.example` documenta os 3 modos de uso com comentários explicativos claros:
+  - Opção 1 — HF Spaces ZeroGPU (gratuito, sem token);
+  - Opção 2 — Colab/ngrok (sem token);
+  - Opção 3 — HuggingFace Inference API (requer token com créditos).
+- O README raiz menciona as opções de endpoint. ✅
+
+**Issue GitHub:** [#45 [M08] HF_TOKEN e modos de inferência](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/45) — **deve ser fechado**
 
 ---
 
 ### M09 — Ausência de CI/CD pipeline
 
 **Situação atual:**
-- Não há arquivo `.github/workflows/` ou equivalente.
+- Não há arquivo `.github/workflows/` ou equivalente (diretório `.github/` inexistente).
 - Testes são executados manualmente.
 
 **Ação recomendada (opcional para a nota, mas agrega valor):**
 - Adicionar um workflow GitHub Actions que rode `pytest` nos módulos `agent/` e `backend/` a cada push;
 - Adicionar verificação de lint (`ruff` ou `flake8`).
 
+**Issue GitHub:** [#46 [M09] Ausência de CI/CD pipeline](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/46) — **aberto**
+
 ---
 
 ### M10 — Documentação dos notebooks de fine-tuning fragmentada
 
 **Situação atual:**
-- Os notebooks `v1, v2, v3, v4` e o notebook de runtime estão em `backend/src/notebooks/`, mas não há um `README.md` na pasta explicando a sequência de uso e o que cada versão faz.
+- Os notebooks `v1, v2, v3, v4` e o notebook de runtime estão em `backend/src/notebooks/`, mas **não há um `README.md`** na pasta explicando a sequência de uso e o que cada versão faz.
 - A referência no `README.md` raiz menciona os notebooks mas não distingue qual usar.
 
 **Ação recomendada:**
 - Criar `backend/src/notebooks/README.md` documentando qual notebook usar, em que ordem, diferenças entre as versões e como rodar no Colab;
 - Marcar o notebook mais atual (v4) como canônico.
+
+**Issue GitHub:** [#40 [M10] Documentação dos notebooks](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/40) — **aberto**
 
 ---
 
@@ -248,36 +260,61 @@ O projeto está bem estruturado e atende à maioria dos requisitos do edital. A 
 | Consultas à base RAG | ✅ Atendido | `rag_retriever.py`, `rag_database.py`, busca híbrida |
 | Limites de atuação (sem prescrição direta) | ✅ Atendido | `safety_guard.py`, `topic_validator.py` |
 | Logging detalhado para auditoria | ✅ Atendido | `audit_logger.py`, collection MongoDB `agent_audit_logs` |
-| Explainability básica (fontes citadas) | ✅ Atendido | `response_formatter.py` com rodapé de fontes |
+| Explainability (fontes + scores RAG) | ✅ Atendido | `response_formatter.py` + `AgentPage.tsx` com fontes expansíveis e similarity_score |
 | Disclaimer obrigatório | ✅ Atendido | Invariante em toda resposta (`requires_human_validation: True`) |
 | Projeto modularizado em Python | ✅ Atendido | Módulos separados: `agent/`, `backend/`, com `pyproject.toml` |
-| Dataset anonimizado / sintético | ⚠️ Parcial | Datasets públicos; curadoria não documentada explicitamente |
-| Instruções no README | ⚠️ Parcial | README existe mas tem seção vazia; link do modelo agora corrigido |
+| Frontend com chat do agente | ✅ Atendido | `AgentPage.tsx` integrado, view padrão ao abrir o app |
+| Instruções no README | ✅ Atendido | README completo com fluxo, Quick Start e seção do assistente |
 | Modelo HuggingFace público | ✅ Atendido | Modelo público em `fiap-hospital-helper/hospital-helper-qwen2.5-1.5b` |
+| HF_TOKEN documentado | ✅ Atendido | `agent/.env.example` com 3 modos documentados |
+| Dataset anonimizado / sintético | ⚠️ Parcial | Datasets públicos; curadoria não documentada explicitamente |
 | Relatório técnico | ❌ Ausente | Arquitetura documentada, mas falta relatório narrativo com métricas do modelo |
-| Avaliação do modelo | ❌ Ausente | Notebook de validação incompleto, sem métricas formais |
+| Avaliação do modelo | ❌ Ausente | Notebook de validação incompleto (3.8 KB), sem métricas formais |
 | Diagrama formal do fluxo | ⚠️ Parcial | Existe como ASCII art e Mermaid, mas não como imagem exportada |
-| Frontend com chat do agente | ❌ Ausente | Endpoint existe na API, mas não há página de chat no frontend |
 
 ---
 
 ## 📋 Backlog Priorizado de Ações
 
-| Prioridade | ID | Título | Esforço Estimado |
-|---|---|---|---|
-| 🔴 Alta | G01 | Criar relatório técnico detalhado | 4–6h |
-| 🔴 Alta | G02 | Adicionar métricas de avaliação do modelo | 3–4h |
-| 🔴 Alta | M01 | Criar página de Chat com o agente no Frontend | 4–6h |
-| 🔴 Alta | G05 | ~~Documentar pipeline Colab + instruções do HF_TOKEN~~ | ~~0.5h~~ ✅ |
-| 🟡 Média | G04 | Documentar estratégia de dataset/anonimização | 1–2h |
-| 🟡 Média | G03 | Exportar diagrama LangGraph como imagem | 1h |
-| 🟡 Média | M07 | Completar README raiz (seção vazia + quickstart) | 1–2h |
-| 🟡 Média | M02 | Criar página de Fine-tuning no Frontend | 3–4h |
-| 🟡 Média | G06 | Implementar memória de sessão no agente | 3–5h |
-| 🟡 Média | M10 | Criar README nos notebooks de fine-tuning | 1h |
-| 🟢 Baixa | M06 | Enriquecer explainability com scores RAG no frontend | 2–3h |
-| 🟢 Baixa | M03 | Adicionar validação semântica nos guardrails | 3–4h |
-| 🟢 Baixa | M04 | Testes de integração end-to-end | 4–6h |
-| 🟢 Baixa | M05 | Documentar curadoria dos dados | 1h |
-| 🟢 Baixa | M08 | Documentar HF_TOKEN no .env.example | 0.5h |
-| 🟢 Baixa | M09 | Adicionar CI/CD com GitHub Actions | 2–3h |
+| Prioridade | ID | Título | Esforço Estimado | Status |
+|---|---|---|---|---|
+| 🔴 Alta | G01 | Criar relatório técnico detalhado | 4–6h | ⏳ Pendente (#32) |
+| 🔴 Alta | G02 | Adicionar métricas de avaliação do modelo | 3–4h | ⏳ Pendente (#33) |
+| ~~🔴 Alta~~ | ~~M01~~ | ~~Criar página de Chat com o agente no Frontend~~ | ~~4–6h~~ | ✅ Resolvido (#37) |
+| ~~🔴 Alta~~ | ~~G05~~ | ~~Documentar pipeline Colab + instruções do HF_TOKEN~~ | ~~0.5h~~ | ✅ Resolvido |
+| ~~🟡 Média~~ | ~~G04~~ | ~~Documentar estratégia de dataset/anonimização~~ | ~~1–2h~~ | ✅ Resolvido (#35) |
+| 🟡 Média | G03 | Exportar diagrama LangGraph como imagem | 1h | ⏳ Pendente (#34) |
+| ~~🟡 Média~~ | ~~M07~~ | ~~Completar README raiz (seção vazia + quickstart)~~ | ~~1–2h~~ | ✅ Resolvido (#39) |
+| ~~🟡 Média~~ | ~~M02~~ | ~~Criar página de Fine-tuning no Frontend~~ | ~~3–4h~~ | ✅ Resolvido (#38) |
+| 🟡 Média | G06 | Implementar memória de sessão no agente | 3–5h | ⏳ Pendente (#36) |
+| 🟡 Média | M10 | Criar README nos notebooks de fine-tuning | 1h | ⏳ Pendente (#40) |
+| ~~🟢 Baixa~~ | ~~M06~~ | ~~Enriquecer explainability com scores RAG no frontend~~ | ~~2–3h~~ | ✅ Resolvido (#41) |
+| 🟢 Baixa | M03 | Adicionar validação semântica nos guardrails | 3–4h | ⏳ Pendente (#42) |
+| 🟢 Baixa | M04 | Testes de integração end-to-end | 4–6h | ⏳ Pendente (#43) |
+| 🟢 Baixa | M05 | Documentar curadoria dos dados | 1h | ⏳ Pendente (#44) |
+| ~~🟢 Baixa~~ | ~~M08~~ | ~~Documentar HF_TOKEN no .env.example~~ | ~~0.5h~~ | ✅ Resolvido (#45) |
+| 🟢 Baixa | M09 | Adicionar CI/CD com GitHub Actions | 2–3h | ⏳ Pendente (#46) |
+
+---
+
+## 🔄 Issues do GitHub — Status de Sincronização
+
+> Sincronizado em: 2026-09-04 às 08:26 BRT
+
+| Issue | Título | Estado no GitHub |
+|---|---|---|
+| #32 | [G01] Relatório técnico detalhado | 🔴 Aberto |
+| #33 | [G02] Avaliação do modelo fine-tunado | 🔴 Aberto |
+| #34 | [G03] Diagrama LangGraph como imagem | 🔴 Aberto |
+| #35 | [G04] Estratégia de dataset/anonimização | ✅ Fechado |
+| #36 | [G06] Agente stateless — sem memória | 🔴 Aberto |
+| #37 | [M01] Página de chat no frontend | ✅ Fechado |
+| #38 | [M02] Página de fine-tuning no frontend | ✅ Fechado |
+| #39 | [M07] README raiz incompleto | ✅ Fechado |
+| #40 | [M10] Documentação dos notebooks | 🔴 Aberto |
+| #41 | [M06] Explainability limitada | ✅ Fechado |
+| #42 | [M03] Guardrails apenas regex | 🔴 Aberto |
+| #43 | [M04] Testes de integração | 🔴 Aberto |
+| #44 | [M05] Curadoria não documentada | 🔴 Aberto |
+| #45 | [M08] HF_TOKEN no .env.example | ✅ Fechado |
+| #46 | [M09] Ausência de CI/CD | 🔴 Aberto |
