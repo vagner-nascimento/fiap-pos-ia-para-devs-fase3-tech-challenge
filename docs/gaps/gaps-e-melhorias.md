@@ -46,7 +46,7 @@ A arquitetura modular (backend, agent, frontend, MongoDB), o pipeline LangGraph 
 - Criado relatório técnico de avaliação com análise quantitativa e qualitativa detalhada "antes vs depois" e calibração de hiperparâmetros: [`docs/avaliacao-modelo.md`](../avaliacao-modelo.md). ✅
 - Formalizado em decisão arquitetural: [`docs/architecture/adr/ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md`](../architecture/adr/ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md). ✅
 
-**Issue GitHub:** [#33 [G02] Avaliação do modelo fine-tunado](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/33) — **deve ser fechado** ✅
+**Issue GitHub:** [#33 [G02] Avaliação do modelo fine-tunado](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/33) — **fechado** ✅
 
 ---
 
@@ -238,7 +238,7 @@ A arquitetura modular (backend, agent, frontend, MongoDB), o pipeline LangGraph 
 **Situação atual (resolvido em 2026-09-05):**
 - Criado [`backend/src/notebooks/README.md`](../../backend/src/notebooks/README.md) detalhando a linhagem completa dos modelos (Base $\rightarrow$ v1.0 $\rightarrow$ v2.0), finalidade de cada notebook, badges do Colab e instruções de execução. ✅
 
-**Issue GitHub:** [#40 [M10] Documentação dos notebooks](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/40) — **deve ser fechado** ✅
+**Issue GitHub:** [#40 [M10] Documentação dos notebooks](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/40) — **fechado** ✅
 
 ---
 
@@ -296,14 +296,14 @@ A arquitetura modular (backend, agent, frontend, MongoDB), o pipeline LangGraph 
 | Issue | Título | Estado no GitHub |
 |---|---|---|
 | #32 | [G01] Relatório técnico detalhado | 🔴 Aberto |
-| #33 | [G02] Avaliação do modelo fine-tunado | ✅ Resolvido (fechar) |
+| #33 | [G02] Avaliação do modelo fine-tunado | ✅ Fechado |
 | #34 | [G03] Diagrama LangGraph como imagem | 🔴 Aberto |
 | #35 | [G04] Estratégia de dataset/anonimização | ✅ Fechado |
 | #36 | [G06] Agente stateless — sem memória | 🔴 Aberto |
 | #37 | [M01] Página de chat no frontend | ✅ Fechado |
 | #38 | [M02] Página de fine-tuning no frontend | ✅ Fechado |
 | #39 | [M07] README raiz incompleto | ✅ Fechado |
-| #40 | [M10] Documentação dos notebooks | ✅ Resolvido (fechar) |
+| #40 | [M10] Documentação dos notebooks | ✅ Fechado |
 | #41 | [M06] Explainability limitada | ✅ Fechado |
 | #42 | [M03] Guardrails apenas regex | 🔴 Aberto |
 | #43 | [M04] Testes de integração | 🔴 Aberto |
