@@ -42,8 +42,9 @@ A arquitetura modular (backend, agent, frontend, MongoDB), o pipeline LangGraph 
 **Situação atual (resolvido em 2026-09-05):**
 - Criado notebook canônico de avaliação [`FIAP_PosTech_IA4Devs_Fase3_TechChallenge_AvaliacaoModelos.ipynb`](../../backend/src/notebooks/FIAP_PosTech_IA4Devs_Fase3_TechChallenge_AvaliacaoModelos.ipynb) preparado para execução direta com GPU no Google Colab com suporte a seleção de tags (`v1.0`, `v2.0` ou Modelo Base). ✅
 - Criado conjunto de teste curado com 50 amostras em pt-BR (15 protocolos clínicos PCDT/FHEMIG e 35 Q&As PubMedQA/MedQuAD): [`backend/datasets/evaluation/golden_test_qa.json`](../../backend/datasets/evaluation/golden_test_qa.json). ✅
-- Exportado artefato estruturado com métricas formais (ROUGE-1: 43.08%, ROUGE-2: 21.16%, ROUGE-L: 36.43%, BLEU-4: 17.62%): [`backend/datasets/evaluation/metrics_evaluation.json`](../../backend/datasets/evaluation/metrics_evaluation.json). ✅
-- Criado relatório técnico de avaliação com análise quantitativa e qualitativa detalhada "antes vs depois": [`docs/avaliacao-modelo.md`](../avaliacao-modelo.md). ✅
+- Exportados artefatos estruturados com métricas formais para 3 regimes de decodificação (`metrics_evaluation_config[A|B|C].json`): a Configuração C atingiu ROUGE-1 29.78%, ROUGE-L 25.62%, BLEU-4 6.77% e latência de 5.58s (redução de 57%): [`backend/datasets/evaluation/metrics_evaluation.json`](../../backend/datasets/evaluation/metrics_evaluation.json). ✅
+- Criado relatório técnico de avaliação com análise quantitativa e qualitativa detalhada "antes vs depois" e calibração de hiperparâmetros: [`docs/avaliacao-modelo.md`](../avaliacao-modelo.md). ✅
+- Formalizado em decisão arquitetural: [`docs/architecture/adr/ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md`](../architecture/adr/ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md). ✅
 
 **Issue GitHub:** [#33 [G02] Avaliação do modelo fine-tunado](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/33) — **deve ser fechado** ✅
 

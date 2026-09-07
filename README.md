@@ -36,7 +36,7 @@ O fluxo completo acontece em etapas encadeadas:
 4. No chat, o agente valida se a pergunta é médica, aplica os guardrails de segurança e consulta a base RAG antes de chamar o modelo fine-tunado.
 5. O agente devolve a resposta com fontes, disclaimer e indicação de validação humana, enquanto registra a interação para auditoria no MongoDB.
 
-O modelo fine-tunado utilizado pelo agente está disponível no [Hugging Face](https://huggingface.co/fiap-hospital-helper/hospital-helper-qwen2.5-1.5b). O endpoint de inferência pode ser o [Space do projeto](https://huggingface.co/spaces/fiap-hospital-helper/hospital-helper) ou uma URL FastAPI exposta via ngrok.
+O modelo fine-tunado utilizado pelo agente está disponível publicamente no [Hugging Face](https://huggingface.co/fiap-hospital-helper/hospital-helper-qwen2.5-1.5b) (tag oficial `v2.0`). O endpoint de inferência pode ser o [Space do projeto](https://huggingface.co/spaces/fiap-hospital-helper/hospital-helper) (com alocação ZeroGPU) ou uma URL FastAPI exposta via ngrok.
 
 ## Tela do Assistente Médico
 
@@ -81,6 +81,8 @@ Para detalhes aprofundados sobre a arquitetura e decisões de projeto:
 
 - **Arquitetura Geral & C4 Models:** [docs/architecture/README.md](docs/architecture/README.md)
 - **Decisões de Arquitetura (ADRs):** [docs/architecture/adr/README.md](docs/architecture/adr/README.md)
+- **Relatório de Avaliação do Modelo (ROUGE/BLEU):** [docs/avaliacao-modelo.md](docs/avaliacao-modelo.md)
+- **Notebooks de Treinamento e Avaliação:** [backend/src/notebooks/README.md](backend/src/notebooks/README.md)
 - **Agente Médico (LangGraph):** [agent/README.md](agent/README.md)
 - **Backend API & RAG:** [backend/README.md](backend/README.md)
 - **Datasets:** [backend/datasets/README.md](backend/datasets/README.md)
@@ -139,5 +141,5 @@ O script [restart-app.sh](restart-app.sh) facilita a reinicialização completa 
 - A tradução usa `Helsinki-NLP/opus-mt-tc-big-en-pt`, em lotes e com fragmentação de textos longos; quando houver uma GPU Nvidia compatível, o backend usa CUDA, caso contrário faz fallback para CPU.
 - Uma execução pode terminar com status `error`; em cenários de falha de fallback interno, também pode aparecer `failed`.
 - Os datasets são baixados automaticamente na primeira execução, incluindo FHEMIG e PCDT; também podem ser tratados manualmente conforme descrito em [backend/datasets/README.md](backend/datasets/README.md).
-- Devido a restrições de hardware, o fine-tuning e a avaliação do modelo escolhido foram realizados através de notebooks no Google Colab. Os arquivos e instruções detalhadas estão na pasta [backend/src/notebooks/](backend/src/notebooks/) (incluindo o notebook de avaliação formal de métricas ROUGE/BLEU) e o modelo treinado foi disponibilizado publicamente no [HuggingFace](https://huggingface.co/fiap-hospital-helper/hospital-helper-qwen2.5-1.5b).
+- Devido a restrições de hardware, o fine-tuning e a avaliação formal do modelo escolhido foram realizados através de notebooks no Google Colab. Os arquivos e instruções detalhadas estão na pasta [backend/src/notebooks/](backend/src/notebooks/) (incluindo a linhagem dos modelos v1.0 e v2.0 e os notebooks de avaliação com métricas ROUGE/BLEU). O modelo canônico de produção foi disponibilizado publicamente no [HuggingFace](https://huggingface.co/fiap-hospital-helper/hospital-helper-qwen2.5-1.5b) sob a tag `v2.0`, e a análise empírica com calibração de hiperparâmetros está detalhada em [docs/avaliacao-modelo.md](docs/avaliacao-modelo.md).
 - **Aviso sobre a Tradução de QAs**: A tradução dos dados de QAs é extremamente demorada e não roda em todos os hardwares que temos. Por isso, foi implementada a opção de pular essa etapa e utilizar o dataset já traduzido que está fixado na pasta `backend/datasets/preprocessed/fixed/qas`.

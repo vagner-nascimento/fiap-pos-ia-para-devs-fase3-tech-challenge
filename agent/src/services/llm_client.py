@@ -24,9 +24,9 @@ logger = logging.getLogger(__name__)
 DEFAULT_LLM_ENDPOINT_URL = os.getenv("LLM_ENDPOINT_URL", "")
 DEFAULT_LLM_API_TOKEN = os.getenv("LLM_API_TOKEN", "") or os.getenv("HF_TOKEN", "")
 DEFAULT_LLM_PROVIDER = os.getenv("LLM_PROVIDER", "auto").lower()  # "auto", "hf_space", "fastapi"
-DEFAULT_MAX_TOKENS = int(os.getenv("AGENT_MAX_TOKENS", "512"))
-DEFAULT_TEMPERATURE = float(os.getenv("AGENT_TEMPERATURE", "0.3"))
-DEFAULT_TOP_P = float(os.getenv("AGENT_TOP_P", "0.9"))
+DEFAULT_MAX_TOKENS = int(os.getenv("AGENT_MAX_TOKENS", "450"))
+DEFAULT_TEMPERATURE = float(os.getenv("AGENT_TEMPERATURE", "0.10"))
+DEFAULT_TOP_P = float(os.getenv("AGENT_TOP_P", "0.85"))
 
 
 def _build_sft_prompt(question: str, context: str = "") -> str:
