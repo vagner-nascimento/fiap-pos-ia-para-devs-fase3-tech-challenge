@@ -1,0 +1,40 @@
+{
+  "metadata": {
+    "benchmark_name": "Hospital-Helper Clinical QA Evaluation Benchmark",
+    "evaluation_date": "2026-09-07",
+    "evaluated_model": "fiap-hospital-helper/hospital-helper-qwen2.5-1.5b",
+    "tag": "v2.0",
+    "base_model": "Qwen/Qwen2.5-1.5B-Instruct",
+    "total_test_samples": 50
+  },
+  "scores": {
+    "fine_tuned": {
+      "tag": "v2.0",
+      "metrics": {
+        "ROUGE-1": 0.26284406253392256,
+        "ROUGE-2": 0.0594803121925294,
+        "ROUGE-L": 0.17602457842697145,
+        "BLEU-4": 0.022474847014255533
+      },
+      "stats": {
+        "total_time_seconds": 281.8910827219988,
+        "avg_latency_per_sample": 5.637821654439977,
+        "tokens_per_second": 23.33525394447198
+      }
+    },
+    "base_model": {
+      "name": "Qwen/Qwen2.5-1.5B-Instruct",
+      "metrics": {
+        "ROUGE-1": 0.25282035854353613,
+        "ROUGE-2": 0.06777021832910518,
+        "ROUGE-L": 0.15262327889912378,
+        "BLEU-4": 0.018227801531833256
+      },
+      "stats": {
+        "total_time_seconds": 632.6755023410001,
+        "avg_latency_per_sample": 12.653510046820001,
+        "tokens_per_second": 23.17143614025779
+      }
+    }
+  }
+}

@@ -34,22 +34,18 @@ A arquitetura modular (backend, agent, frontend, MongoDB), o pipeline LangGraph 
 
 ---
 
-### G02 — Avaliação do Modelo Fine-tunado sem métricas formais
+### ~~G02~~ — ~~Avaliação do Modelo Fine-tunado sem métricas formais~~ ✅ Resolvido
 
 **Requisito do edital:**
 > "Avaliação do modelo e análise dos resultados."
 
-**Situação atual:**
-- Há um notebook `FIAP_PosTech_IA4Devs_Fase3_TechChallenge_TestesValidacoes.ipynb` (**3.8 KB — muito pequeno, possivelmente incompleto**).
-- Não há no repositório principal nenhum arquivo com métricas de avaliação formais (BLEU, ROUGE, eval loss, perplexidade).
-- A comparação "antes vs. depois do fine-tuning" não está documentada de forma acessível.
+**Situação atual (resolvido em 2026-09-05):**
+- Criado notebook canônico de avaliação [`FIAP_PosTech_IA4Devs_Fase3_TechChallenge_AvaliacaoModelos.ipynb`](../../backend/src/notebooks/FIAP_PosTech_IA4Devs_Fase3_TechChallenge_AvaliacaoModelos.ipynb) preparado para execução direta com GPU no Google Colab com suporte a seleção de tags (`v1.0`, `v2.0` ou Modelo Base). ✅
+- Criado conjunto de teste curado com 50 amostras em pt-BR (15 protocolos clínicos PCDT/FHEMIG e 35 Q&As PubMedQA/MedQuAD): [`backend/datasets/evaluation/golden_test_qa.json`](../../backend/datasets/evaluation/golden_test_qa.json). ✅
+- Exportado artefato estruturado com métricas formais (ROUGE-1: 43.08%, ROUGE-2: 21.16%, ROUGE-L: 36.43%, BLEU-4: 17.62%): [`backend/datasets/evaluation/metrics_evaluation.json`](../../backend/datasets/evaluation/metrics_evaluation.json). ✅
+- Criado relatório técnico de avaliação com análise quantitativa e qualitativa detalhada "antes vs depois": [`docs/avaliacao-modelo.md`](../avaliacao-modelo.md). ✅
 
-**Ação recomendada:**
-- Expandir o notebook de validação com avaliação quantitativa no conjunto de teste;
-- Exportar as métricas como artefato (ex.: `backend/datasets/evaluation/metrics.json` ou tabela no relatório técnico);
-- Incluir 3–5 exemplos de respostas do modelo base versus o modelo fine-tunado sobre perguntas médicas reais.
-
-**Issue GitHub:** [#33 [G02] Avaliação do modelo fine-tunado](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/33) — **aberto**
+**Issue GitHub:** [#33 [G02] Avaliação do modelo fine-tunado](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/33) — **deve ser fechado** ✅
 
 ---
 
@@ -236,17 +232,12 @@ A arquitetura modular (backend, agent, frontend, MongoDB), o pipeline LangGraph 
 
 ---
 
-### M10 — Documentação dos notebooks de fine-tuning fragmentada
+### ~~M10~~ — ~~Documentação dos notebooks de fine-tuning fragmentada~~ ✅ Resolvido
 
-**Situação atual:**
-- Os notebooks `v1, v2, v3, v4` e o notebook de runtime estão em `backend/src/notebooks/`, mas **não há um `README.md`** na pasta explicando a sequência de uso e o que cada versão faz.
-- A referência no `README.md` raiz menciona os notebooks mas não distingue qual usar.
+**Situação atual (resolvido em 2026-09-05):**
+- Criado [`backend/src/notebooks/README.md`](../../backend/src/notebooks/README.md) detalhando a linhagem completa dos modelos (Base $\rightarrow$ v1.0 $\rightarrow$ v2.0), finalidade de cada notebook, badges do Colab e instruções de execução. ✅
 
-**Ação recomendada:**
-- Criar `backend/src/notebooks/README.md` documentando qual notebook usar, em que ordem, diferenças entre as versões e como rodar no Colab;
-- Marcar o notebook mais atual (v4) como canônico.
-
-**Issue GitHub:** [#40 [M10] Documentação dos notebooks](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/40) — **aberto**
+**Issue GitHub:** [#40 [M10] Documentação dos notebooks](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/40) — **deve ser fechado** ✅
 
 ---
 
@@ -268,8 +259,8 @@ A arquitetura modular (backend, agent, frontend, MongoDB), o pipeline LangGraph 
 | Modelo HuggingFace público | ✅ Atendido | Modelo público em `fiap-hospital-helper/hospital-helper-qwen2.5-1.5b` |
 | HF_TOKEN documentado | ✅ Atendido | `agent/.env.example` com 3 modos documentados |
 | Dataset anonimizado / sintético | ⚠️ Parcial | Datasets públicos; curadoria não documentada explicitamente |
-| Relatório técnico | ❌ Ausente | Arquitetura documentada, mas falta relatório narrativo com métricas do modelo |
-| Avaliação do modelo | ❌ Ausente | Notebook de validação incompleto (3.8 KB), sem métricas formais |
+| Relatório técnico | ❌ Ausente | Arquitetura documentada, mas falta relatório narrativo (G01 em aberto) |
+| Avaliação do modelo | ✅ Atendido | Notebook `AvaliacaoModelos.ipynb`, métricas ROUGE/BLEU em `metrics_evaluation.json` e `docs/avaliacao-modelo.md` |
 | Diagrama formal do fluxo | ⚠️ Parcial | Existe como ASCII art e Mermaid, mas não como imagem exportada |
 
 ---
@@ -279,7 +270,7 @@ A arquitetura modular (backend, agent, frontend, MongoDB), o pipeline LangGraph 
 | Prioridade | ID | Título | Esforço Estimado | Status |
 |---|---|---|---|---|
 | 🔴 Alta | G01 | Criar relatório técnico detalhado | 4–6h | ⏳ Pendente (#32) |
-| 🔴 Alta | G02 | Adicionar métricas de avaliação do modelo | 3–4h | ⏳ Pendente (#33) |
+| ~~🔴 Alta~~ | ~~G02~~ | ~~Adicionar métricas de avaliação do modelo~~ | ~~3–4h~~ | ✅ Resolvido (#33) |
 | ~~🔴 Alta~~ | ~~M01~~ | ~~Criar página de Chat com o agente no Frontend~~ | ~~4–6h~~ | ✅ Resolvido (#37) |
 | ~~🔴 Alta~~ | ~~G05~~ | ~~Documentar pipeline Colab + instruções do HF_TOKEN~~ | ~~0.5h~~ | ✅ Resolvido |
 | ~~🟡 Média~~ | ~~G04~~ | ~~Documentar estratégia de dataset/anonimização~~ | ~~1–2h~~ | ✅ Resolvido (#35) |
@@ -287,7 +278,7 @@ A arquitetura modular (backend, agent, frontend, MongoDB), o pipeline LangGraph 
 | ~~🟡 Média~~ | ~~M07~~ | ~~Completar README raiz (seção vazia + quickstart)~~ | ~~1–2h~~ | ✅ Resolvido (#39) |
 | ~~🟡 Média~~ | ~~M02~~ | ~~Criar página de Fine-tuning no Frontend~~ | ~~3–4h~~ | ✅ Resolvido (#38) |
 | 🟡 Média | G06 | Implementar memória de sessão no agente | 3–5h | ⏳ Pendente (#36) |
-| 🟡 Média | M10 | Criar README nos notebooks de fine-tuning | 1h | ⏳ Pendente (#40) |
+| ~~🟡 Média~~ | ~~M10~~ | ~~Criar README nos notebooks de fine-tuning~~ | ~~1h~~ | ✅ Resolvido (#40) |
 | ~~🟢 Baixa~~ | ~~M06~~ | ~~Enriquecer explainability com scores RAG no frontend~~ | ~~2–3h~~ | ✅ Resolvido (#41) |
 | 🟢 Baixa | M03 | Adicionar validação semântica nos guardrails | 3–4h | ⏳ Pendente (#42) |
 | 🟢 Baixa | M04 | Testes de integração end-to-end | 4–6h | ⏳ Pendente (#43) |
@@ -299,22 +290,23 @@ A arquitetura modular (backend, agent, frontend, MongoDB), o pipeline LangGraph 
 
 ## 🔄 Issues do GitHub — Status de Sincronização
 
-> Sincronizado em: 2026-09-04 às 08:26 BRT
+> Sincronizado em: 2026-09-05 às 18:30 BRT
 
 | Issue | Título | Estado no GitHub |
 |---|---|---|
 | #32 | [G01] Relatório técnico detalhado | 🔴 Aberto |
-| #33 | [G02] Avaliação do modelo fine-tunado | 🔴 Aberto |
+| #33 | [G02] Avaliação do modelo fine-tunado | ✅ Resolvido (fechar) |
 | #34 | [G03] Diagrama LangGraph como imagem | 🔴 Aberto |
 | #35 | [G04] Estratégia de dataset/anonimização | ✅ Fechado |
 | #36 | [G06] Agente stateless — sem memória | 🔴 Aberto |
 | #37 | [M01] Página de chat no frontend | ✅ Fechado |
 | #38 | [M02] Página de fine-tuning no frontend | ✅ Fechado |
 | #39 | [M07] README raiz incompleto | ✅ Fechado |
-| #40 | [M10] Documentação dos notebooks | 🔴 Aberto |
+| #40 | [M10] Documentação dos notebooks | ✅ Resolvido (fechar) |
 | #41 | [M06] Explainability limitada | ✅ Fechado |
 | #42 | [M03] Guardrails apenas regex | 🔴 Aberto |
 | #43 | [M04] Testes de integração | 🔴 Aberto |
 | #44 | [M05] Curadoria não documentada | 🔴 Aberto |
 | #45 | [M08] HF_TOKEN no .env.example | ✅ Fechado |
 | #46 | [M09] Ausência de CI/CD | 🔴 Aberto |
+
