@@ -10,6 +10,7 @@ responsabilidade única entre serviços.
 """
 import logging
 import os
+import re
 from typing import Any, Dict, List, Optional
 
 import requests
@@ -20,14 +21,32 @@ logger = logging.getLogger(__name__)
 # Configuração
 # ---------------------------------------------------------------------------
 BACKEND_API_URL = os.getenv("BACKEND_API_URL", "http://localhost:3000")
-RAG_TOP_K = int(os.getenv("RAG_TOP_K", "5"))
-RAG_SIMILARITY_THRESHOLD = float(os.getenv("RAG_SIMILARITY_THRESHOLD", "0.25"))
+RAG_TOP_K = int(os.getenv("RAG_TOP_K", "3"))
+RAG_SIMILARITY_THRESHOLD = float(os.getenv("RAG_SIMILARITY_THRESHOLD", "0.40"))
 RAG_QUERY_ENDPOINT = f"{BACKEND_API_URL}/rag-database/query"
 
 
 # ---------------------------------------------------------------------------
 # Funções auxiliares
 # ---------------------------------------------------------------------------
+def _clean_content_for_prompt(content: str) -> str:
+    """
+    Remove cabeçalhos artificiais, URLs longas e metadados repetidos inseridos
+    no texto bruto do chunk durante a indexação, deixando texto clínico limpo
+    para não poluir a atenção de modelos compactos (1.5B).
+    """
+    if not content:
+        return ""
+    cleaned = re.sub(
+        r"^###\s*Protocolo\s+clinico\s+RAG\s*\n(?:Nome:[^\n]*\n)?(?:Fonte:[^\n]*\n)?(?:URL:[^\n]*\n)?(?:\n*Conteudo:\s*\n)?",
+        "",
+        content.strip(),
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(r"\bPág\.\s*\d+\b", "", cleaned)
+    return cleaned.strip()
+
+
 def _query_rag(
     query: str,
     top_k: int = RAG_TOP_K,
@@ -119,6 +138,7 @@ def rag_retriever_node(state: dict) -> dict:
         dataset = doc.get("dataset", "desconhecido")
         score = doc.get("similarity_score", 0.0)
         content = doc.get("content", "").strip()
+        cleaned_content = _clean_content_for_prompt(content)
         source_type = doc.get("source_type", "")
 
         # Mapeia dataset para nome amigável para citação inline
@@ -127,9 +147,17 @@ def rag_retriever_node(state: dict) -> dict:
             "clinical_protocols": "FHEMIG (Protocolos Clínicos)",
         }.get(dataset, dataset)
 
+        meta = doc.get("metadatas") or {}
+        doc_name = ""
+        if isinstance(meta, dict):
+            raw_name = meta.get("name") or meta.get("source_label", "")
+            doc_name = raw_name.replace(".pdf", "").replace("---", " - ")
+
+        title = f"{dataset_label} ({doc_name})" if doc_name else dataset_label
+
         part = (
-            f"[Contexto {i} — Fonte: {dataset_label}, score: {score:.2f}]\n"
-            f"{content}"
+            f"[Contexto {i} — Fonte: {title}, score: {score:.2f}]\n"
+            f"{cleaned_content}"
         )
         context_parts.append(part)
 

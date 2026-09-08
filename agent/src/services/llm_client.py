@@ -27,6 +27,7 @@ DEFAULT_LLM_PROVIDER = os.getenv("LLM_PROVIDER", "auto").lower()  # "auto", "hf_
 DEFAULT_MAX_TOKENS = int(os.getenv("AGENT_MAX_TOKENS", "450"))
 DEFAULT_TEMPERATURE = float(os.getenv("AGENT_TEMPERATURE", "0.10"))
 DEFAULT_TOP_P = float(os.getenv("AGENT_TOP_P", "0.85"))
+DEFAULT_REPETITION_PENALTY = float(os.getenv("AGENT_REPETITION_PENALTY", "1.15"))
 
 
 def _build_sft_prompt(question: str, context: str = "") -> str:
@@ -60,22 +61,39 @@ class GradioSpaceLLMClient:
         max_new_tokens: int = DEFAULT_MAX_TOKENS,
         temperature: float = DEFAULT_TEMPERATURE,
         top_p: float = DEFAULT_TOP_P,
+        repetition_penalty: float = DEFAULT_REPETITION_PENALTY,
     ) -> None:
-        self.space_url_or_id = space_url_or_id
+        self.space_url_or_id = space_url_or_id.strip()
         self.hf_token = hf_token
         self.max_new_tokens = max_new_tokens
         self.temperature = temperature
         self.top_p = top_p
+        self.repetition_penalty = repetition_penalty
         self._client = None
+
+        # Normalizar identificador para o gradio_client
+        # Se for "https://huggingface.co/spaces/owner/space_name" -> extrai "owner/space_name"
+        cleaned = self.space_url_or_id.rstrip("/")
+        if "huggingface.co/spaces/" in cleaned:
+            self.space_id = cleaned.split("huggingface.co/spaces/")[-1]
+        else:
+            self.space_id = cleaned
 
     def _get_gradio_client(self):
         if self._client is None:
             try:
                 from gradio_client import Client
-                self._client = Client(
-                    self.space_url_or_id,
-                    hf_token=self.hf_token or None,
-                )
+                # gradio_client >= 1.0 usa 'token', versões anteriores usavam 'hf_token'
+                try:
+                    self._client = Client(
+                        self.space_id,
+                        token=self.hf_token or None,
+                    )
+                except TypeError:
+                    self._client = Client(
+                        self.space_id,
+                        hf_token=self.hf_token or None,
+                    )
             except Exception as exc:
                 logger.warning(f"[LLM-Space] gradio_client falhou ao inicializar: {exc}. Usará fallback HTTP.")
                 self._client = False
@@ -95,28 +113,59 @@ class GradioSpaceLLMClient:
         """Envia o prompt completo para a API generate do Gradio."""
         client = self._get_gradio_client()
         if client:
+            predict_kwargs = {
+                "prompt": prompt,
+                "max_new_tokens": float(self.max_new_tokens),
+                "temperature": float(self.temperature),
+                "top_p": float(self.top_p),
+                "repetition_penalty": float(self.repetition_penalty),
+                "api_name": "/generate",
+            }
             try:
-                result = client.predict(
-                    prompt=prompt,
-                    max_new_tokens=float(self.max_new_tokens),
-                    temperature=float(self.temperature),
-                    top_p=float(self.top_p),
-                    api_name="/generate",
-                )
+                result = client.predict(**predict_kwargs)
                 return str(result).strip()
+            except TypeError as te:
+                # Pode ocorrer se o client em cache foi criado com schema desatualizado
+                logger.info(f"[LLM-Space] TypeError no predict ({te}). Reconectando com client atualizado...")
+                self._client = None
+                fresh_client = self._get_gradio_client()
+                if fresh_client:
+                    try:
+                        result = fresh_client.predict(**predict_kwargs)
+                        return str(result).strip()
+                    except Exception as retry_exc:
+                        logger.error(f"[LLM-Space] Erro ao retentar com client atualizado: {retry_exc}")
+                        if "repetition_penalty" in str(retry_exc):
+                            predict_kwargs.pop("repetition_penalty")
+                            try:
+                                result = fresh_client.predict(**predict_kwargs)
+                                return str(result).strip()
+                            except Exception as legacy_exc:
+                                self._client = None
+                                return f"[ERRO] Falha na comunicação com o Space: {legacy_exc}"
+                        self._client = None
+                        return f"[ERRO] Falha na comunicação com o Space: {retry_exc}"
             except Exception as exc:
                 logger.error(f"[LLM-Space] Erro na inferência via gradio_client: {exc}")
+                self._client = None  # Invalida cache para reconectar na próxima chamada
                 return f"[ERRO] Falha na comunicação com o Space: {exc}"
 
         # Fallback HTTP direto para Gradio 4/5 API
         import requests
 
-        api_url = self.space_url_or_id.rstrip("/")
-        if not api_url.startswith("http"):
-            api_url = f"https://huggingface.co/spaces/{api_url}"
+        if "/" in self.space_id and not self.space_id.startswith("http"):
+            owner, repo = self.space_id.split("/", 1)
+            direct_host = f"https://{owner.replace('_', '-')}-{repo.replace('_', '-')}.hf.space"
+        elif self.space_id.startswith("http"):
+            direct_host = self.space_id.rstrip("/")
+            if "huggingface.co/spaces/" in direct_host:
+                parts = direct_host.split("huggingface.co/spaces/")[-1].split("/")
+                if len(parts) >= 2:
+                    direct_host = f"https://{parts[0].replace('_', '-')}-{parts[1].replace('_', '-')}.hf.space"
+        else:
+            direct_host = f"https://{self.space_id}.hf.space"
 
-        # Tentar endpoint api/generate
-        target_url = f"{api_url}/api/generate"
+        target_url = f"{direct_host}/api/generate"
         headers = {"Content-Type": "application/json"}
         if self.hf_token:
             headers["Authorization"] = f"Bearer {self.hf_token}"
@@ -127,11 +176,24 @@ class GradioSpaceLLMClient:
                 self.max_new_tokens,
                 self.temperature,
                 self.top_p,
+                self.repetition_penalty,
             ]
         }
 
         try:
             res = requests.post(target_url, json=payload, headers=headers, timeout=90)
+            if res.status_code >= 400:
+                payload_legacy = {
+                    "data": [
+                        prompt,
+                        self.max_new_tokens,
+                        self.temperature,
+                        self.top_p,
+                    ]
+                }
+                res_legacy = requests.post(target_url, json=payload_legacy, headers=headers, timeout=90)
+                if res_legacy.status_code < 400:
+                    res = res_legacy
             res.raise_for_status()
             data = res.json()
             if isinstance(data, dict) and "data" in data and data["data"]:
@@ -155,12 +217,14 @@ class FastApiLLMClient:
         max_new_tokens: int = DEFAULT_MAX_TOKENS,
         temperature: float = DEFAULT_TEMPERATURE,
         top_p: float = DEFAULT_TOP_P,
+        repetition_penalty: float = DEFAULT_REPETITION_PENALTY,
     ) -> None:
         self.endpoint_url = endpoint_url.rstrip("/")
         self.api_token = api_token
         self.max_new_tokens = max_new_tokens
         self.temperature = temperature
         self.top_p = top_p
+        self.repetition_penalty = repetition_penalty
 
     def _resolve_generate_url(self) -> str:
         if self.endpoint_url.endswith("/generate"):
@@ -192,6 +256,7 @@ class FastApiLLMClient:
             "pergunta": pergunta,
             "contexto": contexto or "",
             "max_new_tokens": self.max_new_tokens,
+            "repetition_penalty": self.repetition_penalty,
         }
 
         try:
@@ -227,6 +292,7 @@ def build_llm_client(
     max_new_tokens: int = DEFAULT_MAX_TOKENS,
     temperature: float = DEFAULT_TEMPERATURE,
     top_p: float = DEFAULT_TOP_P,
+    repetition_penalty: float = DEFAULT_REPETITION_PENALTY,
 ) -> Any:
     """
     Constrói e retorna o cliente LLM adequado com base na URL e configuração.
@@ -259,6 +325,7 @@ def build_llm_client(
             max_new_tokens=max_new_tokens,
             temperature=temperature,
             top_p=top_p,
+            repetition_penalty=repetition_penalty,
         )
 
     logger.info(f"[LLM] Inicializando FastApiLLMClient para: {resolved_url}")
@@ -268,4 +335,5 @@ def build_llm_client(
         max_new_tokens=max_new_tokens,
         temperature=temperature,
         top_p=top_p,
+        repetition_penalty=repetition_penalty,
     )
