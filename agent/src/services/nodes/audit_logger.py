@@ -48,6 +48,7 @@ def audit_logger_node(state: dict) -> dict:
     sources_cited = state.get("sources_cited", [])
     has_disclaimer = state.get("has_disclaimer", False)
     preprocess_id = state.get("preprocess_id")
+    conversation_history = list(state.get("conversation_history", []))
 
     # Calcula a duração total do pipeline
     started_at = state.get("_started_at", time.time())
@@ -85,4 +86,6 @@ def audit_logger_node(state: dict) -> dict:
         **state,
         "audit_id": audit_id,
         "duration_ms": duration_ms,
+        "conversation_history": conversation_history
+        + [{"query": query, "response": final_response}],
     }

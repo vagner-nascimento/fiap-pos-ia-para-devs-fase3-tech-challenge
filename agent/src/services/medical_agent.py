@@ -32,6 +32,7 @@ O nó `audit_logger` é sempre o último nó executado, garantindo que toda
 interação seja registrada para auditoria independentemente do resultado.
 """
 import logging
+import os
 import time
 from typing import Any, Dict, List, Optional, TypedDict
 
@@ -58,6 +59,7 @@ class AgentState(TypedDict, total=False):
     session_id: str
     query: str
     preprocess_id: Optional[str]
+    conversation_history: List[Dict[str, str]]
 
     # --- Rastreamento interno ---
     _started_at: float
@@ -202,6 +204,29 @@ def _get_graph():
     return _compiled_graph
 
 
+def _get_session_history(graph: Any, session_id: str) -> List[Dict[str, str]]:
+    """Recupera o histórico persistido da sessão, quando há checkpointer."""
+    config = {
+        "configurable": {
+            "thread_id": session_id,
+        }
+    }
+
+    try:
+        snapshot = graph.get_state(config)
+    except Exception as exc:
+        logger.debug("[AGENT] Histórico indisponível para a sessão: %s", exc)
+        return []
+
+    history = snapshot.values.get("conversation_history", [])
+    if not isinstance(history, list):
+        return []
+
+    max_turns = max(0, int(os.getenv("AGENT_HISTORY_MAX_TURNS", "5")))
+    recent_history = history[-max_turns:] if max_turns else []
+    return [entry for entry in recent_history if isinstance(entry, dict)]
+
+
 # ---------------------------------------------------------------------------
 # Interface pública
 # ---------------------------------------------------------------------------
@@ -232,11 +257,13 @@ def run_medical_agent(
     o estado persistido da conversa no MongoDB.
     """
     graph = _get_graph()
+    conversation_history = _get_session_history(graph, session_id)
 
     initial_state: AgentState = {
         "session_id": session_id,
         "query": query,
         "preprocess_id": preprocess_id,
+        "conversation_history": conversation_history,
         # Defaults para campos opcionais
         "topic_valid": False,
         "topic_reason": "",
@@ -265,7 +292,6 @@ def run_medical_agent(
             config={
                 "configurable": {
                     "thread_id": session_id,
-                    "checkpoint_ns": "medical_agent",
                 }
             },
         )

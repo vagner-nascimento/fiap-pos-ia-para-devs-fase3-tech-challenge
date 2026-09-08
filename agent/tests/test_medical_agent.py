@@ -222,3 +222,28 @@ class TestMedicalAgentSessionMemory:
             "session-memory-001",
             "session-memory-002",
         ]
+
+    @patch("services.nodes.audit_logger.create_audit_log", side_effect=_mock_create_audit_log)
+    def test_historico_do_checkpoint_e_enviado_ao_grafo(self, mock_audit, monkeypatch):
+        import services.medical_agent as medical_agent
+
+        graph = MagicMock()
+        graph.get_state.return_value = SimpleNamespace(
+            values={
+                "conversation_history": [
+                    {"query": "O que é diabetes?", "response": "É uma condição metabólica."}
+                ]
+            }
+        )
+        graph.invoke.return_value = {"session_id": "session-memory-003"}
+        monkeypatch.setattr(medical_agent, "_get_graph", lambda: graph)
+
+        medical_agent.run_medical_agent(
+            query="Quais são os sintomas?",
+            session_id="session-memory-003",
+        )
+
+        state = graph.invoke.call_args.args[0]
+        assert state["conversation_history"] == [
+            {"query": "O que é diabetes?", "response": "É uma condição metabólica."}
+        ]

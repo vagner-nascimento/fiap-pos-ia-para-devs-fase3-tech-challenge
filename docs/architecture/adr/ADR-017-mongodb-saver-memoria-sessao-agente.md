@@ -26,7 +26,7 @@ A integração:
 - mantém o saver em singleton durante o processo;
 - armazena checkpoints nas collections `agent_checkpoints` e `agent_checkpoint_writes`;
 - usa o `session_id` recebido pela API como `configurable.thread_id`;
-- usa o namespace estável `medical_agent` para os checkpoints do grafo;
+- usa o namespace padrão do grafo, com o `session_id` como chave de isolamento;
 - mantém `agent_audit_logs` separado para auditoria de cada interação.
 
 A dependência é limitada à série `0.4.x` (`>=0.4.0,<0.5.0`) para preservar o suporte declarado a Python `>=3.10`.

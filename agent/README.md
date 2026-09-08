@@ -137,6 +137,7 @@ Definidas em `pyproject.toml`:
 | `langchain-mongodb`        | Integracao LangChain com MongoDB                                 |
 | `langchain-text-splitters` | Chunking de documentos                                           |
 | `langgraph`                | Orquestracao do pipeline como grafo dirigido                     |
+| `langgraph-checkpoint-mongodb` | Persistencia do estado e historico de sessoes do grafo        |
 | `gradio-client`            | Cliente de inferência para Hugging Face Spaces ZeroGPU (Gradio)  |
 | `requests`                 | Chamadas HTTP ao backend e ao endpoint LLM (FastAPI/ngrok)        |
 | `huggingface-hub`          | Autenticacao e integração com o ecossistema Hugging Face         |
@@ -168,6 +169,7 @@ cp agent/.env.example agent/.env
 | `AGENT_MAX_TOKENS`         | Numero maximo de tokens na resposta da LLM (calibrado para evitar truncamento e repetições) | `450` |
 | `AGENT_TEMPERATURE`        | Temperatura de amostragem (0.10 recomendado para precisao clinica e determinismo) | `0.10`                  |
 | `AGENT_TOP_P`              | Amostragem nucleus top_p (0.85 conservador para mitigar alucinações)     | `0.85`                  |
+| `AGENT_HISTORY_MAX_TURNS`  | Quantidade maxima de turnos anteriores incluidos no prompt da sessao     | `5`                     |
 | `RAG_TOP_K`                | Quantidade maxima de documentos RAG retornados                          | `5`                     |
 | `RAG_SIMILARITY_THRESHOLD` | Score minimo de similaridade para incluir documento                     | `0.25`                  |
 
@@ -464,6 +466,10 @@ Pos-processamento da resposta bruta da LLM:
 O grafo LangGraph usa `MongoDBSaver` para persistir o estado da conversa. O
 `session_id` enviado ao endpoint `/agent/chat` é usado como `thread_id`, então
 chamadas posteriores da mesma sessão reutilizam o mesmo thread persistido.
+
+As ultimas interacoes da sessao sao recuperadas do checkpoint e incluidas no
+prompt da LLM como `Historico da conversa`. O limite padrao e de cinco turnos e
+pode ser ajustado com `AGENT_HISTORY_MAX_TURNS`.
 
 Os checkpoints são armazenados nas collections `agent_checkpoints` e
 `agent_checkpoint_writes`. Eles são separados da collection `agent_audit_logs`,

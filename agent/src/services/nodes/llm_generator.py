@@ -13,7 +13,11 @@ from services.llm_client import build_llm_client
 logger = logging.getLogger(__name__)
 
 
-def _build_prompt(question: str, context: str = "") -> str:
+def _build_prompt(
+    question: str,
+    context: str = "",
+    conversation_history: list[dict[str, str]] | None = None,
+) -> str:
     """
     Constrói o prompt no formato EXATO utilizado durante o fine-tuning SFT
     do modelo hospital-helper-qwen2.5-1.5b.
@@ -32,6 +36,15 @@ def _build_prompt(question: str, context: str = "") -> str:
         "### Entrada:",
         f"Pergunta: {question}",
     ]
+    if conversation_history:
+        lines.extend(["", "### Historico da conversa:"])
+        for turn in conversation_history:
+            lines.extend(
+                [
+                    f"Usuario: {turn.get('query', '')}",
+                    f"Assistente: {turn.get('response', '')}",
+                ]
+            )
     if context:
         lines.extend(["Contexto:", context])
     lines.extend(["", "### Resposta:"])
@@ -98,10 +111,15 @@ def llm_generator_node(state: dict) -> dict:
     query = state.get("query", "")
     rag_context = state.get("rag_context", "")
     rag_documents = state.get("rag_documents", [])
+    conversation_history = state.get("conversation_history", [])
 
     logger.info(f"[LLM] Gerando resposta para: '{query[:80]}'")
 
-    prompt = _build_prompt(question=query, context=rag_context)
+    prompt = _build_prompt(
+        question=query,
+        context=rag_context,
+        conversation_history=conversation_history,
+    )
 
     llm = _get_llm_client()
 
