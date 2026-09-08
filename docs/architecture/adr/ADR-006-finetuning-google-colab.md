@@ -19,15 +19,19 @@ Alternativas avaliadas para contornar esta restrição de hardware:
 
 ## Decisão
 
-O fine-tuning do modelo foi realizado **externamente à aplicação**, utilizando **Jupyter Notebooks no Google Colab**, mantidos no repositório em `backend/src/notebooks/`:
+O fine-tuning e a avaliação do modelo foram realizados **externamente à aplicação**, utilizando **Jupyter Notebooks no Google Colab**, mantidos e documentados em `backend/src/notebooks/`:
 
 | Notebook | Finalidade |
 |---|---|
-| `FIAP_PosTech_IA4Devs_Fase3_TechChallenge_FineTunning.ipynb` | Pipeline completa de fine-tuning (carrega dados, configura LoRA, treina, salva no HuggingFace) |
-| `FIAP_PosTech_IA4Devs_Fase3_TechChallenge_RuntimeModelo_01.ipynb` | Testa o modelo fine-tunado carregado do HuggingFace |
-| `FIAP_PosTech_IA4Devs_Fase3_TechChallenge_TestesValidacoes.ipynb` | Validações e métricas do modelo treinado |
+| `FIAP_PosTech_IA4Devs_Fase3_TechChallenge_Modelo_v1.ipynb` | Fine-tuning inicial (v1.0 — 188 steps de aquecimento) |
+| `FIAP_PosTech_IA4Devs_Fase3_TechChallenge_Modelo_v2.ipynb` | Treinamento contínuo com checkpoints LoRA (início da linhagem v2.0) |
+| `FIAP_PosTech_IA4Devs_Fase3_TechChallenge_Modelo_v3.ipynb` e `v4.ipynb` | Refinamento contínuo de checkpoints e consolidação da linhagem canônica v2.0 |
+| `FIAP_PosTech_IA4Devs_Fase3_TechChallenge_RuntimeModelo_01.ipynb` | Servidor FastAPI + ngrok para inferência remota interativa |
+| `FIAP_PosTech_IA4Devs_Fase3_TechChallenge_TestesValidacoes.ipynb` | Validação clínica qualitativa e testes pontuais de sanidade |
+| `FIAP_PosTech_IA4Devs_Fase3_TechChallenge_AvaliacaoModelos.ipynb` | Pipeline de avaliação quantitativa formal (ROUGE-1/2/L, BLEU-1/2/3/4, latência) com dataset golden test |
+| `..._AvaliacaoModelos_Config[A|B|C].ipynb` | Execuções completas com outputs e gráficos para calibração de decodificação |
 
-O modelo treinado é publicado como **repositório privado no HuggingFace Hub** (`fiap-hospital-helper/hospital-helper-qwen2.5-1.5b`).
+O modelo treinado é publicado como **repositório público no HuggingFace Hub** ([`fiap-hospital-helper/hospital-helper-qwen2.5-1.5b`](https://huggingface.co/fiap-hospital-helper/hospital-helper-qwen2.5-1.5b)), com a tag `v2.0` como versão oficial de produção.
 
 ## Justificativa
 

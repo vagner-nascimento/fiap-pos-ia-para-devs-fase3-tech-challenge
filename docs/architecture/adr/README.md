@@ -23,8 +23,9 @@
 | [ADR-011](ADR-011-langgraph-medical-agent.md) | LangGraph como orquestrador do agente médico | ✅ Aceito | 2026-08-19 |
 | [ADR-012](ADR-012-arquitetura-hibrida-inferencia-llm.md) | Arquitetura híbrida de inferência LLM (HF Spaces / ngrok) | ✅ Aceito | 2026-08-29 |
 | [ADR-013](ADR-013-desacoplamento-guardrails-template-sft.md) | Desacoplamento de guardrails e preservação do template SFT | ✅ Aceito | 2026-08-29 |
-| [ADR-014](ADR-011-skip-preprocess-translation.md) | Opção de pular a tradução no pré-processamento | ✅ Aceito | 2026-08-28 |
+| [ADR-014](ADR-014-skip-preprocess-translation.md) | Opção de pular a tradução no pré-processamento | ✅ Aceito | 2026-08-28 |
 | [ADR-015](ADR-015-anonimizacao-laudos-lgpd.md) | Anonimização de laudos médicos antes da RAG | ✅ Aceito | 2026-09-03 |
+| [ADR-016](ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md) | Metodologia de avaliação empírica e calibração de decodificação LLM | ✅ Aceito | 2026-09-07 |
 
 ---
 

@@ -37,9 +37,10 @@ def test_get_translator_uses_seq2seq_components(monkeypatch):
 
     result = translator("hello")
     assert result == [{"translation_text": "Olá, mundo!"}]
-    assert generate_kwargs["max_new_tokens"] == 256
-    assert generate_kwargs["num_beams"] == 1
+    assert generate_kwargs["max_new_tokens"] == step_three_translation._MAX_NEW_TOKENS
+    assert generate_kwargs["num_beams"] == 4
     assert generate_kwargs["do_sample"] is False
+    assert generate_kwargs["no_repeat_ngram_size"] == 4
 
 
 def test_translate_creates_translated_files(tmp_path, monkeypatch):

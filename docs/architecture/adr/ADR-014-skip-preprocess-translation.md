@@ -1,4 +1,4 @@
-# ADR-011 — Opção de pular a tradução no pré-processamento
+# ADR-014 — Opção de pular a tradução no pré-processamento
 
 **Status:** Aceito
 **Data:** 2026-08-28

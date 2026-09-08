@@ -165,11 +165,13 @@ cp agent/.env.example agent/.env
 | `LLM_ENDPOINT_URL`         | URL do Space Gradio ou endpoint FastAPI/ngrok                           | —                       |
 | `LLM_API_TOKEN`            | Token de autenticacao HuggingFace (necessario para Spaces privados)     | —                       |
 | `BACKEND_API_URL`          | URL interna do backend para consultas RAG                               | `http://localhost:3000` |
-| `AGENT_MAX_TOKENS`         | Numero maximo de tokens na resposta da LLM                              | `512`                   |
-| `AGENT_TEMPERATURE`        | Temperatura de amostragem (0 = deterministico)                          | `0.3`                   |
-| `AGENT_TOP_P`              | Amostragem nucleus top_p                                                | `0.9`                   |
+| `AGENT_MAX_TOKENS`         | Numero maximo de tokens na resposta da LLM (calibrado para evitar truncamento e repetições) | `450` |
+| `AGENT_TEMPERATURE`        | Temperatura de amostragem (0.10 recomendado para precisao clinica e determinismo) | `0.10`                  |
+| `AGENT_TOP_P`              | Amostragem nucleus top_p (0.85 conservador para mitigar alucinações)     | `0.85`                  |
 | `RAG_TOP_K`                | Quantidade maxima de documentos RAG retornados                          | `5`                     |
 | `RAG_SIMILARITY_THRESHOLD` | Score minimo de similaridade para incluir documento                     | `0.25`                  |
+
+> **Calibração de Hiperparâmetros:** Os valores padrão de decodificação acima foram empiricamente validados na avaliação formal do modelo (GAP02 / M10), detalhada em [docs/avaliacao-modelo.md](../docs/avaliacao-modelo.md) e [ADR-016](../docs/architecture/adr/ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md). Essa configuração reduziu a latência média em 57% e eliminou loops de repetição degenerativa.
 
 > Com Docker Compose, `MONGODB_HOST` deve ser `mongodb` e `BACKEND_API_URL` deve ser `http://fiap-pos-ia-backend:3000`.
 

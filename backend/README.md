@@ -1,11 +1,12 @@
 # FIAP POS IA - Backend
 
-API REST em FastAPI responsavel pelo pre-processamento dos datasets medicos e geracao da base RAG. O fine-tuning do modelo e executado exclusivamente no Google Colab pelos notebooks versionados no repositorio, devido as limitacoes de hardware local.
+API REST em FastAPI responsavel pelo pre-processamento dos datasets medicos e geracao da base RAG. O fine-tuning e a avaliacao quantitativa do modelo sao executados no Google Colab pelos notebooks versionados no repositorio ([`docs/avaliacao-modelo.md`](../docs/avaliacao-modelo.md)), devido as limitacoes de hardware local.
 
 - QAs, a partir de PubMedQA e MedQuAD;
 - protocolos clinicos FHEMIG e PCDT, com extracao de texto dos PDFs;
 - laudos medicos estruturados e sintaticos, usados como base de conhecimento;
 - traducao dos QAs para pt-BR com um modelo local de machine translation;
+- conjunto curado de avaliacao e metricas ROUGE/BLEU (`datasets/evaluation/`);
 
 O progresso de cada execucao e persistido no MongoDB.
 
@@ -48,6 +49,11 @@ src/
 |   `-- rag_database.py      # Logica sincrona de geracao da base RAG
 |   `-- preprocess/
 |       `-- step_three_translation.py   # Traducao local dos QAs
+|-- notebooks/           # Notebooks Colab para fine-tuning e avaliacao de modelos
+|   |-- README.md        # Documentacao de linhagem de modelos e execucao
+|   |-- FIAP_..._Modelo_v1.ipynb a v4.ipynb  # Linhagem de treino (v1.0 e v2.0)
+|   |-- FIAP_..._RuntimeModelo_01.ipynb     # Servidor de inferencia ngrok
+|   `-- FIAP_..._AvaliacaoModelos*.ipynb   # Avaliacao formal ROUGE/BLEU (Configs A/B/C)
 `-- infra/
     `-- database/
         |-- mongodb.py           # Conexao singleton com MongoDB
@@ -58,11 +64,8 @@ src/
 datasets/
 |-- get_datasets.py      # Clone do PubMedQA/MedQuAD e download dos protocolos clinicos
 |-- files/               # Datasets baixados em runtime
+|-- evaluation/          # Dataset golden_test_qa.json (50 casos) e metricas calculadas
 `-- preprocessed/        # Arquivos JSON gerados em runtime
-
-models/
-|-- hospital_helper/     # Modelo fine-tuned gerado
-`-- hospital_helper_tokenizer/  # Tokenizer do modelo fine-tuned
 ```
 
 O processamento pesado roda em background task do FastAPI. O endpoint POST /preprocess retorna imediatamente com o ID da execucao, e o cliente consulta o progresso via GET /preprocess/{id}.
@@ -465,9 +468,16 @@ backend/
 |-- pyproject.toml
 |-- uv.lock
 |-- src/
+|   |-- main.py
+|   |-- server.py
+|   |-- routers/
+|   |-- services/
+|   |-- infra/
+|   `-- notebooks/
 `-- datasets/
     |-- get_datasets.py
     |-- files/
+    |-- evaluation/
     `-- preprocessed/
 ```
 

@@ -18,6 +18,8 @@ Arquivos **versionados no repositorio** (fonte de verdade compartilhada):
 
 - `backend/datasets/files/pcdt/pcdt.zip` (Git LFS)
 - `backend/datasets/files/laudos_medicos/dataset_laudos_medicos.json`
+- `backend/datasets/evaluation/golden_test_qa.json` (Dataset curado de 50 casos clínicos em pt-BR com ground truth para avaliação formal)
+- `backend/datasets/evaluation/metrics_evaluation*.json` (Métricas consolidadas ROUGE-1/2/L, BLEU-1..4 e latência por configuração)
 
 Arquivos **gerados em runtime** (ignorados pelo git):
 
@@ -96,6 +98,12 @@ backend/datasets/
 |   |   `-- data/
 |   `-- laudos_medicos/
 |       `-- dataset_laudos_medicos.json
+|-- evaluation/
+|   |-- golden_test_qa.json
+|   |-- metrics_evaluation.json
+|   |-- metrics_evaluation_configA.json
+|   |-- metrics_evaluation_configB.json
+|   `-- metrics_evaluation_configC.json
 `-- preprocessed/
     |-- qas/
     |-- clinical_protocols/
@@ -113,3 +121,4 @@ backend/datasets/
 - Identificadores do laudo, nome do paciente, medico solicitante e CRM nao sao indexados. O arquivo bruto permanece somente como fonte de entrada do processamento e deve ser tratado conforme os controles de acesso e armazenamento do projeto.
 - O pré-processamento atual não recebe percentual de split. PubMedQA e MedQuAD são normalizados em `preprocessed/qas/qas_train.json`; os protocolos clínicos (FHEMIG + PCDT) são extraídos dos PDFs e salvos em `preprocessed/clinical_protocols/clinical_protocols_rag.json`.
 - A etapa seguinte traduz todos os QAs para pt-BR e grava `preprocessed/qas/qas_train_pt_br.json`. A tradução preserva `metadata` e traduz `question`, `contexts` textuais e `answer`.
+- **Dataset e Métricas de Avaliação (`evaluation/`):** Contém o arquivo `golden_test_qa.json` com 50 casos clínicos desafiadores e os arquivos de métricas `metrics_evaluation*.json` resultantes da avaliação formal do modelo fine-tunado no Google Colab. Para detalhes das métricas e conclusões de calibração, consulte [docs/avaliacao-modelo.md](../../docs/avaliacao-modelo.md) e [ADR-016](../../docs/architecture/adr/ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md).

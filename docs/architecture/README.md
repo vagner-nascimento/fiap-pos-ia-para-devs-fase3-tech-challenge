@@ -35,9 +35,9 @@ O fluxo central da aplicação é:
 2. O backend recebe a requisição, cria um documento de rastreamento no MongoDB e dispara a pipeline em background.
 3. A pipeline baixa ou reutiliza os datasets (PubMedQA, MedQuAD, protocolos FHEMIG e PCDT), extrai os dados em artefatos JSON/PDF e traduz os QAs para português quando necessário.
 4. O usuário pode acompanhar o progresso em tempo real via polling do frontend e, em seguida, gerar e consultar a base RAG.
-5. Com os dados pré-processados, o fine-tuning do modelo Qwen2.5-1.5B-Instruct é executado exclusivamente via Jupyter Notebooks no Google Colab.
+5. Com os dados pré-processados, o fine-tuning e a avaliação formal do modelo Qwen2.5-1.5B-Instruct são executados exclusivamente via Jupyter Notebooks no Google Colab.
 
-> **Nota sobre fine-tuning:** Devido a restrições de hardware local, o fine-tuning do modelo foi executado no Google Colab. O modelo treinado está disponível como repositório privado no HuggingFace. Para servir o modelo em produção, utiliza-se HuggingFace Spaces com ZeroGPU.
+> **Nota sobre fine-tuning e avaliação:** Devido a restrições de hardware local, o treinamento e a avaliação quantitativa do modelo foram executados no Google Colab. O modelo treinado está disponível publicamente no HuggingFace Hub ([`fiap-hospital-helper/hospital-helper-qwen2.5-1.5b`](https://huggingface.co/fiap-hospital-helper/hospital-helper-qwen2.5-1.5b), tag oficial `v2.0`). O relatório completo com métricas ROUGE/BLEU e calibração de decodificação está documentado em [docs/avaliacao-modelo.md](../avaliacao-modelo.md). Para servir o modelo em produção, utiliza-se HuggingFace Spaces com ZeroGPU.
 
 ---
 
@@ -333,4 +333,6 @@ As decisões técnicas que moldaram esta arquitetura estão documentadas como **
 | [ADR-011](adr/ADR-011-langgraph-medical-agent.md)                | LangGraph como orquestrador do agente médico               | ✅ Aceito     |
 | [ADR-012](adr/ADR-012-arquitetura-hibrida-inferencia-llm.md)     | Arquitetura híbrida de inferência LLM (HF Spaces / ngrok)  | ✅ Aceito     |
 | [ADR-013](adr/ADR-013-desacoplamento-guardrails-template-sft.md) | Desacoplamento de guardrails e preservação do template SFT | ✅ Aceito     |
-| [ADR-014](adr/ADR-011-skip-preprocess-translation.md)            | Opção de pular a tradução no pré-processamento             | ✅ Aceito     |
+| [ADR-014](adr/ADR-014-skip-preprocess-translation.md)            | Opção de pular a tradução no pré-processamento             | ✅ Aceito     |
+| [ADR-015](adr/ADR-015-anonimizacao-laudos-lgpd.md)               | Anonimização de laudos médicos antes da RAG                | ✅ Aceito     |
+| [ADR-016](adr/ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md) | Metodologia de avaliação empírica e calibração de decodificação LLM | ✅ Aceito |
