@@ -459,6 +459,18 @@ Pos-processamento da resposta bruta da LLM:
 
 ## Auditoria e explainability
 
+### Memória de sessão
+
+O grafo LangGraph usa `MongoDBSaver` para persistir o estado da conversa. O
+`session_id` enviado ao endpoint `/agent/chat` é usado como `thread_id`, então
+chamadas posteriores da mesma sessão reutilizam o mesmo thread persistido.
+
+Os checkpoints são armazenados nas collections `agent_checkpoints` e
+`agent_checkpoint_writes`. Eles são separados da collection `agent_audit_logs`,
+que continua registrando uma auditoria por interação. O estado persistido pode
+conter a query, o contexto RAG e a resposta clínica; configure a retenção e o
+acesso ao MongoDB de acordo com os requisitos de privacidade do ambiente.
+
 Toda interacao — incluindo as bloqueadas pelos guardrails — e persistida na collection MongoDB `agent_audit_logs` com os seguintes campos:
 
 | Campo                 | Descricao                                             |

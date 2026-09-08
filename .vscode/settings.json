@@ -3,6 +3,14 @@
         "/^c:/code/fiap-pos-ia/fase-3/fiap-pos-ia-para-devs-fase3-tech-challenge/\\.venv/Scripts/python\\.exe -m pytest backend/tests/test_preprocess_data\\.py$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^cd agent && uv run --with 'langgraph-checkpoint-mongodb==0\\.4\\.0' python -c \"import inspect; from langgraph\\.checkpoint\\.mongodb import MongoDBSaver; print\\(inspect\\.signature\\(MongoDBSaver\\)\\); print\\(inspect\\.signature\\(MongoDBSaver\\.from_conn_string\\)\\); print\\(inspect\\.getsource\\(MongoDBSaver\\.__init__\\)\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd agent && uv lock$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     }
 }

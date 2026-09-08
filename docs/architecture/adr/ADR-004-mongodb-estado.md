@@ -1,8 +1,8 @@
-# ADR-004 — MongoDB como banco de estado do processamento
+# ADR-004 — MongoDB como banco de estado do processamento e dos serviços
 
 **Status:** Aceito  
 **Data:** 2026-08-18  
-**Contexto:** Projeto FIAP POS IA Fase 3 — Rastreamento de estado da pipeline de pré-processamento
+**Contexto:** Projeto FIAP POS IA Fase 3 — Rastreamento de estado da pipeline e persistência dos serviços
 **Decisores:** Equipe do projeto  
 
 ---
@@ -25,6 +25,13 @@ Utilizamos **MongoDB** como banco de dados para persistência do estado das pipe
 | Coleção | Finalidade |
 |---|---|
 | `preprocess` | Documentos de rastreamento do pré-processamento (steps, progresso, resultados) |
+| `agent_checkpoints` | Estado persistido dos threads do LangGraph pelo `MongoDBSaver` |
+| `agent_checkpoint_writes` | Escritas pendentes associadas aos checkpoints do agente |
+| `agent_audit_logs` | Auditoria das interações do agente médico |
+
+Os checkpoints do agente e os logs de auditoria possuem schemas e responsabilidades
+distintos. A decisão específica sobre a memória de sessão está documentada na
+[ADR-017](ADR-017-mongodb-saver-memoria-sessao-agente.md).
 
 ### Exemplo de documento `preprocess`
 

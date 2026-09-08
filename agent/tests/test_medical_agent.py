@@ -14,8 +14,10 @@ Verifica o comportamento end-to-end do grafo LangGraph:
 """
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
+import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 
@@ -42,9 +44,7 @@ MOCK_LLM_RESPONSE = (
 
 def _make_mock_llm():
     """Cria um mock do cliente LLM."""
-    llm = MagicMock()
-    llm.invoke.return_value = MOCK_LLM_RESPONSE
-    return llm
+    return SimpleNamespace(invoke=lambda prompt: MOCK_LLM_RESPONSE)
 
 
 def _mock_rag_query(*args, **kwargs):
@@ -55,6 +55,22 @@ def _mock_rag_query(*args, **kwargs):
 def _mock_create_audit_log(**kwargs):
     """Mock do persist de auditoria no MongoDB."""
     return {"_id": "mock-audit-id-123", **kwargs}
+
+
+@pytest.fixture(autouse=True)
+def _isolated_graph(monkeypatch):
+    """Desabilita o MongoDBSaver nos testes unitários do pipeline."""
+    import services.medical_agent as medical_agent
+
+    medical_agent._compiled_graph = None
+    monkeypatch.setattr(medical_agent, "get_checkpointer", lambda: None)
+    monkeypatch.setattr(
+        medical_agent,
+        "_get_graph",
+        lambda: medical_agent._build_graph(None),
+    )
+    yield
+    medical_agent._compiled_graph = None
 
 
 # ---------------------------------------------------------------------------
@@ -179,3 +195,30 @@ class TestMedicalAgentSafetyRejection:
             word in response_lower
             for word in ["médico", "medico", "profissional", "saúde"]
         )
+
+
+class TestMedicalAgentSessionMemory:
+    """Verifica que o session_id é transmitido como identidade do thread."""
+
+    @patch("services.nodes.audit_logger.create_audit_log", side_effect=_mock_create_audit_log)
+    def test_session_id_isola_checkpoints(self, mock_audit, _isolated_graph, monkeypatch):
+        import services.medical_agent as medical_agent
+
+        graph = MagicMock()
+        graph.invoke.return_value = {"session_id": "session-memory-001"}
+        monkeypatch.setattr(medical_agent, "_get_graph", lambda: graph)
+
+        medical_agent.run_medical_agent(
+            query="Quais são os sintomas da tuberculose?",
+            session_id="session-memory-001",
+        )
+        medical_agent.run_medical_agent(
+            query="Quais são os sintomas da pneumonia?",
+            session_id="session-memory-002",
+        )
+
+        configs = [call.kwargs["config"] for call in graph.invoke.call_args_list]
+        assert [config["configurable"]["thread_id"] for config in configs] == [
+            "session-memory-001",
+            "session-memory-002",
+        ]

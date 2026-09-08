@@ -37,6 +37,7 @@ from typing import Any, Dict, List, Optional, TypedDict
 
 from langgraph.graph import END, START, StateGraph
 
+from infra.database.checkpointer import get_checkpointer
 from services.nodes.audit_logger import audit_logger_node
 from services.nodes.llm_generator import llm_generator_node
 from services.nodes.rag_retriever import rag_retriever_node
@@ -132,9 +133,11 @@ def _init_node(state: AgentState) -> AgentState:
 # ---------------------------------------------------------------------------
 # Construção do grafo
 # ---------------------------------------------------------------------------
-def _build_graph() -> StateGraph:
+def _build_graph(checkpointer=None):
     """
     Constrói e compila o grafo LangGraph do agente médico.
+
+    O checkpointer mantém o estado associado ao `thread_id` entre invocações.
 
     Returns:
         StateGraph compilado e pronto para execução.
@@ -182,7 +185,7 @@ def _build_graph() -> StateGraph:
     # Finalização
     graph.add_edge("audit_logger", END)
 
-    return graph.compile()
+    return graph.compile(checkpointer=checkpointer)
 
 
 # Grafo compilado (singleton)
@@ -194,7 +197,7 @@ def _get_graph():
     global _compiled_graph
     if _compiled_graph is None:
         logger.info("[GRAPH] Compilando grafo LangGraph do agente médico...")
-        _compiled_graph = _build_graph()
+        _compiled_graph = _build_graph(get_checkpointer())
         logger.info("[GRAPH] Grafo compilado com sucesso.")
     return _compiled_graph
 
@@ -224,6 +227,9 @@ def run_medical_agent(
         - `requires_human_validation`: Sempre True
         - `audit_id`: ID do log de auditoria criado
         - `duration_ms`: Tempo total de execução
+
+    O `session_id` também é usado como `thread_id` do LangGraph para recuperar
+    o estado persistido da conversa no MongoDB.
     """
     graph = _get_graph()
 
@@ -254,7 +260,15 @@ def run_medical_agent(
     )
 
     try:
-        final_state = graph.invoke(initial_state)
+        final_state = graph.invoke(
+            initial_state,
+            config={
+                "configurable": {
+                    "thread_id": session_id,
+                    "checkpoint_ns": "medical_agent",
+                }
+            },
+        )
         logger.info(
             f"[AGENT] Pipeline concluído: audit_id={final_state.get('audit_id')} "
             f"duration_ms={final_state.get('duration_ms')}"

@@ -27,7 +27,7 @@ A solução é uma aplicação **full-stack** composta por quatro camadas princi
 | **Frontend**       | React + TypeScript + Vite    | Interface web para iniciar, monitorar e consultar o pipeline de dados e a base RAG |
 | **Backend**        | Python + FastAPI             | API REST, orquestração das pipelines de dados, RAG e fine-tuning                   |
 | **Agente Médico**  | Python + FastAPI + LangGraph | Assistente médico com RAG, guardrails de segurança e auditoria                     |
-| **Banco de dados** | MongoDB                      | Persistência do estado das execuções e logs de auditoria                           |
+| **Banco de dados** | MongoDB                      | Persistência do estado das execuções, checkpoints do agente e logs de auditoria    |
 
 O fluxo central da aplicação é:
 
@@ -84,7 +84,7 @@ C4Container
         Container(frontend, "Frontend", "React + TypeScript + Vite\nNginx (produção)", "Interface web para iniciar e monitorar processamento e consultar a base RAG")
         Container(backend, "Backend API", "Python 3.11 + FastAPI + Uvicorn", "REST API: orquestra pré-processamento, RAG e rastreamento de estado")
         Container(agent, "Agente Médico", "Python 3.11 + FastAPI + LangGraph", "Assistente médico com RAG, guardrails de segurança e audit logging — porta 8001")
-        ContainerDb(mongodb, "MongoDB", "MongoDB (Docker)", "Armazena documentos de rastreamento de preprocess e agent_audit_logs")
+        ContainerDb(mongodb, "MongoDB", "MongoDB (Docker)", "Armazena preprocess, checkpoints do agente e agent_audit_logs")
         Container(datasets_fs, "Sistema de Arquivos / Datasets", "Volume Docker", "Armazena datasets brutos e pré-processados")
     }
 
@@ -96,7 +96,7 @@ C4Container
     Rel(frontend, agent, "Consultas ao agente médico", "HTTP :8001")
     Rel(backend, mongodb, "Lê / Grava estado", "MongoDB Wire Protocol :27017")
     Rel(backend, datasets_fs, "Lê/Grava datasets", "I/O local")
-    Rel(agent, mongodb, "Persiste audit_logs e consulta RAG", "MongoDB Wire Protocol :27017")
+    Rel(agent, mongodb, "Persiste checkpoints e audit_logs", "MongoDB Wire Protocol :27017")
     Rel(agent, backend, "Consulta base RAG", "HTTP /rag-database/query")
     Rel(agent, huggingface, "Inferência LLM via ZeroGPU", "HTTPS")
     Rel(agent, colab, "Inferência LLM via ngrok (dev)", "HTTPS")
@@ -282,12 +282,16 @@ sequenceDiagram
     participant LLM as llm_generator
     participant FMT as response_formatter
     participant AUD as audit_logger
+    participant CP as MongoDBSaver
     participant DB as MongoDB
     participant BE as Backend API (/rag-database)
     participant HF as HuggingFace / ngrok
 
     U->>API: POST /agent/chat { session_id, query }
-    API->>TV: invoke(state)
+    API->>CP: Recupera checkpoint por thread_id=session_id
+    CP->>DB: read agent_checkpoints
+    DB-->>CP: estado persistido ou vazio
+    API->>TV: invoke(state, thread_id=session_id)
     TV-->>API: topic_valid=true
     API->>SG: invoke(state)
     SG-->>API: safety_triggered=false
@@ -306,6 +310,9 @@ sequenceDiagram
     AUD->>DB: insert agent_audit_logs
     DB-->>AUD: { _id: audit_id }
     AUD-->>API: audit_id, duration_ms
+    API->>CP: Persiste checkpoint do thread
+    CP->>DB: write agent_checkpoints / agent_checkpoint_writes
+    DB-->>CP: checkpoint persistido
     API-->>U: { response, sources, topic_valid, audit_id, ... }
 
     Note over TV,SG: Se query inválida ou guardrail ativado,
@@ -336,3 +343,4 @@ As decisões técnicas que moldaram esta arquitetura estão documentadas como **
 | [ADR-014](adr/ADR-014-skip-preprocess-translation.md)            | Opção de pular a tradução no pré-processamento             | ✅ Aceito     |
 | [ADR-015](adr/ADR-015-anonimizacao-laudos-lgpd.md)               | Anonimização de laudos médicos antes da RAG                | ✅ Aceito     |
 | [ADR-016](adr/ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md) | Metodologia de avaliação empírica e calibração de decodificação LLM | ✅ Aceito |
+| [ADR-017](adr/ADR-017-mongodb-saver-memoria-sessao-agente.md)    | MongoDBSaver para memória de sessão do agente médico       | ✅ Aceito     |

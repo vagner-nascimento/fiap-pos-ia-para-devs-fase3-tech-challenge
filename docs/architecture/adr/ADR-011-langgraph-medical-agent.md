@@ -19,7 +19,7 @@ As opções consideradas foram: LangChain simples (LLMChain/RetrievalQA), LangCh
 
 ## Decisão
 
-Utilizamos **LangGraph** (`langgraph>=0.1.0`) para orquestrar o pipeline do agente médico como um `StateGraph` compilado com 6 nós.
+Utilizamos **LangGraph** (`langgraph>=0.1.0`) para orquestrar o pipeline do agente médico como um `StateGraph` compilado com 6 nós. O grafo usa `MongoDBSaver` para persistir o estado por sessão; o `session_id` da API é enviado como `configurable.thread_id`.
 
 ## Justificativa
 
@@ -85,6 +85,7 @@ O LangGraph permite definir **roteamento condicional** explícito: quando o vali
 
 ### Positivas
 - Pipeline completamente auditável (todos os campos persistidos no MongoDB)
+- Estado do grafo persistido por sessão, permitindo continuidade entre invocações
 - Early-exit eficiente: LLM não é invocada para perguntas inválidas
 - Cada nó é uma função pura testável isoladamente
 - Extensível: novos nós podem ser adicionados sem reescrever o pipeline
@@ -93,11 +94,17 @@ O LangGraph permite definir **roteamento condicional** explícito: quando o vali
 - LangGraph adiciona dependência adicional ao projeto
 - A compilação do grafo (`graph.compile()`) adiciona ~100ms no primeiro request (singleton mitiga nos seguintes)
 - Maior complexidade de setup inicial comparado a uma simples LLMChain
+- O estado persistido pode conter dados clínicos e requer controles de retenção e acesso
 
 ## Alternativas Rejeitadas
 
 - **LLMChain simples**: Sem suporte a early-exit; toda query passaria pela LLM mesmo sendo inválida. Auditoria requereria wrappers adicionais.
 - **ReAct Agent**: Loop interno do agente dificulta controle preciso do fluxo e torna os testes de guardrails mais complexos.
+
+## Persistência de sessão
+
+A persistência nativa do estado do grafo e a separação entre checkpoints e auditoria
+estão detalhadas na [ADR-017](ADR-017-mongodb-saver-memoria-sessao-agente.md).
 
 ## Referências
 
