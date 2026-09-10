@@ -20,12 +20,15 @@ O frontend permite:
 1. iniciar o pré-processamento de QAs (PubMedQA, MedQuAD), protocolos clínicos (FHEMIG e PCDT) e laudos médicos;
 2. acompanhar o progresso com polling a cada 5 segundos;
 3. visualizar os resultados separados para `QAs`, `clinical_protocols` e laudos anonimizados;
-4. gerar a base RAG a partir de um pré-processamento concluído;
-5. realizar consultas semânticas por similaridade na base RAG (RAG Query);
-6. enviar perguntas ao Assistente Médico, com filtro opcional por `preprocess_id`, resposta contextualizada e fontes consultadas;
-7. visualizar bloqueios de segurança quando a solicitação exigir avaliação de um profissional de saúde.
+4. visualizar o relatório da curadoria automática, com totais aceitos/rejeitados e motivos por fonte;
+5. gerar a base RAG a partir de um pré-processamento concluído;
+6. realizar consultas semânticas por similaridade na base RAG (RAG Query);
+7. enviar perguntas ao Assistente Médico, com filtro opcional por `preprocess_id`, resposta contextualizada e fontes consultadas;
+8. visualizar bloqueios de segurança quando a solicitação exigir avaliação de um profissional de saúde.
 
 A aplicacao e uma SPA servida pelo Vite em desenvolvimento e pelo nginx em producao.
+
+Ao abrir ou atualizar a aplicação, a tela inicial é `Pre Processing`. Nessa tela, o checkbox `Pular etapa da tradução` vem marcado por padrão para permitir uma execução mais rápida usando o dataset pt-BR fixado; o usuário pode desmarcá-lo para executar a tradução local.
 
 ## Arquitetura
 
@@ -149,6 +152,7 @@ flowchart TD
 | Checkbox Pular Tradução | Envia `skip_translation: true` para a API, pulando a etapa demorada de tradução |
 | Status badge | Mostra o status atual da execucao |
 | Contadores | Exibe `qas_count` e `clinical_protocols_count` em pt-BR |
+| Relatório da Curadoria | Exibe versão dos critérios, total avaliado, aceitos, rejeitados e motivos por fonte |
 | Barra de progresso | Mostra `completion_percentage` |
 | Resposta da API | JSON bruto retornado pelo backend |
 

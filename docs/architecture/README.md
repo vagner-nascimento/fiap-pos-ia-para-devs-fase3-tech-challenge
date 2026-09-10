@@ -33,7 +33,7 @@ O fluxo central da aplicação é:
 
 1. O usuário acessa o frontend e inicia o pré-processamento sem parâmetros.
 2. O backend recebe a requisição, cria um documento de rastreamento no MongoDB e dispara a pipeline em background.
-3. A pipeline baixa ou reutiliza os datasets (PubMedQA, MedQuAD, protocolos FHEMIG e PCDT), extrai os dados em artefatos JSON/PDF e traduz os QAs para português quando necessário.
+3. A pipeline baixa ou reutiliza os datasets (PubMedQA, MedQuAD, protocolos FHEMIG e PCDT), aplica curadoria automática versionada, extrai os dados em artefatos JSON/PDF e traduz os QAs para português quando necessário.
 4. O usuário pode acompanhar o progresso em tempo real via polling do frontend e, em seguida, gerar e consultar a base RAG.
 5. Com os dados pré-processados, o fine-tuning e a avaliação formal do modelo Qwen2.5-1.5B-Instruct são executados exclusivamente via Jupyter Notebooks no Google Colab.
 
@@ -122,6 +122,7 @@ C4Component
 
         Component(step1, "services/preprocess/step_one_download_datasets.py", "Step", "Baixa PubMedQA, MedQuAD, PDFs FHEMIG e carrega laudos locais")
         Component(step2, "services/preprocess/step_two_data_extraction.py", "Step", "Extrai QAs e protocolos em arquivos JSON únicos")
+        Component(curation, "step_two_data_extraction.py", "Curation", "Aplica curation-v1 e gera curation_report.json com aceitos, rejeitados e motivos por fonte")
         Component(step3, "services/preprocess/step_three_translation.py", "Step", "Traduz question, contexts e answer dos QAs para pt-BR")
         Component(step4, "services/preprocess/step_four_anonymization.py", "Step", "Anonimiza campos pessoais dos laudos médicos")
         Component(svc_rag, "services/rag_database.py", "Service", "Serializa, divide, embeda e persiste protocolos e laudos anonimizados")
@@ -136,6 +137,7 @@ C4Component
     Rel(router_preprocess, svc_preprocess, "Chama")
     Rel(svc_preprocess, step1, "Executa Step 1")
     Rel(svc_preprocess, step2, "Executa Step 2")
+    Rel(step2, curation, "Valida e contabiliza")
     Rel(svc_preprocess, step3, "Executa Step 3")
     Rel(svc_preprocess, step4, "Executa Step 4")
     Rel(server, svc_rag, "Gera e consulta RAG")
@@ -245,7 +247,8 @@ sequenceDiagram
 
     BG->>DB: update_step_status("two_data_extraction", "in_progress")
     BG->>S2: extract_data(doc_id, qas_paths, clinical_protocols_paths)
-    S2-->>BG: qas_train_path, qas_count, clinical_protocols_rag_path, clinical_protocols_count, medical_reports_path
+    S2->>S2: Aplica curation-v1 por fonte
+    S2-->>BG: artefatos + curation_report.json + estatísticas
     BG->>DB: update_step_status("two_data_extraction", "completed")
 
     BG->>DB: update_step_status("three_translating", "in_progress")

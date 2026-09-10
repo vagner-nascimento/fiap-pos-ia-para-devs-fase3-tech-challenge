@@ -135,3 +135,5 @@ O Step 2 aplica os critérios versionados `curation-v1` aos QAs e aos protocolos
 Cada execução que realiza a extração gera `preprocessed/curation_report.json`, contendo entradas, aceitos, rejeitados e motivos de rejeição por fonte. O mesmo relatório é associado ao `preprocess_id` em `results.curation` e é obrigatório para que os artefatos sejam considerados um cache válido.
 
 Essa contagem representa registros de origem aceitos ou rejeitados. Ela não deve ser confundida com a quantidade posterior de documentos ou chunks gerados na base RAG. A revisão manual de amostras deve ser registrada separadamente como evidência de curadoria humana; o `golden_test_qa.json` é um conjunto de avaliação e não substitui essa revisão.
+
+O relatório é associado ao documento MongoDB da execução em `results.curation`, e seu caminho aparece em `results.curation_report_path`. Quando o cache não possui esse relatório ou usa uma versão diferente de `curation-v1`, a pipeline refaz a extração para evitar apresentar artefatos antigos como evidência da curadoria atual.

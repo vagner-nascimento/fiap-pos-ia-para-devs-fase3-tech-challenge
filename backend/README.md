@@ -6,6 +6,7 @@ API REST em FastAPI responsavel pelo pre-processamento dos datasets medicos e ge
 - protocolos clinicos FHEMIG e PCDT, com extracao de texto dos PDFs;
 - laudos medicos estruturados e sintaticos, usados como base de conhecimento;
 - traducao dos QAs para pt-BR com um modelo local de machine translation;
+- curadoria automatica versionada dos registros, com relatorio de aceitos, rejeitados e motivos por fonte;
 - conjunto curado de avaliacao e metricas ROUGE/BLEU (`datasets/evaluation/`);
 
 O progresso de cada execucao e persistido no MongoDB.
@@ -19,6 +20,7 @@ O progresso de cada execucao e persistido no MongoDB.
 - Como subir a aplicacao
 - Endpoints da API
 - Fluxo de preprocessamento
+- Estrategias de curadoria
 - Fluxo de RAG
 - Estrutura do projeto
 - Documentacao interativa
@@ -198,7 +200,7 @@ Inicia o pre-processamento dos datasets. O processamento roda em background; a r
 
 | Campo              | Tipo   | Obrigatorio | Descricao                                                                     |
 |--------------------|--------|-------------|-------------------------------------------------------------------------------|
-| `skip_translation` | `bool` | Nao         | Pula a etapa de tradução usando dataset já traduzido e fixado (padrao: false) |
+| `skip_translation` | `bool` | Nao         | Pula a etapa de tradução usando dataset já traduzido e fixado (padrao da API: false; frontend: true) |
 
 **Exemplo:**
 
@@ -223,7 +225,9 @@ curl -X POST http://localhost:3000/preprocess/ \
     "qas_train_pt_br_path": null,
     "clinical_protocols_rag_path": null,
     "qas_count": 0,
-    "clinical_protocols_count": 0
+    "clinical_protocols_count": 0,
+    "curation": null,
+    "curation_report_path": null
   },
   "status": "created",
   "updated_date": "2026-07-31T10:00:00.000000+00:00",
@@ -252,7 +256,22 @@ Consulta o status de uma execucao pelo ID.
     "qas_train_pt_br_path": "datasets/preprocessed/qas/qas_train_pt_br.json",
     "clinical_protocols_rag_path": "datasets/preprocessed/clinical_protocols/clinical_protocols_rag.json",
     "qas_count": 15234,
-    "clinical_protocols_count": 120
+    "clinical_protocols_count": 120,
+    "curation_report_path": "datasets/preprocessed/curation_report.json",
+    "curation": {
+      "criteria_version": "curation-v1",
+      "accepted": 15354,
+      "rejected": 87,
+      "sources": {
+        "pubmedqa": {
+          "source": "pubmedqa",
+          "input": 10000,
+          "accepted": 9980,
+          "rejected": 20,
+          "rejection_reasons": {"empty_answer": 20}
+        }
+      }
+    }
   },
   "status": "completed",
   "updated_date": "2026-07-31T10:05:00.000000+00:00",
@@ -427,11 +446,12 @@ flowchart TD
     E --> F[Baixa protocolos clinicos FHEMIG]
     F --> G[Le dataset files/laudos_medicos/dataset_laudos_medicos.json]
     G --> H[Processa QAs e extrai PDFs]
-    H --> I[Salva qas_train.json e clinical_protocols_rag.json]
-    I --> J[Traduz os QAs com o modelo local]
-    J --> K[Anonimiza nomes e medico solicitante]
-    K --> L[Salva anonymizated_medical_reports.json]
-    L --> M[Atualiza MongoDB]
+    H --> I[Aplica curadoria e contabiliza rejeicoes]
+    I --> J[Salva os JSONs e curation_report.json]
+    J --> K[Traduz os QAs com o modelo local]
+    K --> L[Anonimiza nomes e medico solicitante]
+    L --> M[Salva anonymizated_medical_reports.json]
+    M --> N[Atualiza MongoDB com results.curation]
 ```
 
 ### Arquivos gerados
@@ -440,6 +460,26 @@ flowchart TD
 - `datasets/preprocessed/qas/qas_train_pt_br.json`: cópia traduzida dos QAs.
 - `datasets/preprocessed/clinical_protocols/clinical_protocols_rag.json`: protocolos com texto extraído dos PDFs.
 - `datasets/preprocessed/medical_reports/anonymizated_medical_reports.json`: laudos anonimizados gerados a partir de `datasets/files/laudos_medicos/dataset_laudos_medicos.json`.
+- `datasets/preprocessed/curation_report.json`: relatório versionado da curadoria automática, com entradas, aceitos, rejeitados e motivos por fonte.
+
+## Estratégias de curadoria
+
+A curadoria automática ocorre no Step 2, antes da tradução e da geração da base RAG. Registros rejeitados não entram nos arquivos pré-processados finais; permanecem apenas na fonte bruta e são contabilizados no relatório da execução.
+
+Os critérios atuais são identificados por `curation-v1`:
+
+| Fonte | Critérios de aceite | Motivos de rejeição |
+|---|---|---|
+| PubMedQA | Pergunta e resposta não vazias; pergunta com no mínimo 20 caracteres; resposta com no mínimo 40 caracteres | `empty_question`, `empty_answer`, `question_below_min_length`, `answer_below_min_length` |
+| MedQuAD | Estrutura `QAPair` válida e os mesmos limites mínimos dos QAs | `invalid_structure`, `empty_question`, `empty_answer`, `question_below_min_length`, `answer_below_min_length` |
+| FHEMIG | Nome presente, PDF localizado e texto extraível | `missing_name`, `missing_pdf`, `empty_extracted_text` |
+| PCDT | Nome presente, PDF localizado e texto extraível | `missing_name`, `missing_pdf`, `empty_extracted_text` |
+
+O arquivo `curation_report.json` possui `input`, `accepted`, `rejected` e `rejection_reasons` para cada fonte. O relatório também é persistido no MongoDB em `results.curation`, associado ao `preprocess_id`, e seu caminho é exposto em `results.curation_report_path`.
+
+O cache só é considerado válido quando os artefatos e um relatório com `criteria_version: curation-v1` existem. Cache legado sem relatório é reprocessado, evitando apresentar estatísticas retroativas ou incompatíveis.
+
+As estatísticas representam registros de entrada, não documentos ou chunks da RAG. O `golden_test_qa.json` é um conjunto curado para avaliação do modelo e não substitui a curadoria dos dados de treino/RAG. A revisão manual de amostras é uma evidência complementar e deve ser registrada separadamente; o relatório automático não representa validação clínica humana.
 
 ### Laudos médicos e anonimização
 

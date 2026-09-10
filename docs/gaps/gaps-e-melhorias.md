@@ -162,20 +162,23 @@ A arquitetura modular (backend, agent, frontend, MongoDB), o pipeline LangGraph 
 
 ---
 
-### M05 — Curadoria dos dados não documentada
+### ~~M05 — Curadoria dos dados não documentada~~ ✅ Resolvido
 
-**Requisito do edital:**
-> "Preparar os dados com técnicas de preprocessing, anonimização e **curadoria**."
+~~**Requisito do edital:**~~
+> ~~"Preparar os dados com técnicas de preprocessing, anonimização e **curadoria**."~~
 
-**Situação atual:**
-- O preprocessing automático (limpeza, chunking, tradução) está bem implementado.
-- **Curadoria** implica revisão da qualidade das amostras — não há evidência documentada de critérios de aceite/rejeição.
+~~**Situação atual:**~~
+~~- O preprocessing automático (limpeza, chunking, tradução) está bem implementado.~~
+~~- A curadoria automática foi implementada no Step 2 com critérios versionados (`curation-v1`).~~
+~~- O pipeline gera `datasets/preprocessed/curation_report.json` e persiste as estatísticas em `results.curation`, associadas ao `preprocess_id`.~~
+~~- O frontend exibe entradas, aceitos, rejeitados e motivos por fonte antes da resposta JSON da API.~~
+~~- A revisão manual de amostras foi mantida como evidência complementar documentada separadamente.~~
 
-**Ação recomendada:**
-- Documentar no relatório técnico os critérios de curadoria aplicados (mínimo de caracteres por QA, filtragem de respostas vazias, validação manual de amostras);
-- Incluir estatísticas: quantos registros foram descartados e por quê.
+~~**Ação concluída:**~~
+~~- Critérios de aceite/rejeição e estatísticas foram documentados nos READMEs, no ADR-018 e no relatório retornado pela API.~~
+~~- O relatório de curadoria é exibido na interface antes da resposta JSON da API.~~
 
-**Issue GitHub:** [#44 [M05] Curadoria dos dados não documentada](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/44) — **aberto**
+~~**Issue GitHub:** [#44 [M05] Curadoria dos dados não documentada](https://github.com/vagner-nascimento/fiap-pos-ia-para-devs-fase3-tech-challenge/issues/44)~~ — ✅ Resolvido
 
 ---
 
@@ -283,7 +286,7 @@ A arquitetura modular (backend, agent, frontend, MongoDB), o pipeline LangGraph 
 | ~~🟢 Baixa~~ | ~~M06~~ | ~~Enriquecer explainability com scores RAG no frontend~~ | ~~2–3h~~ | ✅ Resolvido (#41) |
 | 🟢 Baixa | M03 | Adicionar validação semântica nos guardrails | 3–4h | ⏳ Pendente (#42) |
 | 🟢 Baixa | M04 | Testes de integração end-to-end | 4–6h | ⏳ Pendente (#43) |
-| 🟢 Baixa | M05 | Documentar curadoria dos dados | 1h | ⏳ Pendente (#44) |
+| ~~🟢 Baixa~~ | ~~M05~~ | ~~Documentar curadoria dos dados~~ | ~~1h~~ | ✅ Resolvido (#44) |
 | ~~🟢 Baixa~~ | ~~M08~~ | ~~Documentar HF_TOKEN no .env.example~~ | ~~0.5h~~ | ✅ Resolvido (#45) |
 | 🟢 Baixa | M09 | Adicionar CI/CD com GitHub Actions | 2–3h | ⏳ Pendente (#46) |
 

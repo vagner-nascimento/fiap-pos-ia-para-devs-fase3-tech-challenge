@@ -16,7 +16,8 @@ A aplicação permite:
 3. interagir com o agente médico inteligente via chat contextualizado com citações de fontes e avisos legais;
 4. acompanhar o progresso das tarefas em tempo real;
 5. consultar os arquivos gerados em formato estruturado para fine-tuning, RAG e recuperação;
-6. visualizar contagens separadas para `QAs` e `clinical_protocols`.
+6. visualizar contagens separadas para `QAs` e `clinical_protocols`;
+7. visualizar o relatório de curadoria automática, com registros aceitos, rejeitados e motivos por fonte.
 
 O fluxo principal funciona assim:
 
@@ -24,6 +25,7 @@ O fluxo principal funciona assim:
 - a tela envia uma requisição ao backend para iniciar o processamento;
 - o backend cria um registro no MongoDB e inicia a tarefa em background;
 - o processamento baixa ou consulta os datasets, extrai texto dos PDFs dos protocolos clínicos (FHEMIG e PCDT) e gera os arquivos de saída;
+- a etapa de extração aplica critérios de curadoria versionados e gera `curation_report.json`, associado ao `preprocess_id` no MongoDB;
 - o frontend faz polling do estado da execução até a conclusão e permite gerar e consultar a base RAG.
 
 ## Como a aplicação funciona
@@ -86,6 +88,7 @@ Para detalhes aprofundados sobre a arquitetura e decisões de projeto:
 - **Agente Médico (LangGraph):** [agent/README.md](agent/README.md)
 - **Backend API & RAG:** [backend/README.md](backend/README.md)
 - **Datasets:** [backend/datasets/README.md](backend/datasets/README.md)
+- **Curadoria e rastreabilidade:** [backend/README.md#estrategias-de-curadoria](backend/README.md#estrategias-de-curadoria)
 - **Frontend:** [frontend/README.md](frontend/README.md)
 
 ## Subindo tudo com Docker Compose

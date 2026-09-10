@@ -26,6 +26,7 @@
 | [ADR-014](ADR-014-skip-preprocess-translation.md) | Opção de pular a tradução no pré-processamento | ✅ Aceito | 2026-08-28 |
 | [ADR-015](ADR-015-anonimizacao-laudos-lgpd.md) | Anonimização de laudos médicos antes da RAG | ✅ Aceito | 2026-09-03 |
 | [ADR-016](ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md) | Metodologia de avaliação empírica e calibração de decodificação LLM | ✅ Aceito | 2026-09-07 |
+| [ADR-018](ADR-018-curadoria-rastreabilidade-datasets.md) | Curadoria automática versionada e rastreabilidade dos datasets | ✅ Aceito | 2026-09-10 |
 
 ---
 
