@@ -15,15 +15,34 @@ from typing import Any, Dict, List, Optional
 
 import requests
 
+from dotenv import load_dotenv
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Configuração
 # ---------------------------------------------------------------------------
 BACKEND_API_URL = os.getenv("BACKEND_API_URL", "http://localhost:3000")
-RAG_TOP_K = int(os.getenv("RAG_TOP_K", "3"))
-RAG_SIMILARITY_THRESHOLD = float(os.getenv("RAG_SIMILARITY_THRESHOLD", "0.40"))
 RAG_QUERY_ENDPOINT = f"{BACKEND_API_URL}/rag-database/query"
+
+
+def _get_similarity_threshold() -> float:
+    """Carrega o threshold de similaridade do .env com override de variáveis antigas."""
+    load_dotenv(override=True)
+    raw = os.getenv("RAG_SIMILARITY_THRESHOLD", "0.48")
+    try:
+        val = float(raw)
+        return max(val, 0.48)
+    except ValueError:
+        return 0.48
+
+
+def _get_top_k() -> int:
+    raw = os.getenv("RAG_TOP_K", "3")
+    try:
+        return int(raw)
+    except ValueError:
+        return 3
 
 
 # ---------------------------------------------------------------------------
@@ -49,9 +68,9 @@ def _clean_content_for_prompt(content: str) -> str:
 
 def _query_rag(
     query: str,
-    top_k: int = RAG_TOP_K,
+    top_k: Optional[int] = None,
     preprocess_id: Optional[str] = None,
-    similarity_threshold: float = RAG_SIMILARITY_THRESHOLD,
+    similarity_threshold: Optional[float] = None,
 ) -> List[Dict[str, Any]]:
     """
     Consulta a API RAG do backend e retorna os documentos mais relevantes.
@@ -65,6 +84,11 @@ def _query_rag(
     Returns:
         Lista de documentos RAG com scores e metadados.
     """
+    if similarity_threshold is None:
+        similarity_threshold = _get_similarity_threshold()
+    if top_k is None:
+        top_k = _get_top_k()
+
     payload: Dict[str, Any] = {
         "query": query,
         "top_k": top_k,
@@ -81,10 +105,14 @@ def _query_rag(
         )
         response.raise_for_status()
         data = response.json()
-        documents = data.get("documents", [])
+        raw_documents = data.get("documents", [])
+        documents = [
+            doc for doc in raw_documents
+            if float(doc.get("similarity_score", 0.0)) >= similarity_threshold
+        ]
         logger.info(
-            f"[RAG] Busca concluída: {len(documents)} documentos retornados "
-            f"de {data.get('total_results', 0)} encontrados."
+            f"[RAG] Busca concluída: {len(documents)} documentos aprovados "
+            f"(de {len(raw_documents)} retornados pelo backend, threshold={similarity_threshold})."
         )
         return documents
     except requests.exceptions.ConnectionError:

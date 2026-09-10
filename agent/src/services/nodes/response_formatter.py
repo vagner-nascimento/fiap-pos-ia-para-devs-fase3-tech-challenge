@@ -99,6 +99,38 @@ def _blocks_are_similar(block1: List[str], block2: List[str], threshold: float =
     return difflib.SequenceMatcher(None, t1, t2).ratio() >= threshold
 
 
+def _dedup_clauses(sentence: str) -> str:
+    """Remove repetições de orações ou itens de lista separados por ponto-e-vírgula."""
+    if ";" not in sentence:
+        return sentence
+    parts = [p.strip() for p in sentence.split(";") if p.strip()]
+    if len(parts) <= 1:
+        return sentence
+    deduped_parts = []
+    for part in parts:
+        if not deduped_parts:
+            deduped_parts.append(part)
+            continue
+        prev = deduped_parts[-1]
+        sim = difflib.SequenceMatcher(None, prev.lower(), part.lower()).ratio()
+        if sim >= 0.70:
+            continue
+        # Prefixo comum entre itens de lista (ex: "erupções cutâneas secundárias" e "erupções cutânicas crônicas")
+        common_len = 0
+        for c1, c2 in zip(prev.lower(), part.lower()):
+            if c1 == c2:
+                common_len += 1
+            else:
+                break
+        if common_len >= 12 and (common_len / max(len(prev), len(part))) > 0.4:
+            continue
+        deduped_parts.append(part)
+    res = "; ".join(deduped_parts)
+    if not re.search(r"[.!?]$", res):
+        res += "."
+    return res
+
+
 def _remove_repetition_loops(text: str) -> str:
     """
     Detecta e remove loops de degeneração/repetição de frases ou blocos de sentenças,
@@ -139,27 +171,28 @@ def _remove_repetition_loops(text: str) -> str:
         # Colapsa sentenças consecutivas idênticas ou fuzzy similares (ratio >= 0.85)
         deduped = []
         for s in raw_sentences:
+            s_clean = _dedup_clauses(s)
             if not deduped:
-                deduped.append(s)
+                deduped.append(s_clean)
                 continue
 
             prev = deduped[-1]
-            sim = difflib.SequenceMatcher(None, prev.lower(), s.lower()).ratio()
+            sim = difflib.SequenceMatcher(None, prev.lower(), s_clean.lower()).ratio()
             if sim >= 0.85:
                 continue
 
             # Prefixo longo compartilhado
             common_len = 0
-            for c1, c2 in zip(prev.lower(), s.lower()):
+            for c1, c2 in zip(prev.lower(), s_clean.lower()):
                 if c1 == c2:
                     common_len += 1
                 else:
                     break
-            max_l = max(len(prev), len(s))
+            max_l = max(len(prev), len(s_clean))
             if common_len >= 25 and (common_len / max_l) > 0.5:
                 continue
 
-            deduped.append(s)
+            deduped.append(s_clean)
 
         # Detecta e remove repetições cíclicas de blocos de sentenças (k=2, 3, 4) com fuzzy matching
         for k in (2, 3, 4):

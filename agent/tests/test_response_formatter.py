@@ -72,6 +72,19 @@ def test_remove_bloco_com_variacao_morfologica():
     assert resultado == bloco1
 
 
+def test_remove_repeticao_lista_ponto_e_virgula():
+    texto = (
+        "A síndrome é caracterizada por erupções cutâneas esporádicas; "
+        "inchaço; edemas; erupções cutâneas secundárias; erupções cutânicas crônicas; "
+        "erupções cutânea secundário; erupções cutâneas secundários; erupções cutâneas secundarias; "
+        "erupções cutâneas secundaria; erupções cutâneas secundária."
+    )
+    resultado = _remove_repetition_loops(texto)
+    assert resultado.count("erupções cutâneas secund") <= 1
+    assert "inchaço" in resultado
+    assert "edemas" in resultado
+
+
 def test_response_formatter_inclui_links_de_url_quando_disponiveis():
     state = {
         "llm_response_raw": "A tuberculose requer tratamento prolongado com antibióticos específicos.",
@@ -89,4 +102,6 @@ def test_response_formatter_inclui_links_de_url_quando_disponiveis():
     }
     novo_state = response_formatter_node(state)
     assert "[FHEMIG: PC-15 — Manejo hospitalar da Tuberculose (2019)](https://www.fhemig.mg.gov.br/files/1394/PC-15.pdf)" in novo_state["final_response"]
+
+
 

@@ -1,0 +1,20 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: DockerfileLocal
+      args:
+        VITE_BACKEND_URL: http://localhost:3000
+        VITE_AGENT_URL: http://localhost:8001
+    container_name: fiap-pos-ia-frontend
+    restart: always
+    ports:
+      - "8080:80"
+    networks:
+      - fiap-network
+
+networks:
+  fiap-network:
+    driver: bridge
+    external: true
+    name: fiap-pos-ia-para-devs-fase3-tech-challenge_default

@@ -121,6 +121,8 @@ def llm_generator_node(state: dict) -> dict:
         conversation_history=conversation_history,
     )
 
+    logger.info(f"[LLM] Prompt completo enviado para a LLM ({len(prompt)} caracteres):\n{prompt}")
+
     llm = _get_llm_client()
 
     try:
