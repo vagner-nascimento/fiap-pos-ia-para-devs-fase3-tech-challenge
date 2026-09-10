@@ -8,6 +8,51 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.services.preprocess import step_two_data_extraction as step_two
 
 
+def test_extract_qas_data_applies_curation_criteria(monkeypatch, tmp_path):
+    datasets_dir = tmp_path / "datasets"
+    pubmedqa_dir = tmp_path / "pubmedqa" / "data"
+    pubmedqa_dir.mkdir(parents=True)
+    (pubmedqa_dir / "ori_pqal.json").write_text(
+        json.dumps(
+            {
+                "valid": {
+                    "QUESTION": "What is the recommended initial treatment for this condition?",
+                    "CONTEXTS": ["Clinical context"],
+                    "LONG_ANSWER": "The recommended treatment includes clinical assessment and appropriate follow-up.",
+                },
+                "empty-answer": {
+                    "QUESTION": "What is the recommended initial treatment for this condition?",
+                    "CONTEXTS": [],
+                    "LONG_ANSWER": "",
+                },
+                "short-question": {
+                    "QUESTION": "Short?",
+                    "CONTEXTS": [],
+                    "LONG_ANSWER": "This answer is intentionally long enough to pass the answer criterion.",
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(step_two, "_datasets_dir", str(datasets_dir))
+    monkeypatch.setattr(step_two, "update_step_status", lambda *args, **kwargs: None)
+
+    output_path, count, curation = step_two._extract_qas_data(
+        "doc-qa",
+        {"pubmedqa": str(pubmedqa_dir.parent), "MedQuAD": str(tmp_path / "missing-medquad")},
+    )
+
+    assert count == 1
+    assert len(json.loads(Path(output_path).read_text(encoding="utf-8"))) == 1
+    assert curation["criteria_version"] == step_two.CURATION_CRITERIA_VERSION
+    assert curation["accepted"] == 1
+    assert curation["rejected"] == 2
+    assert curation["sources"]["pubmedqa"]["rejection_reasons"] == {
+        "empty_answer": 1,
+        "question_below_min_length": 1,
+    }
+
+
 def test_extract_clinical_protocols_data_creates_rag_file(monkeypatch):
     base_tmp_dir = Path(__file__).resolve().parents[1] / ".tmp-tests"
     base_tmp_dir.mkdir(parents=True, exist_ok=True)

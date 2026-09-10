@@ -12,9 +12,45 @@ from infra.database.collections.preprocess import update_step_status
 _script_dir = os.path.dirname(os.path.abspath(__file__))
 _backend_dir = os.path.abspath(os.path.join(_script_dir, "..", "..", ".."))
 _datasets_dir = os.path.join(_backend_dir, "datasets")
+CURATION_CRITERIA_VERSION = "curation-v1"
+MIN_QUESTION_CHARACTERS = 20
+MIN_ANSWER_CHARACTERS = 40
 
 
+def _new_curation_stats(source: str) -> Dict[str, Any]:
+    return {
+        "source": source,
+        "input": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "rejection_reasons": {},
+    }
 
+
+def _reject(stats: Dict[str, Any], reason: str) -> None:
+    stats["rejected"] += 1
+    reasons = stats["rejection_reasons"]
+    reasons[reason] = reasons.get(reason, 0) + 1
+
+
+def _accept(stats: Dict[str, Any]) -> None:
+    stats["accepted"] += 1
+
+
+def _validate_qa(question: str, answer: str, stats: Dict[str, Any]) -> bool:
+    if not question:
+        _reject(stats, "empty_question")
+        return False
+    if not answer:
+        _reject(stats, "empty_answer")
+        return False
+    if len(question) < MIN_QUESTION_CHARACTERS:
+        _reject(stats, "question_below_min_length")
+        return False
+    if len(answer) < MIN_ANSWER_CHARACTERS:
+        _reject(stats, "answer_below_min_length")
+        return False
+    return True
 
 
 def _extract_text_from_pdf(pdf_path: Path) -> str:
@@ -43,7 +79,7 @@ def _extract_text_from_pdf(pdf_path: Path) -> str:
 def _extract_qas_data(
     doc_id: str,
     qas_paths: Dict[str, str],
-) -> Tuple[str, int]:
+) -> Tuple[str, int, Dict[str, Any]]:
     """
     Process QA datasets (PubMedQA and MedQuAD) and persist all data as a single JSON file.
     """
@@ -63,6 +99,7 @@ def _extract_qas_data(
 
     print("Processando dados de PubMedQA...")
     pubmedqa_entries: List[Dict[str, Any]] = []
+    pubmedqa_stats = _new_curation_stats("pubmedqa")
 
     if os.path.exists(pubmedqa_path):
         try:
@@ -74,9 +111,13 @@ def _extract_qas_data(
             raise RuntimeError(f"Erro ao ler arquivo PubMedQA: {exc}") from exc
 
         for pmid, entry in pubmed_raw.items():
+            pubmedqa_stats["input"] += 1
             question = entry.get("QUESTION", "").strip()
             contexts = entry.get("CONTEXTS", [])
             answer = entry.get("LONG_ANSWER", "").strip()
+
+            if not _validate_qa(question, answer, pubmedqa_stats):
+                continue
 
             pubmedqa_entries.append(
                 {
@@ -89,6 +130,7 @@ def _extract_qas_data(
                     },
                 }
             )
+            _accept(pubmedqa_stats)
 
         print(f"PubMedQA processado: {len(pubmedqa_entries)} registros adicionados ao dataset.")
     else:
@@ -98,6 +140,7 @@ def _extract_qas_data(
 
     print("Processando dados de MedQuAD...")
     medquad_entries: List[Dict[str, Any]] = []
+    medquad_stats = _new_curation_stats("medquad")
 
     if os.path.exists(medquad_dir):
         try:
@@ -124,27 +167,32 @@ def _extract_qas_data(
                         continue
 
                     for qa_pair in qa_pairs.findall("QAPair"):
+                        medquad_stats["input"] += 1
                         question_elem = qa_pair.find("Question")
                         answer_elem = qa_pair.find("Answer")
 
                         if question_elem is None or answer_elem is None:
+                            _reject(medquad_stats, "invalid_structure")
                             continue
 
                         q_text = (question_elem.text or "").strip()
                         a_text = "".join(answer_elem.itertext()).strip()
 
-                        if q_text and a_text:
-                            medquad_entries.append(
-                                {
-                                    "question": q_text,
-                                    "contexts": [],
-                                    "answer": a_text,
-                                    "metadata": {
-                                        "source": doc_source or "MedQuAD",
-                                        "url": doc_url or "",
-                                    },
-                                }
-                            )
+                        if not _validate_qa(q_text, a_text, medquad_stats):
+                            continue
+
+                        medquad_entries.append(
+                            {
+                                "question": q_text,
+                                "contexts": [],
+                                "answer": a_text,
+                                "metadata": {
+                                    "source": doc_source or "MedQuAD",
+                                    "url": doc_url or "",
+                                },
+                            }
+                        )
+                        _accept(medquad_stats)
                 except ET.ParseError as exc:
                     print(f"Erro ao processar arquivo XML {xml_path}: {exc}")
                 except Exception as exc:
@@ -171,13 +219,22 @@ def _extract_qas_data(
         raise RuntimeError(f"Erro ao salvar arquivo qas_train.json: {exc}") from exc
 
     print("Extração de dados QA concluída com sucesso!")
-    return train_path, len(all_data)
+    return train_path, len(all_data), {
+        "criteria_version": CURATION_CRITERIA_VERSION,
+        "sources": {
+            "pubmedqa": pubmedqa_stats,
+            "medquad": medquad_stats,
+        },
+        "accepted": len(all_data),
+        "rejected": pubmedqa_stats["rejected"] + medquad_stats["rejected"],
+    }
 
 
 def _extract_clinical_protocols_data(
     doc_id: str,
     clinical_protocols_paths: Tuple[Path, Path],
-) -> Tuple[str, int]:
+    return_stats: bool = False,
+) -> Tuple[str, int] | Tuple[str, int, Dict[str, Any]]:
     """
     Process clinical protocols by extracting PDF text and persist all data as a single JSON file.
     """
@@ -191,6 +248,7 @@ def _extract_clinical_protocols_data(
 
     print("Processando dados de protocolos clínicos...")
     clinical_entries: List[Dict[str, Any]] = []
+    clinical_stats = _new_curation_stats("clinical_protocols")
 
     update_step_status(doc_id, "two_data_extraction", "in_progress", completion_percentage=50)
 
@@ -213,8 +271,10 @@ def _extract_clinical_protocols_data(
         per_protocol_progress = 50.0 / total_protocols if total_protocols > 0 else 0.0
 
         for idx, protocol in enumerate(protocols_data, start=1):
+            clinical_stats["input"] += 1
             pdf_name = (protocol.get("name") or "").strip()
             if not pdf_name:
+                _reject(clinical_stats, "missing_name")
                 print(f"Aviso: Protocolo sem nome, pulando... ({idx}/{total_protocols})")
                 protocol_progress += 1
                 update_step_status(
@@ -233,6 +293,7 @@ def _extract_clinical_protocols_data(
             pdf_path = pdfs_dir / safe_name
 
             if not pdf_path.exists():
+                _reject(clinical_stats, "missing_pdf")
                 print(f"Aviso: PDF não encontrado em {pdf_path}, pulando protocolo... ({idx}/{total_protocols})")
                 protocol_progress += 1
                 update_step_status(
@@ -247,6 +308,7 @@ def _extract_clinical_protocols_data(
             content_text = _extract_text_from_pdf(pdf_path)
 
             if not content_text:
+                _reject(clinical_stats, "empty_extracted_text")
                 print(f"Aviso: Não foi possível extrair texto de {pdf_path.name}, pulando... ({idx}/{total_protocols})")
                 protocol_progress += 1
                 update_step_status(
@@ -265,6 +327,7 @@ def _extract_clinical_protocols_data(
                     "content_text": content_text,
                 }
             )
+            _accept(clinical_stats)
             percent = (idx / total_protocols) * 100 if total_protocols > 0 else 0.0
             print(f"Texto extraído com sucesso: {len(content_text)} caracteres ({idx}/{total_protocols} — {percent:.2f}%)")
             protocol_progress += 1
@@ -302,6 +365,8 @@ def _extract_clinical_protocols_data(
         raise RuntimeError(f"Erro ao salvar arquivo clinical_protocols_rag.json: {exc}") from exc
 
     print("Extração de dados de protocolos clínicos concluída com sucesso!")
+    if return_stats:
+        return rag_path, len(clinical_entries), clinical_stats
     return rag_path, len(clinical_entries)
 
 
@@ -310,7 +375,8 @@ def _extract_pcdt_data(
     pcdt_paths: Tuple[Path, Path],
     clinical_protocols_rag_path: str,
     starting_count: int,
-) -> int:
+    return_stats: bool = False,
+) -> int | Tuple[int, Dict[str, Any]]:
     """
     Extract text from PCDT PDFs and APPEND the resulting records to the
     existing ``clinical_protocols_rag.json`` file. Returns the total number of
@@ -321,7 +387,7 @@ def _extract_pcdt_data(
 
     if not json_path.exists():
         print(f"Aviso: Catálogo PCDT não encontrado em {json_path}")
-        return starting_count
+        return (starting_count, _new_curation_stats("pcdt")) if return_stats else starting_count
 
     try:
         with json_path.open("r", encoding="utf-8") as handle:
@@ -344,11 +410,14 @@ def _extract_pcdt_data(
 
     print(f"Processando {total_pcdt} PDFs do PCDT (combined total: {combined_total})...")
     pcdt_entries: List[Dict[str, Any]] = []
+    pcdt_stats = _new_curation_stats("pcdt")
 
     processed_pcdt = 0
     for idx, protocol in enumerate(protocols_data, start=1):
+        pcdt_stats["input"] += 1
         pdf_name = (protocol.get("name") or "").strip()
         if not pdf_name:
+            _reject(pcdt_stats, "missing_name")
             print(f"Aviso: Entrada PCDT sem nome, pulando... ({idx}/{total_pcdt})")
             processed_pcdt += 1
             update_step_status(
@@ -365,6 +434,7 @@ def _extract_pcdt_data(
             safe_name = re.sub(r"[^\w.-]+", "_", pdf_name, flags=re.UNICODE).strip("._-") or pdf_name
             pdf_path = pdfs_dir / safe_name
             if not pdf_path.exists():
+                _reject(pcdt_stats, "missing_pdf")
                 print(f"Aviso: PDF PCDT não encontrado ({pdf_name}), pulando... ({idx}/{total_pcdt})")
                 processed_pcdt += 1
                 update_step_status(
@@ -378,6 +448,7 @@ def _extract_pcdt_data(
         print(f"Extraindo texto de {pdf_path.name}... ({idx}/{total_pcdt})")
         content_text = _extract_text_from_pdf(pdf_path)
         if not content_text:
+            _reject(pcdt_stats, "empty_extracted_text")
             print(f"Aviso: Não foi possível extrair texto de {pdf_path.name}, pulando... ({idx}/{total_pcdt})")
             processed_pcdt += 1
             update_step_status(
@@ -396,6 +467,7 @@ def _extract_pcdt_data(
                 "content_text": content_text,
             }
         )
+        _accept(pcdt_stats)
         processed_pcdt += 1
         update_step_status(
             doc_id,
@@ -421,6 +493,8 @@ def _extract_pcdt_data(
     with rag_path.open("w", encoding="utf-8") as handle:
         json.dump(combined, handle, ensure_ascii=False, indent=4)
 
+    if return_stats:
+        return len(combined), pcdt_stats
     return len(combined)
 
 
@@ -437,27 +511,46 @@ def extract_data(
         - qas_train_path, qas_count
         - clinical_protocols_rag_path, clinical_protocols_count
     """
-    qas_train_path, qas_count = _extract_qas_data(
+    qas_train_path, qas_count, qas_curation = _extract_qas_data(
         doc_id,
         qas_paths,
     )
-    clinical_protocols_rag_path, clinical_protocols_count = _extract_clinical_protocols_data(
+    clinical_protocols_rag_path, clinical_protocols_count, clinical_stats = _extract_clinical_protocols_data(
         doc_id,
         clinical_protocols_paths,
+        return_stats=True,
     )
+    pcdt_stats = _new_curation_stats("pcdt")
 
     # Append PCDT PDFs into the same clinical_protocols_rag.json when available.
     if pcdt_paths is not None:
-        clinical_protocols_count = _extract_pcdt_data(
+        clinical_protocols_count, pcdt_stats = _extract_pcdt_data(
             doc_id,
             pcdt_paths,
             clinical_protocols_rag_path,
             clinical_protocols_count,
+            return_stats=True,
         )
+
+    curation_report = {
+        "criteria_version": CURATION_CRITERIA_VERSION,
+        "sources": {
+            **qas_curation["sources"],
+            "clinical_protocols": clinical_stats,
+            "pcdt": pcdt_stats,
+        },
+        "accepted": qas_curation["accepted"] + clinical_stats["accepted"] + pcdt_stats["accepted"],
+        "rejected": qas_curation["rejected"] + clinical_stats["rejected"] + pcdt_stats["rejected"],
+    }
+    curation_report_path = os.path.join(_datasets_dir, "preprocessed", "curation_report.json")
+    with open(curation_report_path, "w", encoding="utf-8") as handle:
+        json.dump(curation_report, handle, ensure_ascii=False, indent=2)
 
     return {
         "qas_train_path": qas_train_path,
         "qas_count": qas_count,
         "clinical_protocols_rag_path": clinical_protocols_rag_path,
         "clinical_protocols_count": clinical_protocols_count,
+        "curation": curation_report,
+        "curation_report_path": curation_report_path,
     }

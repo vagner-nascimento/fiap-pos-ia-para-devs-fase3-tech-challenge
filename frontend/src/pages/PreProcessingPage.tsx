@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { startPreprocess } from "../api/preprocess";
 import { ApiResponseBlock } from "../components/preprocessing/ApiResponseBlock";
+import { CurationReport } from "../components/preprocessing/CurationReport";
 import { ProcessResults } from "../components/preprocessing/ProcessResults";
 import { ProcessStatus } from "../components/preprocessing/ProcessStatus";
 import { ProcessSteps } from "../components/preprocessing/ProcessSteps";
@@ -16,7 +17,7 @@ interface Props {
 export function PreProcessingPage({ onPreprocessComplete }: Props) {
   const { document, pollingDocId, isStarting, isPolling, error } =
     usePreprocessStore();
-  const [skipTranslation, setSkipTranslation] = useState(false);
+  const [skipTranslation, setSkipTranslation] = useState(true);
 
   const handleStart = async () => {
     preprocessStore.setStarting(true);
@@ -122,6 +123,7 @@ export function PreProcessingPage({ onPreprocessComplete }: Props) {
               <ProcessStatus document={document} />
               <ProcessSteps steps={document.steps} />
               <ProcessResults results={document.results} />
+              <CurationReport results={document.results} />
               <ApiResponseBlock document={document} />
             </>
           ) : (

@@ -8,8 +8,8 @@ interface Props {
 const STEP_NAMES: Record<string, string> = {
   one_download_datasets: "Download dos Datasets",
   two_data_extraction: "Extração de Dados",
-  three_translating: "Curadoria - Tradução dos Dados",
-  four_anonymization: "Curadoria - Anonimização dos Laudos Médicos",
+  three_translating: "Tradução dos Dados",
+  four_anonymization: "Anonimização dos Laudos Médicos",
 };
 
 function stepStatusClassName(status: StepStatus): string {

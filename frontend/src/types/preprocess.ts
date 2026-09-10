@@ -13,6 +13,21 @@ export interface StepInfo {
   completion_percentage?: number;
 }
 
+export interface CurationSourceStats {
+  source: string;
+  input: number;
+  accepted: number;
+  rejected: number;
+  rejection_reasons: Record<string, number>;
+}
+
+export interface CurationReport {
+  criteria_version: string;
+  sources: Record<string, CurationSourceStats>;
+  accepted: number;
+  rejected: number;
+}
+
 export interface Results {
   qas_train_path?: string;
   qas_train_pt_br_path?: string;
@@ -21,6 +36,8 @@ export interface Results {
   medical_reports_count: number;
   qas_count: number;
   clinical_protocols_count: number;
+  curation?: CurationReport | null;
+  curation_report_path?: string | null;
 }
 
 export interface PreprocessDocument {

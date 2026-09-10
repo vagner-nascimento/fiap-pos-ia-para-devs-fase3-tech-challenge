@@ -68,6 +68,7 @@ def _get_preprocessed_paths() -> Dict[str, str]:
             "medical_reports",
             "anonymizated_medical_reports.json",
         ),
+        "curation": os.path.join(dataset_root, "preprocessed", "curation_report.json"),
     }
 
 
@@ -88,19 +89,35 @@ def _is_valid_preprocessed_file(file_path: str | None) -> bool:
     return len(payload) > 0
 
 
+def _read_curation_report(file_path: str | None) -> Dict[str, Any] | None:
+    if not file_path or not os.path.exists(file_path):
+        return None
+    try:
+        with open(file_path, "r", encoding="utf-8") as handle:
+            report = json.load(handle)
+    except Exception:
+        return None
+    if not isinstance(report, dict) or report.get("criteria_version") != "curation-v1":
+        return None
+    return report
+
+
 def _get_valid_preprocessed_cache() -> Dict[str, Any] | None:
     """Return a valid cache snapshot only when all required preprocessed artifacts exist."""
     preprocessed_paths = _get_preprocessed_paths()
     qas_valid = _is_valid_preprocessed_file(preprocessed_paths["qas"])
     clinical_valid = _is_valid_preprocessed_file(preprocessed_paths["clinical"])
     medical_reports_valid = _is_valid_preprocessed_file(preprocessed_paths["medical_reports"])
-    if not (qas_valid and clinical_valid and medical_reports_valid):
+    curation_report = _read_curation_report(preprocessed_paths.get("curation"))
+    if not (qas_valid and clinical_valid and medical_reports_valid and curation_report):
         return None
 
     return {
         "qas": preprocessed_paths["qas"],
         "clinical": preprocessed_paths["clinical"],
         "medical_reports": preprocessed_paths["medical_reports"],
+        "curation": curation_report,
+        "curation_path": preprocessed_paths["curation"],
     }
 
 
@@ -132,10 +149,12 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
             "qas_train_path": None,
             "qas_train_pt_br_path": None,
             "clinical_protocols_rag_path": None,
-                        "medical_reports_path": None,
+            "medical_reports_path": None,
             "medical_reports_count": 0,
             "qas_count": 0,
             "clinical_protocols_count": 0,
+            "curation": None,
+            "curation_report_path": None,
         }
 
         # Marcar início do processamento
@@ -187,6 +206,10 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
                 results["clinical_protocols_rag_path"] = _get_relative_path(clinical_protocols_rag_path)
                 results["qas_count"] = qas_count
                 results["clinical_protocols_count"] = clinical_protocols_count
+                results["curation"] = preprocessed_cache["curation"]
+                results["curation_report_path"] = _get_relative_path(
+                    preprocessed_cache["curation_path"]
+                )
                 update_step_status(
                     doc_id,
                     "two_data_extraction",
@@ -210,6 +233,7 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
                     qas_count = extraction.get("qas_count", 0)
                     clinical_protocols_rag_path = extraction.get("clinical_protocols_rag_path")
                     clinical_protocols_count = extraction.get("clinical_protocols_count", 0)
+                    results["curation"] = extraction.get("curation")
                 else:
                     # seq handling
                     if len(extraction) >= 4:
@@ -222,6 +246,9 @@ def preprocess_data_background(doc_id: str, skip_translation: bool = False) -> N
                 results["clinical_protocols_rag_path"] = _get_relative_path(clinical_protocols_rag_path)
                 results["qas_count"] = qas_count
                 results["clinical_protocols_count"] = clinical_protocols_count
+                results["curation_report_path"] = _get_relative_path(
+                    extraction["curation_report_path"]
+                ) if isinstance(extraction, dict) and extraction.get("curation_report_path") else None
                 update_step_status(
                     doc_id,
                     "two_data_extraction",

@@ -30,6 +30,8 @@ class Results(BaseModel):
     medical_reports_count: int = 0
     qas_count: int = 0
     clinical_protocols_count: int = 0
+    curation: Optional[Dict[str, Any]] = None
+    curation_report_path: Optional[str] = None
 
 
 class PreprocessResponse(BaseModel):

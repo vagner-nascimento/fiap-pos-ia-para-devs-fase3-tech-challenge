@@ -122,3 +122,16 @@ backend/datasets/
 - O pré-processamento atual não recebe percentual de split. PubMedQA e MedQuAD são normalizados em `preprocessed/qas/qas_train.json`; os protocolos clínicos (FHEMIG + PCDT) são extraídos dos PDFs e salvos em `preprocessed/clinical_protocols/clinical_protocols_rag.json`.
 - A etapa seguinte traduz todos os QAs para pt-BR e grava `preprocessed/qas/qas_train_pt_br.json`. A tradução preserva `metadata` e traduz `question`, `contexts` textuais e `answer`.
 - **Dataset e Métricas de Avaliação (`evaluation/`):** Contém o arquivo `golden_test_qa.json` com 50 casos clínicos desafiadores e os arquivos de métricas `metrics_evaluation*.json` resultantes da avaliação formal do modelo fine-tunado no Google Colab. Para detalhes das métricas e conclusões de calibração, consulte [docs/avaliacao-modelo.md](../../docs/avaliacao-modelo.md) e [ADR-016](../../docs/architecture/adr/ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md).
+
+## Curadoria e rastreabilidade
+
+O Step 2 aplica os critérios versionados `curation-v1` aos QAs e aos protocolos clínicos:
+
+- QAs precisam ter pergunta e resposta não vazias;
+- perguntas precisam ter pelo menos 20 caracteres;
+- respostas precisam ter pelo menos 40 caracteres;
+- protocolos precisam ter nome, PDF disponível e texto extraível.
+
+Cada execução que realiza a extração gera `preprocessed/curation_report.json`, contendo entradas, aceitos, rejeitados e motivos de rejeição por fonte. O mesmo relatório é associado ao `preprocess_id` em `results.curation` e é obrigatório para que os artefatos sejam considerados um cache válido.
+
+Essa contagem representa registros de origem aceitos ou rejeitados. Ela não deve ser confundida com a quantidade posterior de documentos ou chunks gerados na base RAG. A revisão manual de amostras deve ser registrada separadamente como evidência de curadoria humana; o `golden_test_qa.json` é um conjunto de avaliação e não substitui essa revisão.

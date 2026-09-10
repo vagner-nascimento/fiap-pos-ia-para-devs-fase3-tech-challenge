@@ -115,7 +115,9 @@ def create_preprocess_document() -> Dict[str, Any]:
             "medical_reports_path": None,
             "medical_reports_count": 0,
             "qas_count": 0,
-            "clinical_protocols_count": 0
+            "clinical_protocols_count": 0,
+            "curation": None,
+            "curation_report_path": None,
         },
         "status": "created",
         "error_message": None,

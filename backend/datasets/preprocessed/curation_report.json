@@ -1,0 +1,39 @@
+{
+  "criteria_version": "curation-v1",
+  "sources": {
+    "pubmedqa": {
+      "source": "pubmedqa",
+      "input": 1000,
+      "accepted": 1000,
+      "rejected": 0,
+      "rejection_reasons": {}
+    },
+    "medquad": {
+      "source": "medquad",
+      "input": 47441,
+      "accepted": 16382,
+      "rejected": 31059,
+      "rejection_reasons": {
+        "empty_answer": 31034,
+        "answer_below_min_length": 12,
+        "question_below_min_length": 13
+      }
+    },
+    "clinical_protocols": {
+      "source": "clinical_protocols",
+      "input": 55,
+      "accepted": 55,
+      "rejected": 0,
+      "rejection_reasons": {}
+    },
+    "pcdt": {
+      "source": "pcdt",
+      "input": 177,
+      "accepted": 177,
+      "rejected": 0,
+      "rejection_reasons": {}
+    }
+  },
+  "accepted": 17614,
+  "rejected": 31059
+}

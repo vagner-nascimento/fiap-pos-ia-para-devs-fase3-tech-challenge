@@ -241,6 +241,150 @@
   margin-top: 1rem;
 }
 
+.curation-report {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1px solid #dbe3ef;
+  border-radius: 0.5rem;
+}
+
+.curation-report-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.curation-report h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.curation-report-heading p {
+  margin: 0.3rem 0 0;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.curation-version {
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: #e0e7ff;
+  color: #3730a3;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.curation-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.curation-summary-item {
+  padding: 0.75rem;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.4rem;
+}
+
+.curation-summary-item span {
+  display: block;
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.curation-summary-item strong {
+  display: block;
+  margin-top: 0.25rem;
+  color: #334155;
+  font-size: 1.15rem;
+}
+
+.curation-summary-item.accepted strong,
+.curation-accepted {
+  color: #15803d;
+}
+
+.curation-summary-item.rejected strong,
+.curation-rejected {
+  color: #b91c1c;
+}
+
+.curation-sources {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.curation-source {
+  padding: 0.75rem;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.4rem;
+}
+
+.curation-source-header,
+.curation-source-metrics {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.curation-source-header {
+  color: #334155;
+  font-size: 0.85rem;
+}
+
+.curation-source-header span {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.curation-source-metrics {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.curation-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.6rem;
+}
+
+.curation-reason {
+  padding: 0.2rem 0.4rem;
+  background: #fef2f2;
+  border-radius: 0.25rem;
+  color: #991b1b;
+  font-size: 0.72rem;
+}
+
+.curation-path,
+.curation-empty {
+  margin: 0.75rem 0 0;
+  color: #64748b;
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .curation-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .curation-report-heading {
+    flex-direction: column;
+  }
+}
+
 .response-block h3 {
   margin: 0 0 0.5rem;
   font-size: 0.95rem;

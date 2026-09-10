@@ -6,7 +6,7 @@ import { RagGenerationPage } from "./pages/RagGenerationPage";
 import { RagQueryPage } from "./pages/RagQueryPage";
 
 function App() {
-  const [activeView, setActiveView] = useState<ViewType>("agent");
+  const [activeView, setActiveView] = useState<ViewType>("preprocess");
   const [lastPreprocessId, setLastPreprocessId] = useState<string | null>(null);
 
   return (

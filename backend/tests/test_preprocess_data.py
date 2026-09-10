@@ -283,6 +283,11 @@ def test_preprocess_data_background_reuses_valid_preprocessed_cache(monkeypatch,
     qas_path.write_text(json.dumps([{"question": "Pergunta", "answer": "Resposta"}]), encoding="utf-8")
     clinical_path.write_text(json.dumps([{"name": "protocolo", "content_text": "conteudo"}]), encoding="utf-8")
     medical_reports_path.write_text(json.dumps([{"corpo_tecnico": {"tipo_exame": "EEG"}}]), encoding="utf-8")
+    curation_path = tmp_path / "curation_report.json"
+    curation_path.write_text(
+        json.dumps({"criteria_version": "curation-v1", "accepted": 2, "rejected": 0}),
+        encoding="utf-8",
+    )
 
     monkeypatch.setattr(
         preprocess_data,
@@ -291,6 +296,7 @@ def test_preprocess_data_background_reuses_valid_preprocessed_cache(monkeypatch,
             "qas": str(qas_path),
             "clinical": str(clinical_path),
             "medical_reports": str(medical_reports_path),
+            "curation": str(curation_path),
         },
     )
 
