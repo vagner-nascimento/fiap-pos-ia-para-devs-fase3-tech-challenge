@@ -215,16 +215,28 @@ def _get_session_history(graph: Any, session_id: str) -> List[Dict[str, str]]:
     try:
         snapshot = graph.get_state(config)
     except Exception as exc:
-        logger.debug("[AGENT] Histórico indisponível para a sessão: %s", exc)
+        logger.warning("[AGENT] Falha ao recuperar estado da sessão '%s': %s", session_id, exc)
+        return []
+
+    if not snapshot or not snapshot.values:
+        logger.info("[AGENT] Nenhum checkpoint encontrado para sessão '%s'.", session_id)
         return []
 
     history = snapshot.values.get("conversation_history", [])
     if not isinstance(history, list):
+        logger.warning("[AGENT] conversation_history com formato inesperado: %s", type(history))
         return []
 
     max_turns = max(0, int(os.getenv("AGENT_HISTORY_MAX_TURNS", "5")))
     recent_history = history[-max_turns:] if max_turns else []
-    return [entry for entry in recent_history if isinstance(entry, dict)]
+    valid_history = [entry for entry in recent_history if isinstance(entry, dict)]
+
+    logger.info(
+        "[AGENT] Histórico recuperado: sessão='%s' total_turnos=%d retornando=%d",
+        session_id, len(history), len(valid_history),
+    )
+    return valid_history
+
 
 
 # ---------------------------------------------------------------------------

@@ -152,11 +152,30 @@ def rag_retriever_node(state: dict) -> dict:
     """
     query = state.get("query", "")
     preprocess_id = state.get("preprocess_id")
+    conversation_history = state.get("conversation_history", [])
 
-    logger.info(f"[RAG] Buscando contexto para: '{query[:80]}'")
+    # Enriquece a query do RAG com contexto do histórico quando a query é um
+    # follow-up (ex: "pode resumir?", "e os cuidados em casa?").
+    # Usa a última query do histórico para dar contexto médico à busca vetorial.
+    rag_query = query
+    if conversation_history and isinstance(conversation_history, list):
+        last_turn = conversation_history[-1]
+        if isinstance(last_turn, dict):
+            last_query = last_turn.get("query", "").strip()
+            # Heurística: query curta ou sem ponto de interrogação médico
+            # indica follow-up que precisa de contexto extra para o RAG
+            is_short_followup = len(query.split()) <= 20
+            if last_query and is_short_followup:
+                rag_query = f"{last_query} {query}"
+                logger.info(
+                    f"[RAG] Query enriquecida com contexto do histórico "
+                    f"({len(query.split())} → {len(rag_query.split())} palavras)."
+                )
+
+    logger.info(f"[RAG] Buscando contexto para: '{rag_query[:120]}'")
 
     documents = _query_rag(
-        query=query,
+        query=rag_query,
         preprocess_id=preprocess_id,
     )
 
