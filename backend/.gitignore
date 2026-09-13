@@ -231,6 +231,7 @@ datasets/preprocessed/medical_reports
 # Excecoes: datasets versionados no repositorio (fonte de verdade compartilhada)
 !datasets/files/laudos_medicos/
 !datasets/files/pcdt/
+!datasets/files/medical_record/
 
 # Dentro de pcdt/, versionamos apenas o ZIP (Git LFS). O data/ extraido e o
 # catalogo gerado sao artefatos de runtime e NAO devem ser commitados.
