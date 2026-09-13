@@ -23,3 +23,11 @@ export interface AgentChatResponse {
   audit_id: string;
   duration_ms: number;
 }
+
+export interface AgentConversationTurn {
+  query: string;
+  response: string;
+  sources: AgentSource[];
+  safety_triggered: boolean;
+  safety_reason: string | null;
+}
