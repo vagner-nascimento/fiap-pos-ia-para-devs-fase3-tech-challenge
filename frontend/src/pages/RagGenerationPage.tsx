@@ -80,7 +80,7 @@ export function RagGenerationPage({ lastPreprocessId }: Props) {
             <RagGenerationResults document={document} />
           ) : (
             <p className="empty-state">
-              Nenhuma execucao iniciada. Clique em &quot;Gerar base RAG&quot; para
+              Nenhuma execucao iniciada? Clique em &quot;Gerar base RAG&quot; para
               comecar.
             </p>
           )}
