@@ -121,6 +121,43 @@ def llm_generator_node(state: dict) -> dict:
         conversation_history=conversation_history,
     )
 
+    # -----------------------------------------------------------------------
+    # Métricas de consumo da janela de contexto
+    # O Qwen2.5 usa tokenização similar ao GPT-4 (cl100k).
+    # Proporção empírica para PT-BR: ~3.5 chars/token.
+    # -----------------------------------------------------------------------
+    CHARS_PER_TOKEN = 3.5
+    MAX_CONTEXT_TOKENS = 32_768  # Qwen2.5-1.5B context window
+    max_new_tokens = getattr(_get_llm_client(), "max_new_tokens", 450)
+
+    # Detalha o tamanho de cada componente do prompt
+    history_text = ""
+    for turn in conversation_history:
+        history_text += f"{turn.get('query','')} {turn.get('response','')}"
+
+    input_tokens_est = int(len(prompt) / CHARS_PER_TOKEN)
+    output_tokens_est = max_new_tokens
+    total_tokens_est = input_tokens_est + output_tokens_est
+    window_pct = total_tokens_est / MAX_CONTEXT_TOKENS * 100
+
+    logger.info(
+        "[LLM] Consumo de contexto estimado: "
+        "input=~%d tokens | output_max=%d tokens | total=~%d tokens | "
+        "janela=%d tokens (%.1f%% usado) | "
+        "detalhes=[query=%d chars, historico=%d chars (%d turnos), rag=%d chars]",
+        input_tokens_est, output_tokens_est, total_tokens_est,
+        MAX_CONTEXT_TOKENS, window_pct,
+        len(query), len(history_text), len(conversation_history), len(rag_context),
+    )
+
+    if window_pct > 80:
+        logger.warning(
+            "[LLM] ⚠️ Uso da janela de contexto acima de 80%% (%.1f%%). "
+            "Considere reduzir AGENT_HISTORY_MAX_TURNS ou RAG_TOP_K.", window_pct
+        )
+
+    logger.debug(f"[LLM] Prompt completo ({len(prompt)} chars):\n{prompt}")
+
     llm = _get_llm_client()
 
     try:
@@ -133,8 +170,9 @@ def llm_generator_node(state: dict) -> dict:
         else:
             raw_response = llm.invoke(prompt)
 
+        output_tokens_real = int(len(raw_response) / CHARS_PER_TOKEN)
         logger.info(
-            f"[LLM] Resposta gerada com {len(raw_response)} caracteres."
+            f"[LLM] Resposta gerada: {len(raw_response)} chars (~{output_tokens_real} tokens)."
         )
     except Exception as exc:
         logger.error(f"[LLM] Erro ao chamar a LLM: {exc}")

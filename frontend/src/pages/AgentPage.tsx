@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { chatWithAgent } from "../api/agent";
-import type { AgentChatResponse, AgentSource } from "../types/agent";
+import type { AgentChatResponse, AgentConversationTurn, AgentSource } from "../types/agent";
 import "./AgentPage.css";
 
 function SourceDetails({ source, index }: { source: AgentSource; index: number }) {
@@ -51,9 +51,36 @@ function AgentResult({ response }: { response: AgentChatResponse }) {
   );
 }
 
+function Conversation({ turns }: { turns: AgentConversationTurn[] }) {
+  return (
+    <section className="agent-conversation" aria-label="Histórico da conversa">
+      <div className="agent-section-heading">
+        <h2>Conversa</h2>
+        <span>{turns.length} {turns.length === 1 ? "turno" : "turnos"}</span>
+      </div>
+      <div className="agent-messages">
+        {turns.map((turn, index) => (
+          <div className="agent-turn" key={`${index}-${turn.query}`}>
+            <div className="agent-message agent-message-human">
+              <strong>Human</strong>
+              <p>{turn.query}</p>
+            </div>
+            <div className="agent-message agent-message-agent">
+              <strong>Agent</strong>
+              <p>{turn.response}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function AgentPage() {
   const [query, setQuery] = useState("");
   const [preprocessId, setPreprocessId] = useState("");
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [conversation, setConversation] = useState<AgentConversationTurn[]>([]);
   const [response, setResponse] = useState<AgentChatResponse | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,10 +96,23 @@ export function AgentPage() {
     setIsSubmitting(true);
     setError(null);
     try {
-      setResponse(await chatWithAgent({
+      const nextResponse = await chatWithAgent({
         query: trimmedQuery,
+        session_id: sessionId ?? undefined,
         preprocess_id: preprocessId.trim() || null,
-      }));
+      });
+      setSessionId(nextResponse.session_id);
+      setResponse(nextResponse);
+      setConversation((turns) => [
+        ...turns,
+        {
+          query: trimmedQuery,
+          response: nextResponse.response,
+          sources: nextResponse.sources,
+          safety_triggered: nextResponse.safety_triggered,
+          safety_reason: nextResponse.safety_reason,
+        },
+      ]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao consultar o assistente");
     } finally {
@@ -80,11 +120,24 @@ export function AgentPage() {
     }
   };
 
+  const handleNewConversation = () => {
+    setSessionId(null);
+    setConversation([]);
+    setResponse(null);
+    setError(null);
+    setQuery("");
+  };
+
   return (
     <div className="agent-page">
       <header className="page-header">
         <h1>Assistente Médico</h1>
         <p>Consulte informações gerais baseadas na base de conhecimento clínica.</p>
+        {conversation.length > 0 && (
+          <button className="btn btn-secondary" type="button" onClick={handleNewConversation}>
+            Nova conversa
+          </button>
+        )}
       </header>
 
       <section className="card agent-card">
@@ -113,6 +166,7 @@ export function AgentPage() {
         </form>
 
         {error && <div className="alert alert-error agent-error">{error}</div>}
+        {conversation.length > 0 && <Conversation turns={conversation} />}
         {response && <AgentResult response={response} />}
       </section>
     </div>

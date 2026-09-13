@@ -10,9 +10,12 @@ responsabilidade única entre serviços.
 """
 import logging
 import os
+import re
 from typing import Any, Dict, List, Optional
 
 import requests
+
+from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
 
@@ -20,19 +23,54 @@ logger = logging.getLogger(__name__)
 # Configuração
 # ---------------------------------------------------------------------------
 BACKEND_API_URL = os.getenv("BACKEND_API_URL", "http://localhost:3000")
-RAG_TOP_K = int(os.getenv("RAG_TOP_K", "5"))
-RAG_SIMILARITY_THRESHOLD = float(os.getenv("RAG_SIMILARITY_THRESHOLD", "0.25"))
 RAG_QUERY_ENDPOINT = f"{BACKEND_API_URL}/rag-database/query"
+
+
+def _get_similarity_threshold() -> float:
+    """Carrega o threshold de similaridade do .env com override de variáveis antigas."""
+    load_dotenv(override=True)
+    raw = os.getenv("RAG_SIMILARITY_THRESHOLD", "0.48")
+    try:
+        val = float(raw)
+        return max(val, 0.48)
+    except ValueError:
+        return 0.48
+
+
+def _get_top_k() -> int:
+    raw = os.getenv("RAG_TOP_K", "3")
+    try:
+        return int(raw)
+    except ValueError:
+        return 3
 
 
 # ---------------------------------------------------------------------------
 # Funções auxiliares
 # ---------------------------------------------------------------------------
+def _clean_content_for_prompt(content: str) -> str:
+    """
+    Remove cabeçalhos artificiais, URLs longas e metadados repetidos inseridos
+    no texto bruto do chunk durante a indexação, deixando texto clínico limpo
+    para não poluir a atenção de modelos compactos (1.5B).
+    """
+    if not content:
+        return ""
+    cleaned = re.sub(
+        r"^###\s*Protocolo\s+clinico\s+RAG\s*\n(?:Nome:[^\n]*\n)?(?:Fonte:[^\n]*\n)?(?:URL:[^\n]*\n)?(?:\n*Conteudo:\s*\n)?",
+        "",
+        content.strip(),
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(r"\bPág\.\s*\d+\b", "", cleaned)
+    return cleaned.strip()
+
+
 def _query_rag(
     query: str,
-    top_k: int = RAG_TOP_K,
+    top_k: Optional[int] = None,
     preprocess_id: Optional[str] = None,
-    similarity_threshold: float = RAG_SIMILARITY_THRESHOLD,
+    similarity_threshold: Optional[float] = None,
 ) -> List[Dict[str, Any]]:
     """
     Consulta a API RAG do backend e retorna os documentos mais relevantes.
@@ -46,6 +84,11 @@ def _query_rag(
     Returns:
         Lista de documentos RAG com scores e metadados.
     """
+    if similarity_threshold is None:
+        similarity_threshold = _get_similarity_threshold()
+    if top_k is None:
+        top_k = _get_top_k()
+
     payload: Dict[str, Any] = {
         "query": query,
         "top_k": top_k,
@@ -62,10 +105,14 @@ def _query_rag(
         )
         response.raise_for_status()
         data = response.json()
-        documents = data.get("documents", [])
+        raw_documents = data.get("documents", [])
+        documents = [
+            doc for doc in raw_documents
+            if float(doc.get("similarity_score", 0.0)) >= similarity_threshold
+        ]
         logger.info(
-            f"[RAG] Busca concluída: {len(documents)} documentos retornados "
-            f"de {data.get('total_results', 0)} encontrados."
+            f"[RAG] Busca concluída: {len(documents)} documentos aprovados "
+            f"(de {len(raw_documents)} retornados pelo backend, threshold={similarity_threshold})."
         )
         return documents
     except requests.exceptions.ConnectionError:
@@ -105,11 +152,30 @@ def rag_retriever_node(state: dict) -> dict:
     """
     query = state.get("query", "")
     preprocess_id = state.get("preprocess_id")
+    conversation_history = state.get("conversation_history", [])
 
-    logger.info(f"[RAG] Buscando contexto para: '{query[:80]}'")
+    # Enriquece a query do RAG com contexto do histórico quando a query é um
+    # follow-up (ex: "pode resumir?", "e os cuidados em casa?").
+    # Usa a última query do histórico para dar contexto médico à busca vetorial.
+    rag_query = query
+    if conversation_history and isinstance(conversation_history, list):
+        last_turn = conversation_history[-1]
+        if isinstance(last_turn, dict):
+            last_query = last_turn.get("query", "").strip()
+            # Heurística: query curta ou sem ponto de interrogação médico
+            # indica follow-up que precisa de contexto extra para o RAG
+            is_short_followup = len(query.split()) <= 20
+            if last_query and is_short_followup:
+                rag_query = f"{last_query} {query}"
+                logger.info(
+                    f"[RAG] Query enriquecida com contexto do histórico "
+                    f"({len(query.split())} → {len(rag_query.split())} palavras)."
+                )
+
+    logger.info(f"[RAG] Buscando contexto para: '{rag_query[:120]}'")
 
     documents = _query_rag(
-        query=query,
+        query=rag_query,
         preprocess_id=preprocess_id,
     )
 
@@ -119,6 +185,7 @@ def rag_retriever_node(state: dict) -> dict:
         dataset = doc.get("dataset", "desconhecido")
         score = doc.get("similarity_score", 0.0)
         content = doc.get("content", "").strip()
+        cleaned_content = _clean_content_for_prompt(content)
         source_type = doc.get("source_type", "")
 
         # Mapeia dataset para nome amigável para citação inline
@@ -127,9 +194,17 @@ def rag_retriever_node(state: dict) -> dict:
             "clinical_protocols": "FHEMIG (Protocolos Clínicos)",
         }.get(dataset, dataset)
 
+        meta = doc.get("metadatas") or {}
+        doc_name = ""
+        if isinstance(meta, dict):
+            raw_name = meta.get("name") or meta.get("source_label", "")
+            doc_name = raw_name.replace(".pdf", "").replace("---", " - ")
+
+        title = f"{dataset_label} ({doc_name})" if doc_name else dataset_label
+
         part = (
-            f"[Contexto {i} — Fonte: {dataset_label}, score: {score:.2f}]\n"
-            f"{content}"
+            f"[Contexto {i} — Fonte: {title}, score: {score:.2f}]\n"
+            f"{cleaned_content}"
         )
         context_parts.append(part)
 

@@ -606,12 +606,17 @@ def query_rag_documents(
         raw_text_score = text_scores.get(doc_id, 0.0)
         norm_text_score = raw_text_score / max_text_score if max_text_score > 0 else 0.0
 
-        # Para busca hibrida: combinamos o score semantico (vetor) com o lexical (texto).
-        # A formula aditiva (60% vetor / 40% texto) permite que um documento com excelente match
-        # de palavra-chave (tuberculose) seja resgatado mesmo que seu embedding vetorial seja fraco (ex: < 0.3).
-        # Ao mesmo tempo, um documento que so tem "tratar" tera um norm_text_score muito baixo (~0.2),
-        # fazendo com que seu final_score desabe para baixo de 0.3.
-        final_score = round((cos_sim * 0.6) + (norm_text_score * 0.4), 6)
+        # Para busca híbrida: combinamos o score semântico (vetor) com o lexical (texto).
+        # Se a similaridade semântica de cosseno for muito baixa (< 0.12), significa que o
+        # conteúdo não possui relevância conceitual com a pergunta (ex: apenas uma palavra-chave
+        # isolada no cabeçalho ou título do arquivo). Nesses casos, reduzimos a influência textual
+        # para evitar que falsos positivos por título superem documentos legítimos.
+        if cos_sim < 0.12:
+            effective_text_weight = 0.15
+        else:
+            effective_text_weight = 0.40
+
+        final_score = round((cos_sim * (1.0 - effective_text_weight)) + (norm_text_score * effective_text_weight), 6)
 
         if similarity_threshold is not None and final_score < similarity_threshold:
             continue
