@@ -33,9 +33,14 @@ O backend expoe endpoints para:
 2. consultar o status de uma execucao em andamento ou concluida;
 3. gerar a base RAG para uso futuro por um agente de IA;
 4. realizar consultas semanticas por similaridade na base RAG;
-5. verificar a saude da aplicacao.
+5. consultar laudos médicos pelo nome do paciente;
+6. verificar a saude da aplicacao.
 
-Na inicializacao, a API testa a conexao com o MongoDB. Se a conexao falhar, a aplicacao nao sobe.
+Na inicializacao, a API testa a conexao com o MongoDB e importa
+`datasets/files/laudos_medicos/dataset_laudos_medicos.json` para a collection
+`medical_reports` somente quando ela não existe ou está vazia. Se a collection já
+possuir dados, a importação é ignorada. Se a conexão ou a importação falhar, a
+aplicacao nao sobe.
 
 ## Arquitetura
 
@@ -71,6 +76,14 @@ datasets/
 ```
 
 O processamento pesado roda em background task do FastAPI. O endpoint POST /preprocess retorna imediatamente com o ID da execucao, e o cliente consulta o progresso via GET /preprocess/{id}.
+
+### Consulta de laudos médicos
+
+`GET /medical-reports?patient_name=Pedro%20Oliveira%20Pereira`
+
+Retorna os laudos cujo campo `cabecalho_identificador.nome_paciente` coincide
+exatamente com o nome informado, ignorando maiúsculas e minúsculas. Quando não
+há correspondências, a API retorna uma lista vazia.
 
 Quando ha uma GPU Nvidia disponivel com driver/runtime configurados, o backend usa CUDA automaticamente para a etapa de traducao. Se nao houver GPU, ele faz fallback para CPU, o que deixa a traducao bem mais lenta.
 

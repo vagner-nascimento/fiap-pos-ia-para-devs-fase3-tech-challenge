@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime
 from fastapi import FastAPI
 from routers import get_all_routers
+from infra.database.collections.medical_reports import initialize_medical_reports_collection
 from infra.database.mongodb import test_connection
 
 # Configure logging
@@ -27,6 +28,11 @@ async def lifespan(app: FastAPI):
     
     if test_connection():
         logger.info("Conexão com MongoDB estabelecida com sucesso!")
+        import_result = initialize_medical_reports_collection()
+        if import_result["imported"]:
+            logger.info("Laudos médicos importados: %s registros.", import_result["count"])
+        else:
+            logger.info("Collection medical_reports já possui dados; importação ignorada.")
     else:
         logger.error("Falha na conexão com MongoDB. A aplicação não será inicializada.")
         raise SystemExit("Não foi possível conectar ao MongoDB. Verifique as configurações e se o serviço está rodando.")
