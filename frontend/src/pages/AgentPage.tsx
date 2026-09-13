@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { chatWithAgent } from "../api/agent";
-import type { AgentChatResponse, AgentConversationTurn, AgentSource } from "../types/agent";
+import { chatWithAgent, getAgentAuditLog } from "../api/agent";
+import type { AgentAuditLog, AgentChatResponse, AgentConversationTurn, AgentSource } from "../types/agent";
 import "./AgentPage.css";
 
 function SourceDetails({ source, index }: { source: AgentSource; index: number }) {
@@ -51,6 +51,91 @@ function AgentResult({ response }: { response: AgentChatResponse }) {
   );
 }
 
+function AuditTrail({ audit }: { audit: AgentAuditLog }) {
+  return (
+    <div className="agent-audit-detail">
+      <div className="agent-audit-meta">
+        <span className={`agent-badge ${audit.topic_valid ? "agent-badge-ok" : "agent-badge-warn"}`}>
+          {audit.topic_valid ? "Tópico válido" : "Tópico fora do domínio"}
+        </span>
+        <span className={`agent-badge ${audit.safety_triggered ? "agent-badge-alert" : "agent-badge-ok"}`}>
+          {audit.safety_triggered ? "Guardrail acionado" : "Sem bloqueio"}
+        </span>
+        <span className="agent-badge agent-badge-neutral">{audit.rag_documents_count} fontes</span>
+      </div>
+
+      <div className="agent-audit-grid">
+        <div>
+          <strong>Identificador</strong>
+          <span>{audit.id}</span>
+        </div>
+        <div>
+          <strong>Data</strong>
+          <span>{new Date(audit.created_date).toLocaleString("pt-BR")}</span>
+        </div>
+        <div>
+          <strong>Tempo</strong>
+          <span>{audit.duration_ms} ms</span>
+        </div>
+        <div>
+          <strong>Disclaimer</strong>
+          <span>{audit.has_disclaimer ? "Presente" : "Ausente"}</span>
+        </div>
+      </div>
+
+      {audit.safety_reason && (
+        <div className="agent-audit-block">
+          <h3>Motivo do guardrail</h3>
+          <p>{audit.safety_reason}</p>
+        </div>
+      )}
+
+      {audit.sources_cited.length > 0 && (
+        <div className="agent-audit-block">
+          <h3>Fontes citadas</h3>
+          <ul className="agent-inline-list">
+            {audit.sources_cited.map((source) => (
+              <li key={source}>{source}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {audit.rag_documents_used.length > 0 && (
+        <div className="agent-audit-block">
+          <h3>Contexto RAG consultado</h3>
+          <div className="agent-rag-list">
+            {audit.rag_documents_used.map((document, index) => (
+              <details key={`${document.id ?? index}-${document.dataset ?? "doc"}`} className="agent-source">
+                <summary>
+                  <span>{document.dataset || "Documento RAG"} {index + 1}</span>
+                  <strong>{document.similarity_score ? `${(document.similarity_score * 100).toFixed(1)}%` : "similaridade"}</strong>
+                </summary>
+                <div className="agent-source-content">
+                  <span className="agent-source-type">{document.source_type || "Fonte não informada"}</span>
+                  <p>{document.content_preview || "Prévia do conteúdo indisponível."}</p>
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="agent-audit-block">
+        <h3>Resposta final</h3>
+        <p>{audit.final_response}</p>
+      </div>
+
+      {audit.llm_response_raw && (
+        <div className="agent-audit-block">
+          <h3>Resposta bruta da LLM</h3>
+          <p>{audit.llm_response_raw}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Conversation({ turns }: { turns: AgentConversationTurn[] }) {
   return (
     <section className="agent-conversation" aria-label="Histórico da conversa">
@@ -82,8 +167,48 @@ export function AgentPage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [conversation, setConversation] = useState<AgentConversationTurn[]>([]);
   const [response, setResponse] = useState<AgentChatResponse | null>(null);
+  const [auditLog, setAuditLog] = useState<AgentAuditLog | null>(null);
+  const [isAuditOpen, setIsAuditOpen] = useState(false);
+  const [isLoadingAudit, setIsLoadingAudit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [auditError, setAuditError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!response?.audit_id) {
+      setAuditLog(null);
+      setAuditError(null);
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadAuditLog = async () => {
+      setIsLoadingAudit(true);
+      setAuditError(null);
+      try {
+        const detail = await getAgentAuditLog(response.audit_id);
+        if (isMounted) {
+          setAuditLog(detail);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setAuditError(err instanceof Error ? err.message : "Erro ao carregar a trilha de auditoria.");
+          setAuditLog(null);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingAudit(false);
+        }
+      }
+    };
+
+    void loadAuditLog();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [response?.audit_id]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -124,6 +249,9 @@ export function AgentPage() {
     setSessionId(null);
     setConversation([]);
     setResponse(null);
+    setAuditLog(null);
+    setIsAuditOpen(false);
+    setAuditError(null);
     setError(null);
     setQuery("");
   };
@@ -167,7 +295,23 @@ export function AgentPage() {
 
         {error && <div className="alert alert-error agent-error">{error}</div>}
         {conversation.length > 0 && <Conversation turns={conversation} />}
-        {response && <AgentResult response={response} />}
+        {response && (
+          <>
+            <AgentResult response={response} />
+            <section className="agent-audit" aria-live="polite">
+              <div className="agent-section-heading">
+                <h2>Trilha de auditoria</h2>
+                <button type="button" className="btn btn-secondary btn-compact" onClick={() => setIsAuditOpen((open) => !open)}>
+                  {isAuditOpen ? "Ocultar" : "Mostrar"}
+                </button>
+              </div>
+
+              {isLoadingAudit && <div className="agent-info">Carregando trilha de auditoria...</div>}
+              {auditError && <div className="alert alert-error">{auditError}</div>}
+              {isAuditOpen && auditLog && <AuditTrail audit={auditLog} />}
+            </section>
+          </>
+        )}
       </section>
     </div>
   );

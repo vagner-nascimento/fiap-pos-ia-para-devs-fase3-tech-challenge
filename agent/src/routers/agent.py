@@ -82,6 +82,16 @@ class AgentChatResponse(BaseModel):
     duration_ms: int = Field(description="Tempo total de processamento em milissegundos.")
 
 
+class RagAuditDocument(BaseModel):
+    """Resumo de documento RAG armazenado no log de auditoria."""
+
+    id: Optional[str] = None
+    dataset: Optional[str] = None
+    source_type: Optional[str] = None
+    similarity_score: Optional[float] = None
+    content_preview: Optional[str] = None
+
+
 class AuditLogResponse(BaseModel):
     """Log de auditoria de uma interação."""
 
@@ -92,6 +102,8 @@ class AuditLogResponse(BaseModel):
     safety_triggered: bool
     safety_reason: Optional[str]
     rag_documents_count: int
+    rag_documents_used: List[RagAuditDocument] = Field(default_factory=list)
+    llm_response_raw: str = Field(default="", description="Resposta bruta gerada pela LLM antes da formatação final.")
     sources_cited: List[str]
     has_disclaimer: bool
     preprocess_id: Optional[str]
@@ -197,6 +209,17 @@ def get_audit_history(session_id: str) -> List[Dict[str, Any]]:
             "safety_triggered": log.get("safety_triggered", False),
             "safety_reason": log.get("safety_reason"),
             "rag_documents_count": log.get("rag_documents_count", 0),
+            "rag_documents_used": [
+                RagAuditDocument(
+                    id=doc.get("id"),
+                    dataset=doc.get("dataset"),
+                    source_type=doc.get("source_type"),
+                    similarity_score=doc.get("similarity_score"),
+                    content_preview=doc.get("content_preview"),
+                )
+                for doc in log.get("rag_documents_used", [])
+            ],
+            "llm_response_raw": log.get("llm_response_raw", ""),
             "sources_cited": log.get("sources_cited", []),
             "has_disclaimer": log.get("has_disclaimer", False),
             "preprocess_id": log.get("preprocess_id"),
@@ -240,6 +263,17 @@ def get_audit_log(audit_id: str) -> Dict[str, Any]:
         "safety_triggered": log.get("safety_triggered", False),
         "safety_reason": log.get("safety_reason"),
         "rag_documents_count": log.get("rag_documents_count", 0),
+        "rag_documents_used": [
+            RagAuditDocument(
+                id=doc.get("id"),
+                dataset=doc.get("dataset"),
+                source_type=doc.get("source_type"),
+                similarity_score=doc.get("similarity_score"),
+                content_preview=doc.get("content_preview"),
+            )
+            for doc in log.get("rag_documents_used", [])
+        ],
+        "llm_response_raw": log.get("llm_response_raw", ""),
         "sources_cited": log.get("sources_cited", []),
         "has_disclaimer": log.get("has_disclaimer", False),
         "preprocess_id": log.get("preprocess_id"),

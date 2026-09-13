@@ -24,6 +24,32 @@ export interface AgentChatResponse {
   duration_ms: number;
 }
 
+export interface AuditRagDocument {
+  id?: string;
+  dataset?: string;
+  source_type?: string;
+  similarity_score?: number;
+  content_preview?: string;
+}
+
+export interface AgentAuditLog {
+  id: string;
+  session_id: string;
+  query: string;
+  topic_valid: boolean;
+  safety_triggered: boolean;
+  safety_reason: string | null;
+  rag_documents_count: number;
+  rag_documents_used: AuditRagDocument[];
+  llm_response_raw: string;
+  sources_cited: string[];
+  has_disclaimer: boolean;
+  preprocess_id: string | null;
+  duration_ms: number;
+  created_date: string;
+  final_response: string;
+}
+
 export interface AgentConversationTurn {
   query: string;
   response: string;
