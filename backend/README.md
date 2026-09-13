@@ -159,7 +159,7 @@ cp .env.example .env
 
 ## Como subir a aplicacao
 
-### Opcao 1 - Docker Compose
+### Opcao 1A - Docker Compose (Modo GPU - Nvidia CUDA)
 
 ```bash
 docker compose -f app-docker-compose.yaml up --build -d
@@ -171,6 +171,29 @@ Para reiniciar os containers:
 
 ```bash
 ./restart-app.sh
+```
+
+### Opcao 1B - Docker Compose (Modo CPU - Sem GPU Nvidia)
+
+Para rodar em máquinas sem placa Nvidia ou sem drivers CUDA/NVIDIA Container Toolkit:
+
+```bash
+./start-app-cpu.sh
+```
+
+Ou diretamente via Docker Compose:
+
+```bash
+docker compose -f app-docker-compose.cpu.yaml up --build -d
+```
+
+Esta versão utiliza o `Dockerfile.cpu` baseado em `python:3.10-slim` e PyTorch CPU oficial, resultando em downloads muito menores e build mais rápido.
+
+Para reiniciar ou parar em modo CPU:
+
+```bash
+./restart-app-cpu.sh
+./stop-app-cpu.sh
 ```
 
 ### Opcao 2 - Apenas infraestrutura via Docker

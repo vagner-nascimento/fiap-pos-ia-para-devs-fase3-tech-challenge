@@ -1,0 +1,42 @@
+FROM python:3.10-slim
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app/src \
+    PATH="/app/.venv/bin:$PATH"
+
+WORKDIR /app
+
+# Instalar dependências básicas do sistema necessárias para compilação/build
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    ca-certificates \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar uv para gerenciamento rápido e eficiente de pacotes
+RUN pip install --no-cache-dir uv
+
+# Copiar arquivos de configuração do pacote
+COPY pyproject.toml ./
+
+# Criar ambiente virtual dedicado
+RUN uv venv /app/.venv --python /usr/local/bin/python
+
+# Instalar PyTorch oficial em versão pura CPU para evitar download de pacotes CUDA da NVIDIA (~2.5GB)
+RUN uv pip install --no-cache-dir "torch>=2.0.0" --index https://download.pytorch.org/whl/cpu
+
+# Instalar as demais dependências do projeto respeitando a instalação de CPU existente
+RUN uv pip install --no-cache-dir .
+
+# Copiar código-fonte e datasets
+COPY src/ ./src/
+COPY datasets/ ./datasets/
+
+# Expor porta padrão do backend
+EXPOSE 3000
+
+# Executar a aplicação usando o ambiente virtual configurado
+CMD ["/app/.venv/bin/python", "src/main.py"]

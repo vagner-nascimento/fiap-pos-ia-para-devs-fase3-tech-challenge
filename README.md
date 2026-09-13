@@ -97,8 +97,24 @@ O arquivo [app-docker-compose.yaml](app-docker-compose.yaml) sobe a aplicação 
 
 ### Comando
 
+### Comando (Modo GPU - Nvidia CUDA)
+
 ```bash
 docker compose -f app-docker-compose.yaml up --build -d
+```
+
+### Comando (Modo CPU - Sem necessidade de GPU Nvidia)
+
+Para rodar em máquinas sem placa Nvidia ou sem o NVIDIA Container Toolkit configurado:
+
+```bash
+./start-app-cpu.sh
+```
+
+Ou diretamente via Docker Compose:
+
+```bash
+docker compose -f app-docker-compose.cpu.yaml up --build -d
 ```
 
 Para atualizar somente o backend ou frontend pós correção, use:
@@ -106,14 +122,18 @@ Para atualizar somente o backend ou frontend pós correção, use:
 ```bash
 docker compose -f app-docker-compose.yaml up --build -d backend
 docker compose -f app-docker-compose.yaml up --build -d frontend
+# Ou para o modo CPU:
+docker compose -f app-docker-compose.cpu.yaml up --build -d backend
 ```
 
-Observação: o primeiro build pode demorar bastante, principalmente por causa do backend, que baixa dependências grandes de IA e pacotes de suporte à execução em GPU Nvidia.
+Observação: o build com GPU Nvidia baixa dependências CUDA adicionais. Já o build em modo CPU utiliza imagem otimizada `python:3.10-slim` com PyTorch CPU, sendo consideravelmente mais leve e rápido de baixar.
 
-Depois de subir a aplicação, acompanhe os logs em tempo real com `docker compose logs -f` ou, usando o arquivo deste projeto, `docker compose -f app-docker-compose.yaml logs -f`:
+Depois de subir a aplicação, acompanhe os logs em tempo real com `docker compose logs -f` ou, usando o arquivo deste projeto:
 
 ```bash
 docker compose -f app-docker-compose.yaml logs -f
+# Ou em modo CPU:
+docker compose -f app-docker-compose.cpu.yaml logs -f
 ```
 
 ### Acesso
@@ -126,16 +146,26 @@ docker compose -f app-docker-compose.yaml logs -f
 ### Parar os containers
 
 ```bash
+# Modo GPU
 docker compose -f app-docker-compose.yaml down
+# ou ./stop-app.sh
+
+# Modo CPU
+./stop-app-cpu.sh
+# ou docker compose -f app-docker-compose.cpu.yaml down
 ```
 
-## Script de reinicialização
+## Scripts de automação
 
-O script [restart-app.sh](restart-app.sh) facilita a reinicialização completa da aplicação.
+- **Modo GPU (padrão):**
+  - Iniciar: `./start-app.sh`
+  - Parar: `./stop-app.sh`
+  - Reiniciar: `./restart-app.sh`
+- **Modo CPU (sem GPU):**
+  - Iniciar: `./start-app-cpu.sh`
+  - Parar: `./stop-app-cpu.sh`
+  - Reiniciar: `./restart-app-cpu.sh`
 
-```bash
-./restart-app.sh
-```
 
 ## Observações importantes
 
