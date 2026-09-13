@@ -32,9 +32,35 @@ function AgentResult({ response }: { response: AgentChatResponse }) {
       )}
 
       <div className="agent-answer">
-        <h2>Resposta do assistente</h2>
+        <div className="agent-section-heading">
+          <h2>Resposta do assistente</h2>
+          <div className="agent-badges-group">
+            {response.patient_context_used && (
+              <span className="agent-badge agent-badge-patient">
+                🏥 Prontuário consultado
+              </span>
+            )}
+            {response.context_summarized && (
+              <span className="agent-badge agent-badge-summarized">
+                ⚡ Contexto resumido
+              </span>
+            )}
+          </div>
+        </div>
         <div className="agent-answer-text">{response.response}</div>
       </div>
+
+      {response.patient_context_used && response.patient_fields_used && response.patient_fields_used.length > 0 && (
+        <details className="agent-source agent-patient-details">
+          <summary>
+            <span>Dados clínicos do prontuário utilizados</span>
+            <strong>{response.patient_fields_used.length} {response.patient_fields_used.length === 1 ? "campo" : "campos"}</strong>
+          </summary>
+          <div className="agent-source-content">
+            <p>Seções clínicas consultadas: {response.patient_fields_used.join(", ")}</p>
+          </div>
+        </details>
+      )}
 
       {!response.safety_triggered && response.sources.length > 0 && (
         <div className="agent-sources">
@@ -61,6 +87,16 @@ function AuditTrail({ audit }: { audit: AgentAuditLog }) {
         <span className={`agent-badge ${audit.safety_triggered ? "agent-badge-alert" : "agent-badge-ok"}`}>
           {audit.safety_triggered ? "Guardrail acionado" : "Sem bloqueio"}
         </span>
+        {audit.patient_record_used && (
+          <span className="agent-badge agent-badge-patient">
+            🏥 Prontuário consultado
+          </span>
+        )}
+        {audit.context_summarized && (
+          <span className="agent-badge agent-badge-summarized">
+            ⚡ Contexto resumido ({audit.context_summarizer_mode || "auto"})
+          </span>
+        )}
         <span className="agent-badge agent-badge-neutral">{audit.rag_documents_count} fontes</span>
       </div>
 
@@ -147,11 +183,15 @@ function Conversation({ turns }: { turns: AgentConversationTurn[] }) {
         {turns.map((turn, index) => (
           <div className="agent-turn" key={`${index}-${turn.query}`}>
             <div className="agent-message agent-message-human">
-              <strong>Human</strong>
+              <strong>
+                Human {turn.patient_name ? `• Paciente: ${turn.patient_name}` : ""}
+              </strong>
               <p>{turn.query}</p>
             </div>
             <div className="agent-message agent-message-agent">
-              <strong>Agent</strong>
+              <strong>
+                Agent {turn.patient_context_used ? "• 🏥 Prontuário consultado" : ""}
+              </strong>
               <p>{turn.response}</p>
             </div>
           </div>
@@ -163,6 +203,7 @@ function Conversation({ turns }: { turns: AgentConversationTurn[] }) {
 
 export function AgentPage() {
   const [query, setQuery] = useState("");
+  const [patientName, setPatientName] = useState("");
   const [preprocessId, setPreprocessId] = useState("");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [conversation, setConversation] = useState<AgentConversationTurn[]>([]);
@@ -225,6 +266,7 @@ export function AgentPage() {
         query: trimmedQuery,
         session_id: sessionId ?? undefined,
         preprocess_id: preprocessId.trim() || null,
+        patient_name: patientName.trim() || null,
       });
       setSessionId(nextResponse.session_id);
       setResponse(nextResponse);
@@ -236,6 +278,9 @@ export function AgentPage() {
           sources: nextResponse.sources,
           safety_triggered: nextResponse.safety_triggered,
           safety_reason: nextResponse.safety_reason,
+          patient_name: patientName.trim() || null,
+          patient_context_used: nextResponse.patient_context_used,
+          patient_fields_used: nextResponse.patient_fields_used,
         },
       ]);
     } catch (err) {
@@ -254,13 +299,14 @@ export function AgentPage() {
     setAuditError(null);
     setError(null);
     setQuery("");
+    setPatientName("");
   };
 
   return (
     <div className="agent-page">
       <header className="page-header">
         <h1>Assistente Médico</h1>
-        <p>Consulte informações gerais baseadas na base de conhecimento clínica.</p>
+        <p>Consulte informações gerais ou contextualizadas por prontuário de paciente (Jornada 2).</p>
         {conversation.length > 0 && (
           <button className="btn btn-secondary" type="button" onClick={handleNewConversation}>
             Nova conversa
@@ -275,10 +321,18 @@ export function AgentPage() {
             id="agent-query"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Ex.: Quais são os sintomas da tuberculose?"
+            placeholder="Ex.: Quais são os sintomas da tuberculose? ou Quais cuidados prescrever?"
             disabled={isSubmitting}
             rows={4}
             autoFocus
+          />
+          <label htmlFor="agent-patient-name">Nome do paciente (Jornada 2 — opcional)</label>
+          <input
+            id="agent-patient-name"
+            value={patientName}
+            onChange={(event) => setPatientName(event.target.value)}
+            placeholder="Ex.: João da Silva (preencha para contextualizar com prontuário)"
+            disabled={isSubmitting}
           />
           <label htmlFor="agent-preprocess-id">Preprocess ID (opcional)</label>
           <input

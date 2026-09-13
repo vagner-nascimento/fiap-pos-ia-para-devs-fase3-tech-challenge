@@ -40,7 +40,9 @@ from langgraph.graph import END, START, StateGraph
 
 from infra.database.checkpointer import get_checkpointer
 from services.nodes.audit_logger import audit_logger_node
+from services.nodes.context_summarizer import context_summarizer_node
 from services.nodes.llm_generator import llm_generator_node
+from services.nodes.patient_context_retriever import patient_context_retriever_node
 from services.nodes.rag_retriever import rag_retriever_node
 from services.nodes.response_formatter import response_formatter_node
 from services.nodes.safety_guard import safety_guard_node
@@ -59,6 +61,7 @@ class AgentState(TypedDict, total=False):
     session_id: str
     query: str
     preprocess_id: Optional[str]
+    patient_name: Optional[str]
     conversation_history: List[Dict[str, str]]
 
     # --- Rastreamento interno ---
@@ -72,9 +75,20 @@ class AgentState(TypedDict, total=False):
     safety_triggered: bool
     safety_reason: Optional[str]
 
+    # --- Contexto do Paciente (Jornada 2) ---
+    patient_context: str
+    patient_context_used: bool
+    patient_fields_used: List[str]
+
     # --- RAG ---
     rag_documents: List[Dict[str, Any]]
     rag_context: str
+
+    # --- Sumarização de Contexto (Janela SFT 3K) ---
+    compressed_rag_context: str
+    compressed_patient_context: str
+    context_summarized: bool
+    context_summarizer_mode: str
 
     # --- LLM ---
     llm_response_raw: str
@@ -115,13 +129,13 @@ def _route_after_safety_guard(state: AgentState) -> str:
     Decide o próximo nó após o guardrail de segurança.
 
     Se um guardrail foi ativado, pula direto para o audit_logger.
-    Caso contrário, prossegue para o RAG retriever.
+    Caso contrário, prossegue para o recuperador de contexto do paciente.
     """
     if state.get("done"):
         logger.info("[GRAPH] Roteando: safety_guard → audit_logger (safety ativado)")
         return "audit_logger"
-    logger.info("[GRAPH] Roteando: safety_guard → rag_retriever")
-    return "rag_retriever"
+    logger.info("[GRAPH] Roteando: safety_guard → patient_context_retriever")
+    return "patient_context_retriever"
 
 
 # ---------------------------------------------------------------------------
@@ -150,7 +164,9 @@ def _build_graph(checkpointer=None):
     graph.add_node("init", _init_node)
     graph.add_node("topic_validator", topic_validator_node)
     graph.add_node("safety_guard", safety_guard_node)
+    graph.add_node("patient_context_retriever", patient_context_retriever_node)
     graph.add_node("rag_retriever", rag_retriever_node)
+    graph.add_node("context_summarizer", context_summarizer_node)
     graph.add_node("llm_generator", llm_generator_node)
     graph.add_node("response_formatter", response_formatter_node)
     graph.add_node("audit_logger", audit_logger_node)
@@ -174,13 +190,15 @@ def _build_graph(checkpointer=None):
         "safety_guard",
         _route_after_safety_guard,
         {
-            "rag_retriever": "rag_retriever",
+            "patient_context_retriever": "patient_context_retriever",
             "audit_logger": "audit_logger",
         },
     )
 
     # Pipeline principal (sem desvios)
-    graph.add_edge("rag_retriever", "llm_generator")
+    graph.add_edge("patient_context_retriever", "rag_retriever")
+    graph.add_edge("rag_retriever", "context_summarizer")
+    graph.add_edge("context_summarizer", "llm_generator")
     graph.add_edge("llm_generator", "response_formatter")
     graph.add_edge("response_formatter", "audit_logger")
 
@@ -246,6 +264,7 @@ def run_medical_agent(
     query: str,
     session_id: str,
     preprocess_id: Optional[str] = None,
+    patient_name: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Executa o pipeline completo do agente médico para uma query.
@@ -254,6 +273,7 @@ def run_medical_agent(
         query: Pergunta do usuário em linguagem natural.
         session_id: Identificador da sessão do usuário (para rastreamento).
         preprocess_id: ID do pré-processamento para filtrar a base RAG (opcional).
+        patient_name: Nome do paciente para busca de prontuário (Jornada 2, opcional).
 
     Returns:
         Dicionário com o estado final do agente, incluindo:
@@ -262,6 +282,10 @@ def run_medical_agent(
         - `topic_valid`: Se a query passou na validação de domínio
         - `safety_triggered`: Se algum guardrail foi ativado
         - `requires_human_validation`: Sempre True
+        - `patient_context_used`: Se o prontuário do paciente foi utilizado
+        - `patient_fields_used`: Campos extraídos do prontuário
+        - `context_summarized`: Se o contexto foi comprimido
+        - `context_summarizer_mode`: Modo de sumarização empregado
         - `audit_id`: ID do log de auditoria criado
         - `duration_ms`: Tempo total de execução
 
@@ -275,12 +299,20 @@ def run_medical_agent(
         "session_id": session_id,
         "query": query,
         "preprocess_id": preprocess_id,
+        "patient_name": patient_name,
         "conversation_history": conversation_history,
         # Defaults para campos opcionais
         "topic_valid": False,
         "topic_reason": "",
         "safety_triggered": False,
         "safety_reason": None,
+        "patient_context": "",
+        "patient_context_used": False,
+        "patient_fields_used": [],
+        "compressed_rag_context": "",
+        "compressed_patient_context": "",
+        "context_summarized": False,
+        "context_summarizer_mode": "not_needed",
         "rag_documents": [],
         "rag_context": "",
         "llm_response_raw": "",
@@ -295,7 +327,7 @@ def run_medical_agent(
 
     logger.info(
         f"[AGENT] Iniciando pipeline: session={session_id} "
-        f"query='{query[:80]}' preprocess_id={preprocess_id}"
+        f"query='{query[:80]}' patient='{patient_name}' preprocess_id={preprocess_id}"
     )
 
     try:
@@ -313,7 +345,7 @@ def run_medical_agent(
         )
         return final_state
     except Exception as exc:
-        logger.error(f"[AGENT] Erro crítico no pipeline: {exc}")
+        logger.error(f"[AGENT] Erro crítico no pipeline: {exc}", exc_info=True)
         return {
             **initial_state,
             "final_response": (

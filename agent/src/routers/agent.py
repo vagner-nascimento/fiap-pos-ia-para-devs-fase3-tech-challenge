@@ -47,6 +47,13 @@ class AgentChatRequest(BaseModel):
             "Se não informado, usa todos os documentos disponíveis."
         ),
     )
+    patient_name: Optional[str] = Field(
+        None,
+        min_length=2,
+        max_length=120,
+        description="Nome do paciente. A presença aciona a Jornada 2 (consulta ao prontuário).",
+        examples=["João da Silva"],
+    )
 
 
 class RagDocumentSummary(BaseModel):
@@ -78,6 +85,18 @@ class AgentChatResponse(BaseModel):
         True,
         description="Sempre True — toda resposta requer validação humana.",
     )
+    patient_context_used: bool = Field(
+        False,
+        description="Se o prontuário do paciente foi recuperado e utilizado como contexto (Jornada 2).",
+    )
+    patient_fields_used: List[str] = Field(
+        default_factory=list,
+        description="Seções clínicas extraídas do prontuário (ex: avaliacao, alergias).",
+    )
+    context_summarized: bool = Field(
+        False,
+        description="Se o contexto excedeu o limite de 3K tokens do SFT e foi comprimido.",
+    )
     audit_id: str = Field(description="ID do log de auditoria criado no MongoDB.")
     duration_ms: int = Field(description="Tempo total de processamento em milissegundos.")
 
@@ -108,6 +127,10 @@ class AuditLogResponse(BaseModel):
     has_disclaimer: bool
     preprocess_id: Optional[str]
     duration_ms: int
+    patient_record_used: bool = False
+    patient_fields_used: List[str] = Field(default_factory=list)
+    context_summarized: bool = False
+    context_summarizer_mode: str = "not_needed"
     created_date: str
     final_response: str
 
@@ -142,6 +165,7 @@ def agent_chat(request: AgentChatRequest) -> Dict[str, Any]:
             query=request.query,
             session_id=request.session_id,
             preprocess_id=request.preprocess_id,
+            patient_name=request.patient_name,
         )
     except Exception as exc:
         logger.error(f"[ROUTER] Erro ao executar o agente: {exc}")
@@ -170,6 +194,9 @@ def agent_chat(request: AgentChatRequest) -> Dict[str, Any]:
         "safety_triggered": result.get("safety_triggered", False),
         "safety_reason": result.get("safety_reason"),
         "requires_human_validation": True,
+        "patient_context_used": result.get("patient_context_used", False),
+        "patient_fields_used": result.get("patient_fields_used", []),
+        "context_summarized": result.get("context_summarized", False),
         "audit_id": result.get("audit_id", ""),
         "duration_ms": result.get("duration_ms", 0),
     }
@@ -224,6 +251,10 @@ def get_audit_history(session_id: str) -> List[Dict[str, Any]]:
             "has_disclaimer": log.get("has_disclaimer", False),
             "preprocess_id": log.get("preprocess_id"),
             "duration_ms": log.get("duration_ms", 0),
+            "patient_record_used": log.get("patient_record_used", False),
+            "patient_fields_used": log.get("patient_fields_used", []),
+            "context_summarized": log.get("context_summarized", False),
+            "context_summarizer_mode": log.get("context_summarizer_mode", "not_needed"),
             "created_date": log.get("created_date", ""),
             "final_response": log.get("final_response", ""),
         }
@@ -278,6 +309,10 @@ def get_audit_log(audit_id: str) -> Dict[str, Any]:
         "has_disclaimer": log.get("has_disclaimer", False),
         "preprocess_id": log.get("preprocess_id"),
         "duration_ms": log.get("duration_ms", 0),
+        "patient_record_used": log.get("patient_record_used", False),
+        "patient_fields_used": log.get("patient_fields_used", []),
+        "context_summarized": log.get("context_summarized", False),
+        "context_summarizer_mode": log.get("context_summarizer_mode", "not_needed"),
         "created_date": log.get("created_date", ""),
         "final_response": log.get("final_response", ""),
     }

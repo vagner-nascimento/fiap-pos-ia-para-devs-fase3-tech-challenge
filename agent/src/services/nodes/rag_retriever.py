@@ -153,6 +153,7 @@ def rag_retriever_node(state: dict) -> dict:
     query = state.get("query", "")
     preprocess_id = state.get("preprocess_id")
     conversation_history = state.get("conversation_history", [])
+    patient_context = state.get("patient_context", "")
 
     # Enriquece a query do RAG com contexto do histórico quando a query é um
     # follow-up (ex: "pode resumir?", "e os cuidados em casa?").
@@ -171,6 +172,15 @@ def rag_retriever_node(state: dict) -> dict:
                     f"[RAG] Query enriquecida com contexto do histórico "
                     f"({len(query.split())} → {len(rag_query.split())} palavras)."
                 )
+
+    # Se patient_context estiver preenchido (Jornada 2), enriquece a busca vetorial
+    # com termos clínicos do paciente (diagnósticos, alergias, medicações)
+    if patient_context:
+        patient_excerpt = " ".join(patient_context.splitlines()[:3])
+        rag_query = f"{rag_query} {patient_excerpt}".strip()
+        logger.info(
+            f"[RAG] Query enriquecida com dados do paciente: '{rag_query[:120]}'"
+        )
 
     logger.info(f"[RAG] Buscando contexto para: '{rag_query[:120]}'")
 

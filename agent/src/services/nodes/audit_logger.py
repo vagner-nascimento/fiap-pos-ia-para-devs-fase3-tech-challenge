@@ -50,6 +50,11 @@ def audit_logger_node(state: dict) -> dict:
     preprocess_id = state.get("preprocess_id")
     conversation_history = list(state.get("conversation_history", []))
 
+    patient_record_used = state.get("patient_context_used", False)
+    patient_fields_used = state.get("patient_fields_used", [])
+    context_summarized = state.get("context_summarized", False)
+    context_summarizer_mode = state.get("context_summarizer_mode", "not_needed")
+
     # Calcula a duração total do pipeline
     started_at = state.get("_started_at", time.time())
     duration_ms = int((time.time() - started_at) * 1000)
@@ -57,6 +62,7 @@ def audit_logger_node(state: dict) -> dict:
     logger.info(
         f"[AUDIT] Persistindo log: session={session_id} "
         f"topic_valid={topic_valid} safety_triggered={safety_triggered} "
+        f"patient_used={patient_record_used} summarized={context_summarized} "
         f"rag_docs={len(rag_documents)} duration_ms={duration_ms}"
     )
 
@@ -74,6 +80,10 @@ def audit_logger_node(state: dict) -> dict:
             has_disclaimer=has_disclaimer,
             preprocess_id=preprocess_id,
             duration_ms=duration_ms,
+            patient_record_used=patient_record_used,
+            patient_fields_used=patient_fields_used,
+            context_summarized=context_summarized,
+            context_summarizer_mode=context_summarizer_mode,
         )
         audit_id = audit_doc.get("_id", "")
         logger.info(f"[AUDIT] Log persistido com sucesso: audit_id={audit_id}")

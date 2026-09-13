@@ -2,6 +2,7 @@ export interface AgentChatRequest {
   query: string;
   session_id?: string;
   preprocess_id?: string | null;
+  patient_name?: string | null;
 }
 
 export interface AgentSource {
@@ -20,6 +21,9 @@ export interface AgentChatResponse {
   safety_triggered: boolean;
   safety_reason: string | null;
   requires_human_validation: boolean;
+  patient_context_used?: boolean;
+  patient_fields_used?: string[];
+  context_summarized?: boolean;
   audit_id: string;
   duration_ms: number;
 }
@@ -46,6 +50,10 @@ export interface AgentAuditLog {
   has_disclaimer: boolean;
   preprocess_id: string | null;
   duration_ms: number;
+  patient_record_used?: boolean;
+  patient_fields_used?: string[];
+  context_summarized?: boolean;
+  context_summarizer_mode?: string;
   created_date: string;
   final_response: string;
 }
@@ -56,4 +64,7 @@ export interface AgentConversationTurn {
   sources: AgentSource[];
   safety_triggered: boolean;
   safety_reason: string | null;
+  patient_name?: string | null;
+  patient_context_used?: boolean;
+  patient_fields_used?: string[];
 }

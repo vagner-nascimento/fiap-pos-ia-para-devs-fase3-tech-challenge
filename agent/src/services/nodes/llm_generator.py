@@ -4,8 +4,13 @@ Nó 4: Gerador LLM (LLM Generator)
 Injeta o contexto RAG recuperado, formata o prompt de acordo com o padrão
 de fine-tuning (SFT) do modelo Qwen2.5 (hospital-helper) e chama a LLM
 através do cliente híbrido (Hugging Face Spaces ZeroGPU ou FastAPI ngrok).
+
+Se `patient_context` estiver no estado (Jornada 2), é injetado no prompt
+com uma seção dedicada de dados clínicos anônimos do paciente, orientando
+a LLM a cruzar protocolo com histórico clínico.
 """
 import logging
+import os
 from typing import List
 
 from services.llm_client import build_llm_client
@@ -16,15 +21,21 @@ logger = logging.getLogger(__name__)
 def _build_prompt(
     question: str,
     context: str = "",
+    patient_context: str = "",
     conversation_history: list[dict[str, str]] | None = None,
 ) -> str:
     """
     Constrói o prompt no formato EXATO utilizado durante o fine-tuning SFT
     do modelo hospital-helper-qwen2.5-1.5b.
 
+    Se `patient_context` for fornecido (Jornada 2), uma seção de dados clínicos
+    anônimos do paciente é inserida no prompt, orientando a LLM a cruzar
+    protocolo com histórico clínico individual.
+
     Args:
         question: Pergunta do usuário.
         context: Contexto recuperado do RAG (opcional).
+        patient_context: Dados clínicos anônimos do paciente (opcional, Jornada 2).
 
     Returns:
         Prompt formatado para o modelo.
@@ -45,6 +56,15 @@ def _build_prompt(
                     f"Assistente: {turn.get('response', '')}",
                 ]
             )
+    if patient_context:
+        lines.extend([
+            "",
+            "### Dados Clinicos do Paciente (sem identificacao pessoal):",
+            patient_context,
+            "",
+            "(Use os dados clinicos acima para contextualizar sua resposta, "
+            "citando-os quando relevante para a pergunta.)",
+        ])
     if context:
         lines.extend(["Contexto:", context])
     lines.extend(["", "### Resposta:"])
@@ -109,15 +129,21 @@ def llm_generator_node(state: dict) -> dict:
         Estado atualizado com a resposta da LLM.
     """
     query = state.get("query", "")
-    rag_context = state.get("rag_context", "")
+    # Preferência por contextos já comprimidos pelo context_summarizer (se ativado)
+    rag_context = state.get("compressed_rag_context") or state.get("rag_context", "")
+    patient_context = state.get("compressed_patient_context") or state.get("patient_context", "")
     rag_documents = state.get("rag_documents", [])
     conversation_history = state.get("conversation_history", [])
 
-    logger.info(f"[LLM] Gerando resposta para: '{query[:80]}'")
+    logger.info(
+        f"[LLM] Gerando resposta para: '{query[:80]}' "
+        f"patient_context={'sim' if patient_context else 'nao'}"
+    )
 
     prompt = _build_prompt(
         question=query,
         context=rag_context,
+        patient_context=patient_context,
         conversation_history=conversation_history,
     )
 
@@ -127,7 +153,10 @@ def llm_generator_node(state: dict) -> dict:
     # Proporção empírica para PT-BR: ~3.5 chars/token.
     # -----------------------------------------------------------------------
     CHARS_PER_TOKEN = 3.5
-    MAX_CONTEXT_TOKENS = 32_768  # Qwen2.5-1.5B context window
+    # Limite real da janela do SFT (fine-tuning), não do modelo base (32K).
+    # O modelo foi treinado com sequências de até 3K tokens, passar mais
+    # degrada a qualidade da resposta.
+    MAX_CONTEXT_TOKENS = int(os.getenv("LLM_MAX_CONTEXT_TOKENS", "3000"))
     max_new_tokens = getattr(_get_llm_client(), "max_new_tokens", 450)
 
     # Detalha o tamanho de cada componente do prompt

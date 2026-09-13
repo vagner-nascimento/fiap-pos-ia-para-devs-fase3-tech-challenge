@@ -40,6 +40,10 @@ def create_audit_log(
     has_disclaimer: bool,
     preprocess_id: Optional[str],
     duration_ms: int,
+    patient_record_used: bool = False,
+    patient_fields_used: Optional[List[str]] = None,
+    context_summarized: bool = False,
+    context_summarizer_mode: str = "not_needed",
 ) -> Dict[str, Any]:
     """
     Persiste um log de auditoria completo no MongoDB.
@@ -93,6 +97,10 @@ def create_audit_log(
         "has_disclaimer": has_disclaimer,
         "preprocess_id": preprocess_id,
         "duration_ms": duration_ms,
+        "patient_record_used": patient_record_used,
+        "patient_fields_used": patient_fields_used or [],
+        "context_summarized": context_summarized,
+        "context_summarizer_mode": context_summarizer_mode,
         "created_date": now.isoformat(),
     }
 
