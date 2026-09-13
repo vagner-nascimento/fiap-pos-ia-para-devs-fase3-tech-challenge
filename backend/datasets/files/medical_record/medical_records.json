@@ -1,0 +1,3602 @@
+[
+  {
+    "id_prontuario": "8c67207c-db14-4bd9-9ded-1b42e5513e0a",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:00:00",
+    "profissional": {
+      "nome": "Dra. Mariana Oliveira",
+      "registro": "CRM-MG 100000"
+    },
+    "identificacao": {
+      "nome": "Pedro Oliveira Pereira",
+      "idade": 28,
+      "sexo": "Feminino",
+      "telefone": "(31) 97000-1000"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata episódios de ausência e contrações musculares breves, sem febre ou trauma recente.",
+        "historia_da_doenca_atual": "Quadro avaliado em 20/01/2026 durante eletroencefalograma (eeg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Levetiracetam 500 mg por via oral a cada 12 horas, conforme prescrição neurológica sintética."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "122 x 80 mmHg",
+          "frequencia_cardiaca": 78,
+          "frequencia_respiratoria": 16,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Paciente consciente no momento da avaliação, sem déficit motor focal evidente.",
+        "exames_complementares": {
+          "tipo": "Eletroencefalograma (EEG)",
+          "descricao": "Descargas epileptiformes generalizadas, do tipo ponta-onda a 3Hz, desencadeadas durante a hiperpneia.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Epilepsia generalizada idiopática",
+        "cid_10": "G40.3",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Avaliação com especialista em caráter de urgência.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "8c67207c-db14-4bd9-9ded-1b42e5513e0a",
+      "cabecalho_identificador": {
+        "nome_paciente": "Pedro Oliveira Pereira",
+        "data_exame": "2026-01-20",
+        "local_exame": "Clínica Mais Saúde",
+        "medico_solicitante": "Dr(a). Bruno Carvalho",
+        "crm_solicitante": "16511-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletroencefalograma (EEG)",
+        "descricao_tecnica": "Descargas epileptiformes generalizadas, do tipo ponta-onda a 3Hz, desencadeadas durante a hiperpneia.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Epilepsia generalizada idiopática",
+        "cid_10": "G40.3",
+        "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "40081c26-0e7d-4cbd-bffd-b242da4023d3",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:01:00",
+    "profissional": {
+      "nome": "Dra. Rafael Oliveira",
+      "registro": "CRM-MG 100001"
+    },
+    "identificacao": {
+      "nome": "Bruno Pereira Souza",
+      "idade": 35,
+      "sexo": "Masculino",
+      "telefone": "(31) 97001-1001"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata falta de ar aos esforços e cansaço progressivo, sem dor torácica no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 05/02/2026 durante raio-x de tórax. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Enalapril 10 mg por via oral a cada 12 horas e furosemida 40 mg pela manhã, conforme acompanhamento cardiológico."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "129 x 79 mmHg",
+          "frequencia_cardiaca": 85,
+          "frequencia_respiratoria": 19,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Perfusão periférica preservada, com discreto edema maleolar bilateral.",
+        "exames_complementares": {
+          "tipo": "Raio-X de Tórax",
+          "descricao": "Aumento global da área cardíaca. Congestão hilar bilateral. Linhas B de Kerley presentes.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Insuficiência cardíaca",
+        "cid_10": "I50.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Nenhuma conduta terapêutica específica necessária no momento.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "40081c26-0e7d-4cbd-bffd-b242da4023d3",
+      "cabecalho_identificador": {
+        "nome_paciente": "Bruno Pereira Souza",
+        "data_exame": "2026-02-05",
+        "local_exame": "Centro Médico Avançado",
+        "medico_solicitante": "Dr(a). Fernanda Santos",
+        "crm_solicitante": "48369-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Raio-X de Tórax",
+        "descricao_tecnica": "Aumento global da área cardíaca. Congestão hilar bilateral. Linhas B de Kerley presentes.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Insuficiência cardíaca",
+        "cid_10": "I50.9",
+        "conduta_terapeutica": "Nenhuma conduta terapêutica específica necessária no momento.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "0d025f32-1f72-4b12-8f86-bb96ecdee5ff",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:02:00",
+    "profissional": {
+      "nome": "Dra. Camila Oliveira",
+      "registro": "CRM-MG 100002"
+    },
+    "identificacao": {
+      "nome": "Bruno Costa Alves",
+      "idade": 42,
+      "sexo": "Feminino",
+      "telefone": "(31) 97002-1002"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 10/12/2025 durante eletroencefalograma (eeg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "124 x 78 mmHg",
+          "frequencia_cardiaca": 74,
+          "frequencia_respiratoria": 18,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Eletroencefalograma (EEG)",
+          "descricao": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+          "evolucao": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 15
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "0d025f32-1f72-4b12-8f86-bb96ecdee5ff",
+      "cabecalho_identificador": {
+        "nome_paciente": "Bruno Costa Alves",
+        "data_exame": "2025-12-10",
+        "local_exame": "Polo de Telemedicina",
+        "medico_solicitante": "Dr(a). Mariana Souza",
+        "crm_solicitante": "66936-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletroencefalograma (EEG)",
+        "descricao_tecnica": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+        "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+        "tempo_repouso_estimado_dias": 15
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "bf92fac6-621d-4543-a795-3f160b8cb373",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:03:00",
+    "profissional": {
+      "nome": "Dra. Joao Oliveira",
+      "registro": "CRM-MG 100003"
+    },
+    "identificacao": {
+      "nome": "Patricia Silva Gomes",
+      "idade": 49,
+      "sexo": "Masculino",
+      "telefone": "(31) 97003-1003"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata falta de ar aos esforços, tosse seca intermitente e chiado ocasional.",
+        "historia_da_doenca_atual": "Quadro avaliado em 16/06/2026 durante espirometria. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Brometo de tiotrópio 18 mcg por inalação uma vez ao dia e salbutamol se necessário."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "119 x 77 mmHg",
+          "frequencia_cardiaca": 81,
+          "frequencia_respiratoria": 17,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Expansibilidade torácica discretamente reduzida, sem sinais de desconforto respiratório agudo.",
+        "exames_complementares": {
+          "tipo": "Espirometria",
+          "descricao": "VEF1 reduzido, Relação VEF1/CVF < 0.70. Curva fluxo-volume com concavidade superior. Ausência de resposta significativa ao broncodilatador.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Doença pulmonar obstrutiva crônica",
+        "cid_10": "J44.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Repouso relativo, hidratação e analgesia se dor.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "bf92fac6-621d-4543-a795-3f160b8cb373",
+      "cabecalho_identificador": {
+        "nome_paciente": "Patricia Silva Gomes",
+        "data_exame": "2026-06-16",
+        "local_exame": "Instituto de Diagnóstico",
+        "medico_solicitante": "Dr(a). Pedro Alves",
+        "crm_solicitante": "85331-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Espirometria",
+        "descricao_tecnica": "VEF1 reduzido, Relação VEF1/CVF < 0.70. Curva fluxo-volume com concavidade superior. Ausência de resposta significativa ao broncodilatador.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Doença pulmonar obstrutiva crônica",
+        "cid_10": "J44.9",
+        "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "291d2e12-dfbc-46fd-bce3-688fc3639178",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:04:00",
+    "profissional": {
+      "nome": "Dra. Mariana Oliveira",
+      "registro": "CRM-MG 100004"
+    },
+    "identificacao": {
+      "nome": "Bruno Costa Almeida",
+      "idade": 56,
+      "sexo": "Feminino",
+      "telefone": "(31) 97004-1004"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata cefaleia episódica e dificuldade de concentração, sem alteração de consciência no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 11/08/2026 durante eletroencefalograma (eeg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor, até avaliação neurológica especializada."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "126 x 76 mmHg",
+          "frequencia_cardiaca": 70,
+          "frequencia_respiratoria": 16,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Orientado em tempo e espaço, força preservada e sem déficit neurológico focal evidente.",
+        "exames_complementares": {
+          "tipo": "Eletroencefalograma (EEG)",
+          "descricao": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Transtorno não especificado do encéfalo",
+        "cid_10": "G93.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "291d2e12-dfbc-46fd-bce3-688fc3639178",
+      "cabecalho_identificador": {
+        "nome_paciente": "Bruno Costa Almeida",
+        "data_exame": "2026-08-11",
+        "local_exame": "Polo de Telemedicina",
+        "medico_solicitante": "Dr(a). Fernanda Carvalho",
+        "crm_solicitante": "43925-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletroencefalograma (EEG)",
+        "descricao_tecnica": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Transtorno não especificado do encéfalo",
+        "cid_10": "G93.9",
+        "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "77312c4e-012c-4a25-bcb3-a721443547a4",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:05:00",
+    "profissional": {
+      "nome": "Dra. Rafael Oliveira",
+      "registro": "CRM-MG 100005"
+    },
+    "identificacao": {
+      "nome": "Lucas Almeida Oliveira",
+      "idade": 63,
+      "sexo": "Masculino",
+      "telefone": "(31) 97005-1005"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata cefaleia episódica e dificuldade de concentração, sem alteração de consciência no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 14/06/2026 durante eletroencefalograma (eeg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor, até avaliação neurológica especializada."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "121 x 83 mmHg",
+          "frequencia_cardiaca": 77,
+          "frequencia_respiratoria": 19,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Orientado em tempo e espaço, força preservada e sem déficit neurológico focal evidente.",
+        "exames_complementares": {
+          "tipo": "Eletroencefalograma (EEG)",
+          "descricao": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Transtorno não especificado do encéfalo",
+        "cid_10": "G93.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "77312c4e-012c-4a25-bcb3-a721443547a4",
+      "cabecalho_identificador": {
+        "nome_paciente": "Lucas Almeida Oliveira",
+        "data_exame": "2026-06-14",
+        "local_exame": "Clínica Mais Saúde",
+        "medico_solicitante": "Dr(a). Aline Almeida",
+        "crm_solicitante": "31952-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletroencefalograma (EEG)",
+        "descricao_tecnica": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Transtorno não especificado do encéfalo",
+        "cid_10": "G93.9",
+        "conduta_terapeutica": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "6bb7f22c-6d69-4793-a88a-69dc82423fe0",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:06:00",
+    "profissional": {
+      "nome": "Dra. Camila Oliveira",
+      "registro": "CRM-MG 100006"
+    },
+    "identificacao": {
+      "nome": "Marcos Martins Oliveira",
+      "idade": 70,
+      "sexo": "Feminino",
+      "telefone": "(31) 97006-1006"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata palpitações intermitentes e cansaço aos esforços, sem síncope recente.",
+        "historia_da_doenca_atual": "Quadro avaliado em 22/05/2026 durante eletrocardiograma (ecg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Metoprolol 25 mg por via oral a cada 12 horas, com avaliação cardiológica para ajuste."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "128 x 82 mmHg",
+          "frequencia_cardiaca": 84,
+          "frequencia_respiratoria": 18,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Paciente estável, pulsos periféricos palpáveis e sem sinais de baixo débito.",
+        "exames_complementares": {
+          "tipo": "Eletrocardiograma (ECG)",
+          "descricao": "Ritmo sinusal com extrassístoles ventriculares isoladas e frequentes.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Arritmia não especificada",
+        "cid_10": "I49.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Avaliação com especialista em caráter de urgência.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "6bb7f22c-6d69-4793-a88a-69dc82423fe0",
+      "cabecalho_identificador": {
+        "nome_paciente": "Marcos Martins Oliveira",
+        "data_exame": "2026-05-22",
+        "local_exame": "Polo de Telemedicina",
+        "medico_solicitante": "Dr(a). Juliana Carvalho",
+        "crm_solicitante": "14467-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletrocardiograma (ECG)",
+        "descricao_tecnica": "Ritmo sinusal com extrassístoles ventriculares isoladas e frequentes.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Arritmia não especificada",
+        "cid_10": "I49.9",
+        "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "8629a6da-2a98-47f8-8a47-c7f9a5661e58",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:07:00",
+    "profissional": {
+      "nome": "Dra. Joao Oliveira",
+      "registro": "CRM-MG 100007"
+    },
+    "identificacao": {
+      "nome": "Juliana Pereira Almeida",
+      "idade": 29,
+      "sexo": "Masculino",
+      "telefone": "(31) 97007-1007"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata cefaleia episódica e dificuldade de concentração, sem alteração de consciência no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 26/10/2025 durante ressonância magnética do crânio. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor, até avaliação neurológica especializada."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "123 x 81 mmHg",
+          "frequencia_cardiaca": 79,
+          "frequencia_respiratoria": 17,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Orientado em tempo e espaço, força preservada e sem déficit neurológico focal evidente.",
+        "exames_complementares": {
+          "tipo": "Ressonância Magnética do Crânio",
+          "descricao": "Focos de hipersinal em T2/FLAIR na substância branca periventricular e subcortical, de aspecto microangiopático/desmielinizante.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Outras afecções desmielinizantes do sistema nervoso central",
+        "cid_10": "G37.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "8629a6da-2a98-47f8-8a47-c7f9a5661e58",
+      "cabecalho_identificador": {
+        "nome_paciente": "Juliana Pereira Almeida",
+        "data_exame": "2025-10-26",
+        "local_exame": "Instituto de Diagnóstico",
+        "medico_solicitante": "Dr(a). Aline Ribeiro",
+        "crm_solicitante": "13307-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Ressonância Magnética do Crânio",
+        "descricao_tecnica": "Focos de hipersinal em T2/FLAIR na substância branca periventricular e subcortical, de aspecto microangiopático/desmielinizante.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Outras afecções desmielinizantes do sistema nervoso central",
+        "cid_10": "G37.9",
+        "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "953714a9-a9a9-40c6-ad12-c65e185aacad",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:08:00",
+    "profissional": {
+      "nome": "Dra. Mariana Oliveira",
+      "registro": "CRM-MG 100008"
+    },
+    "identificacao": {
+      "nome": "Carlos Almeida Gomes",
+      "idade": 36,
+      "sexo": "Feminino",
+      "telefone": "(31) 97008-1008"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata falta de ar aos esforços e cansaço progressivo, sem dor torácica no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 30/01/2026 durante raio-x de tórax. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Enalapril 10 mg por via oral a cada 12 horas e furosemida 40 mg pela manhã, conforme acompanhamento cardiológico."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "118 x 80 mmHg",
+          "frequencia_cardiaca": 68,
+          "frequencia_respiratoria": 16,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Perfusão periférica preservada, com discreto edema maleolar bilateral.",
+        "exames_complementares": {
+          "tipo": "Raio-X de Tórax",
+          "descricao": "Aumento global da área cardíaca. Congestão hilar bilateral. Linhas B de Kerley presentes.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Insuficiência cardíaca",
+        "cid_10": "I50.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "953714a9-a9a9-40c6-ad12-c65e185aacad",
+      "cabecalho_identificador": {
+        "nome_paciente": "Carlos Almeida Gomes",
+        "data_exame": "2026-01-30",
+        "local_exame": "Clínica Mais Saúde",
+        "medico_solicitante": "Dr(a). Aline Martins",
+        "crm_solicitante": "63326-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Raio-X de Tórax",
+        "descricao_tecnica": "Aumento global da área cardíaca. Congestão hilar bilateral. Linhas B de Kerley presentes.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Insuficiência cardíaca",
+        "cid_10": "I50.9",
+        "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "80bd8722-a04f-40be-b4d2-5dde2ad4cb72",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:09:00",
+    "profissional": {
+      "nome": "Dra. Rafael Oliveira",
+      "registro": "CRM-MG 100009"
+    },
+    "identificacao": {
+      "nome": "Aline Almeida Souza",
+      "idade": 43,
+      "sexo": "Masculino",
+      "telefone": "(31) 97009-1009"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata dispneia leve aos esforços e tosse seca ocasional, sem febre.",
+        "historia_da_doenca_atual": "Quadro avaliado em 27/03/2026 durante espirometria. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Nenhuma medicação específica iniciada; manter hidratação e avaliação pneumológica."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "125 x 79 mmHg",
+          "frequencia_cardiaca": 75,
+          "frequencia_respiratoria": 19,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Saturação periférica preservada em repouso, com crepitações discretas à ausculta.",
+        "exames_complementares": {
+          "tipo": "Espirometria",
+          "descricao": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Doença pulmonar intersticial não especificada",
+        "cid_10": "J84.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Nenhuma conduta terapêutica específica necessária no momento.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "80bd8722-a04f-40be-b4d2-5dde2ad4cb72",
+      "cabecalho_identificador": {
+        "nome_paciente": "Aline Almeida Souza",
+        "data_exame": "2026-03-27",
+        "local_exame": "Instituto de Diagnóstico",
+        "medico_solicitante": "Dr(a). Rafael Costa",
+        "crm_solicitante": "82083-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Espirometria",
+        "descricao_tecnica": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Doença pulmonar intersticial não especificada",
+        "cid_10": "J84.9",
+        "conduta_terapeutica": "Nenhuma conduta terapêutica específica necessária no momento.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "2faf842b-8436-4968-a747-9712f58f72f1",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:10:00",
+    "profissional": {
+      "nome": "Dra. Camila Oliveira",
+      "registro": "CRM-MG 100010"
+    },
+    "identificacao": {
+      "nome": "Mariana Pereira Rodrigues",
+      "idade": 50,
+      "sexo": "Feminino",
+      "telefone": "(31) 97010-1010"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 16/10/2025 durante eletrocardiograma (ecg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "120 x 78 mmHg",
+          "frequencia_cardiaca": 82,
+          "frequencia_respiratoria": 18,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Eletrocardiograma (ECG)",
+          "descricao": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Repouso relativo, hidratação e analgesia se dor.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "2faf842b-8436-4968-a747-9712f58f72f1",
+      "cabecalho_identificador": {
+        "nome_paciente": "Mariana Pereira Rodrigues",
+        "data_exame": "2025-10-16",
+        "local_exame": "Hospital Central",
+        "medico_solicitante": "Dr(a). Ana Santos",
+        "crm_solicitante": "30609-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletrocardiograma (ECG)",
+        "descricao_tecnica": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "bd54758a-5c49-4333-af0f-821900506c48",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:11:00",
+    "profissional": {
+      "nome": "Dra. Joao Oliveira",
+      "registro": "CRM-MG 100011"
+    },
+    "identificacao": {
+      "nome": "Camila Ribeiro Carvalho",
+      "idade": 57,
+      "sexo": "Masculino",
+      "telefone": "(31) 97011-1011"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 26/01/2026 durante espirometria. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "127 x 77 mmHg",
+          "frequencia_cardiaca": 71,
+          "frequencia_respiratoria": 17,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Espirometria",
+          "descricao": "Capacidade Vital Forçada (CVF) e Volume Expiratório Forçado no 1º segundo (VEF1) dentro dos limites previstos. Relação VEF1/CVF normal.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Repouso relativo, hidratação e analgesia se dor.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "bd54758a-5c49-4333-af0f-821900506c48",
+      "cabecalho_identificador": {
+        "nome_paciente": "Camila Ribeiro Carvalho",
+        "data_exame": "2026-01-26",
+        "local_exame": "Instituto de Diagnóstico",
+        "medico_solicitante": "Dr(a). Lucas Gomes",
+        "crm_solicitante": "22152-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Espirometria",
+        "descricao_tecnica": "Capacidade Vital Forçada (CVF) e Volume Expiratório Forçado no 1º segundo (VEF1) dentro dos limites previstos. Relação VEF1/CVF normal.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "62f85434-ec34-4930-83b3-26108eb7547c",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:12:00",
+    "profissional": {
+      "nome": "Dra. Mariana Oliveira",
+      "registro": "CRM-MG 100012"
+    },
+    "identificacao": {
+      "nome": "Camila Carvalho Carvalho",
+      "idade": 64,
+      "sexo": "Feminino",
+      "telefone": "(31) 97012-1012"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 20/12/2025 durante eletroencefalograma (eeg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "122 x 76 mmHg",
+          "frequencia_cardiaca": 78,
+          "frequencia_respiratoria": 16,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Eletroencefalograma (EEG)",
+          "descricao": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Repouso relativo, hidratação e analgesia se dor.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "62f85434-ec34-4930-83b3-26108eb7547c",
+      "cabecalho_identificador": {
+        "nome_paciente": "Camila Carvalho Carvalho",
+        "data_exame": "2025-12-20",
+        "local_exame": "Hospital da Cidade",
+        "medico_solicitante": "Dr(a). Carlos Souza",
+        "crm_solicitante": "84193-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletroencefalograma (EEG)",
+        "descricao_tecnica": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "4569b913-f8f1-4892-a2e9-44b2840c1bc1",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:13:00",
+    "profissional": {
+      "nome": "Dra. Rafael Oliveira",
+      "registro": "CRM-MG 100013"
+    },
+    "identificacao": {
+      "nome": "Lucas Lima Carvalho",
+      "idade": 71,
+      "sexo": "Masculino",
+      "telefone": "(31) 97013-1013"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata episódios de ausência e contrações musculares breves, sem febre ou trauma recente.",
+        "historia_da_doenca_atual": "Quadro avaliado em 29/09/2025 durante eletroencefalograma (eeg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Levetiracetam 500 mg por via oral a cada 12 horas, conforme prescrição neurológica sintética."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "129 x 83 mmHg",
+          "frequencia_cardiaca": 85,
+          "frequencia_respiratoria": 19,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Paciente consciente no momento da avaliação, sem déficit motor focal evidente.",
+        "exames_complementares": {
+          "tipo": "Eletroencefalograma (EEG)",
+          "descricao": "Descargas epileptiformes generalizadas, do tipo ponta-onda a 3Hz, desencadeadas durante a hiperpneia.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Epilepsia generalizada idiopática",
+        "cid_10": "G40.3",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Acompanhamento ambulatorial de rotina.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "4569b913-f8f1-4892-a2e9-44b2840c1bc1",
+      "cabecalho_identificador": {
+        "nome_paciente": "Lucas Lima Carvalho",
+        "data_exame": "2025-09-29",
+        "local_exame": "Centro Médico Avançado",
+        "medico_solicitante": "Dr(a). Aline Silva",
+        "crm_solicitante": "32784-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletroencefalograma (EEG)",
+        "descricao_tecnica": "Descargas epileptiformes generalizadas, do tipo ponta-onda a 3Hz, desencadeadas durante a hiperpneia.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Epilepsia generalizada idiopática",
+        "cid_10": "G40.3",
+        "conduta_terapeutica": "Acompanhamento ambulatorial de rotina.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "17d78ed8-c596-42dd-90ff-1962b76561bd",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:14:00",
+    "profissional": {
+      "nome": "Dra. Camila Oliveira",
+      "registro": "CRM-MG 100014"
+    },
+    "identificacao": {
+      "nome": "Juliana Ribeiro Gomes",
+      "idade": 30,
+      "sexo": "Feminino",
+      "telefone": "(31) 97014-1014"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata dispneia leve aos esforços e tosse seca ocasional, sem febre.",
+        "historia_da_doenca_atual": "Quadro avaliado em 30/06/2026 durante espirometria. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Nenhuma medicação específica iniciada; manter hidratação e avaliação pneumológica."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "124 x 82 mmHg",
+          "frequencia_cardiaca": 80,
+          "frequencia_respiratoria": 18,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Saturação periférica preservada em repouso, com crepitações discretas à ausculta.",
+        "exames_complementares": {
+          "tipo": "Espirometria",
+          "descricao": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Doença pulmonar intersticial não especificada",
+        "cid_10": "J84.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Avaliação com especialista em caráter de urgência.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "17d78ed8-c596-42dd-90ff-1962b76561bd",
+      "cabecalho_identificador": {
+        "nome_paciente": "Juliana Ribeiro Gomes",
+        "data_exame": "2026-06-30",
+        "local_exame": "Centro Médico Avançado",
+        "medico_solicitante": "Dr(a). Felipe Souza",
+        "crm_solicitante": "34806-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Espirometria",
+        "descricao_tecnica": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Doença pulmonar intersticial não especificada",
+        "cid_10": "J84.9",
+        "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "b17a7388-2681-483f-afba-47b348cbba9a",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:15:00",
+    "profissional": {
+      "nome": "Dra. Joao Oliveira",
+      "registro": "CRM-MG 100015"
+    },
+    "identificacao": {
+      "nome": "Camila Almeida Costa",
+      "idade": 37,
+      "sexo": "Masculino",
+      "telefone": "(31) 97015-1015"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 12/07/2026 durante eletrocardiograma (ecg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "119 x 81 mmHg",
+          "frequencia_cardiaca": 69,
+          "frequencia_respiratoria": 17,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Eletrocardiograma (ECG)",
+          "descricao": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Repouso relativo, hidratação e analgesia se dor.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "b17a7388-2681-483f-afba-47b348cbba9a",
+      "cabecalho_identificador": {
+        "nome_paciente": "Camila Almeida Costa",
+        "data_exame": "2026-07-12",
+        "local_exame": "Instituto de Diagnóstico",
+        "medico_solicitante": "Dr(a). Bruno Gomes",
+        "crm_solicitante": "36880-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletrocardiograma (ECG)",
+        "descricao_tecnica": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "d52479b9-2ce1-48fe-8b6c-5de3292de85d",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:16:00",
+    "profissional": {
+      "nome": "Dra. Mariana Oliveira",
+      "registro": "CRM-MG 100016"
+    },
+    "identificacao": {
+      "nome": "Carlos Costa Pereira",
+      "idade": 44,
+      "sexo": "Feminino",
+      "telefone": "(31) 97016-1016"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata cefaleia episódica e dificuldade de concentração, sem alteração de consciência no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 15/07/2026 durante ressonância magnética do crânio. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor, até avaliação neurológica especializada."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "126 x 80 mmHg",
+          "frequencia_cardiaca": 76,
+          "frequencia_respiratoria": 16,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Orientado em tempo e espaço, força preservada e sem déficit neurológico focal evidente.",
+        "exames_complementares": {
+          "tipo": "Ressonância Magnética do Crânio",
+          "descricao": "Focos de hipersinal em T2/FLAIR na substância branca periventricular e subcortical, de aspecto microangiopático/desmielinizante.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Outras afecções desmielinizantes do sistema nervoso central",
+        "cid_10": "G37.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Repouso relativo, hidratação e analgesia se dor.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "d52479b9-2ce1-48fe-8b6c-5de3292de85d",
+      "cabecalho_identificador": {
+        "nome_paciente": "Carlos Costa Pereira",
+        "data_exame": "2026-07-15",
+        "local_exame": "Clínica Mais Saúde",
+        "medico_solicitante": "Dr(a). Lucas Pereira",
+        "crm_solicitante": "31953-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Ressonância Magnética do Crânio",
+        "descricao_tecnica": "Focos de hipersinal em T2/FLAIR na substância branca periventricular e subcortical, de aspecto microangiopático/desmielinizante.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Outras afecções desmielinizantes do sistema nervoso central",
+        "cid_10": "G37.9",
+        "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "93f38a3d-ebed-477f-97d8-582cca44ef2d",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:17:00",
+    "profissional": {
+      "nome": "Dra. Rafael Oliveira",
+      "registro": "CRM-MG 100017"
+    },
+    "identificacao": {
+      "nome": "Pedro Costa Gomes",
+      "idade": 51,
+      "sexo": "Masculino",
+      "telefone": "(31) 97017-1017"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata falta de ar aos esforços, tosse seca intermitente e chiado ocasional.",
+        "historia_da_doenca_atual": "Quadro avaliado em 01/06/2026 durante espirometria. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Brometo de tiotrópio 18 mcg por inalação uma vez ao dia e salbutamol se necessário."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "121 x 79 mmHg",
+          "frequencia_cardiaca": 83,
+          "frequencia_respiratoria": 19,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Expansibilidade torácica discretamente reduzida, sem sinais de desconforto respiratório agudo.",
+        "exames_complementares": {
+          "tipo": "Espirometria",
+          "descricao": "VEF1 reduzido, Relação VEF1/CVF < 0.70. Curva fluxo-volume com concavidade superior. Ausência de resposta significativa ao broncodilatador.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Doença pulmonar obstrutiva crônica",
+        "cid_10": "J44.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "93f38a3d-ebed-477f-97d8-582cca44ef2d",
+      "cabecalho_identificador": {
+        "nome_paciente": "Pedro Costa Gomes",
+        "data_exame": "2026-06-01",
+        "local_exame": "Clínica Mais Saúde",
+        "medico_solicitante": "Dr(a). Marcos Oliveira",
+        "crm_solicitante": "43666-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Espirometria",
+        "descricao_tecnica": "VEF1 reduzido, Relação VEF1/CVF < 0.70. Curva fluxo-volume com concavidade superior. Ausência de resposta significativa ao broncodilatador.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Doença pulmonar obstrutiva crônica",
+        "cid_10": "J44.9",
+        "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "bfe8a565-7770-4fec-ae6b-20c883ab03f3",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:18:00",
+    "profissional": {
+      "nome": "Dra. Camila Oliveira",
+      "registro": "CRM-MG 100018"
+    },
+    "identificacao": {
+      "nome": "Mariana Santos Alves",
+      "idade": 58,
+      "sexo": "Feminino",
+      "telefone": "(31) 97018-1018"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata dispneia leve aos esforços e tosse seca ocasional, sem febre.",
+        "historia_da_doenca_atual": "Quadro avaliado em 03/10/2025 durante espirometria. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Nenhuma medicação específica iniciada; manter hidratação e avaliação pneumológica."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "128 x 78 mmHg",
+          "frequencia_cardiaca": 72,
+          "frequencia_respiratoria": 18,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Saturação periférica preservada em repouso, com crepitações discretas à ausculta.",
+        "exames_complementares": {
+          "tipo": "Espirometria",
+          "descricao": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Doença pulmonar intersticial não especificada",
+        "cid_10": "J84.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Avaliação com especialista em caráter de urgência.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "bfe8a565-7770-4fec-ae6b-20c883ab03f3",
+      "cabecalho_identificador": {
+        "nome_paciente": "Mariana Santos Alves",
+        "data_exame": "2025-10-03",
+        "local_exame": "Clínica Mais Saúde",
+        "medico_solicitante": "Dr(a). Marcos Silva",
+        "crm_solicitante": "53526-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Espirometria",
+        "descricao_tecnica": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Doença pulmonar intersticial não especificada",
+        "cid_10": "J84.9",
+        "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "6f3c7fd8-e4c1-4d7c-b70d-277e09df6629",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:19:00",
+    "profissional": {
+      "nome": "Dra. Joao Oliveira",
+      "registro": "CRM-MG 100019"
+    },
+    "identificacao": {
+      "nome": "Fernanda Costa Ribeiro",
+      "idade": 65,
+      "sexo": "Masculino",
+      "telefone": "(31) 97019-1019"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 30/12/2025 durante eletrocardiograma (ecg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "123 x 77 mmHg",
+          "frequencia_cardiaca": 79,
+          "frequencia_respiratoria": 17,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Eletrocardiograma (ECG)",
+          "descricao": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Repouso relativo, hidratação e analgesia se dor.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "6f3c7fd8-e4c1-4d7c-b70d-277e09df6629",
+      "cabecalho_identificador": {
+        "nome_paciente": "Fernanda Costa Ribeiro",
+        "data_exame": "2025-12-30",
+        "local_exame": "Clínica Mais Saúde",
+        "medico_solicitante": "Dr(a). Lucas Santos",
+        "crm_solicitante": "35597-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletrocardiograma (ECG)",
+        "descricao_tecnica": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "3d95171c-fdd1-478d-8263-4adbacda07c9",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:20:00",
+    "profissional": {
+      "nome": "Dra. Mariana Oliveira",
+      "registro": "CRM-MG 100020"
+    },
+    "identificacao": {
+      "nome": "Aline Martins Santos",
+      "idade": 72,
+      "sexo": "Feminino",
+      "telefone": "(31) 97020-1020"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 13/08/2026 durante eletrocardiograma (ecg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "118 x 76 mmHg",
+          "frequencia_cardiaca": 68,
+          "frequencia_respiratoria": 16,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Eletrocardiograma (ECG)",
+          "descricao": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+          "evolucao": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "3d95171c-fdd1-478d-8263-4adbacda07c9",
+      "cabecalho_identificador": {
+        "nome_paciente": "Aline Martins Santos",
+        "data_exame": "2026-08-13",
+        "local_exame": "Centro Médico Avançado",
+        "medico_solicitante": "Dr(a). Felipe Pereira",
+        "crm_solicitante": "76711-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletrocardiograma (ECG)",
+        "descricao_tecnica": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+        "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "ba694375-118d-46a2-ac41-be9e804c7a23",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:21:00",
+    "profissional": {
+      "nome": "Dra. Rafael Oliveira",
+      "registro": "CRM-MG 100021"
+    },
+    "identificacao": {
+      "nome": "Patricia Pereira Silva",
+      "idade": 31,
+      "sexo": "Masculino",
+      "telefone": "(31) 97021-1021"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 16/03/2026 durante ressonância magnética do crânio. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "125 x 83 mmHg",
+          "frequencia_cardiaca": 81,
+          "frequencia_respiratoria": 19,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Ressonância Magnética do Crânio",
+          "descricao": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+          "evolucao": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Avaliação com especialista em caráter de urgência.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "ba694375-118d-46a2-ac41-be9e804c7a23",
+      "cabecalho_identificador": {
+        "nome_paciente": "Patricia Pereira Silva",
+        "data_exame": "2026-03-16",
+        "local_exame": "Hospital da Cidade",
+        "medico_solicitante": "Dr(a). Pedro Pereira",
+        "crm_solicitante": "12579-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Ressonância Magnética do Crânio",
+        "descricao_tecnica": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+        "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "e4ba7de9-18b9-4ac9-8afa-2fea03c4da5f",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:22:00",
+    "profissional": {
+      "nome": "Dra. Camila Oliveira",
+      "registro": "CRM-MG 100022"
+    },
+    "identificacao": {
+      "nome": "Maria Santos Almeida",
+      "idade": 38,
+      "sexo": "Feminino",
+      "telefone": "(31) 97022-1022"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata falta de ar aos esforços, tosse seca intermitente e chiado ocasional.",
+        "historia_da_doenca_atual": "Quadro avaliado em 26/04/2026 durante espirometria. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Brometo de tiotrópio 18 mcg por inalação uma vez ao dia e salbutamol se necessário."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "120 x 82 mmHg",
+          "frequencia_cardiaca": 70,
+          "frequencia_respiratoria": 18,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Expansibilidade torácica discretamente reduzida, sem sinais de desconforto respiratório agudo.",
+        "exames_complementares": {
+          "tipo": "Espirometria",
+          "descricao": "VEF1 reduzido, Relação VEF1/CVF < 0.70. Curva fluxo-volume com concavidade superior. Ausência de resposta significativa ao broncodilatador.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Doença pulmonar obstrutiva crônica",
+        "cid_10": "J44.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "e4ba7de9-18b9-4ac9-8afa-2fea03c4da5f",
+      "cabecalho_identificador": {
+        "nome_paciente": "Maria Santos Almeida",
+        "data_exame": "2026-04-26",
+        "local_exame": "Instituto de Diagnóstico",
+        "medico_solicitante": "Dr(a). João Almeida",
+        "crm_solicitante": "23222-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Espirometria",
+        "descricao_tecnica": "VEF1 reduzido, Relação VEF1/CVF < 0.70. Curva fluxo-volume com concavidade superior. Ausência de resposta significativa ao broncodilatador.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Doença pulmonar obstrutiva crônica",
+        "cid_10": "J44.9",
+        "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "1d88207c-5468-49c7-9e5e-aeaf7f8c1ece",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:23:00",
+    "profissional": {
+      "nome": "Dra. Joao Oliveira",
+      "registro": "CRM-MG 100023"
+    },
+    "identificacao": {
+      "nome": "Ana Souza Ferreira",
+      "idade": 45,
+      "sexo": "Masculino",
+      "telefone": "(31) 97023-1023"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata cansaço leve aos esforços, sem dor torácica, síncope ou palpitações persistentes.",
+        "historia_da_doenca_atual": "Quadro avaliado em 18/10/2025 durante eletrocardiograma (ecg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "127 x 81 mmHg",
+          "frequencia_cardiaca": 77,
+          "frequencia_respiratoria": 17,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Hemodinamicamente estável, sem sinais de congestão periférica.",
+        "exames_complementares": {
+          "tipo": "Eletrocardiograma (ECG)",
+          "descricao": "Ritmo sinusal. Bloqueio de ramo direito incompleto. Alterações difusas da repolarização ventricular.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Bloqueio de ramo direito",
+        "cid_10": "I45.1",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Avaliação com especialista em caráter de urgência.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "1d88207c-5468-49c7-9e5e-aeaf7f8c1ece",
+      "cabecalho_identificador": {
+        "nome_paciente": "Ana Souza Ferreira",
+        "data_exame": "2025-10-18",
+        "local_exame": "Centro Médico Avançado",
+        "medico_solicitante": "Dr(a). Juliana Gomes",
+        "crm_solicitante": "69745-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletrocardiograma (ECG)",
+        "descricao_tecnica": "Ritmo sinusal. Bloqueio de ramo direito incompleto. Alterações difusas da repolarização ventricular.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Bloqueio de ramo direito",
+        "cid_10": "I45.1",
+        "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "375b9c33-6932-47b6-b79f-05cddc0cb26a",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:24:00",
+    "profissional": {
+      "nome": "Dra. Mariana Oliveira",
+      "registro": "CRM-MG 100024"
+    },
+    "identificacao": {
+      "nome": "Juliana Lima Silva",
+      "idade": 52,
+      "sexo": "Feminino",
+      "telefone": "(31) 97024-1024"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 15/10/2025 durante ressonância magnética do crânio. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "122 x 80 mmHg",
+          "frequencia_cardiaca": 84,
+          "frequencia_respiratoria": 16,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Ressonância Magnética do Crânio",
+          "descricao": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Nenhuma conduta terapêutica específica necessária no momento.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 15
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "375b9c33-6932-47b6-b79f-05cddc0cb26a",
+      "cabecalho_identificador": {
+        "nome_paciente": "Juliana Lima Silva",
+        "data_exame": "2025-10-15",
+        "local_exame": "Instituto de Diagnóstico",
+        "medico_solicitante": "Dr(a). Carlos Martins",
+        "crm_solicitante": "11829-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Ressonância Magnética do Crânio",
+        "descricao_tecnica": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Nenhuma conduta terapêutica específica necessária no momento.",
+        "tempo_repouso_estimado_dias": 15
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "2cc8de62-6b5d-4b21-88e0-9414a60d6b87",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:25:00",
+    "profissional": {
+      "nome": "Dra. Rafael Oliveira",
+      "registro": "CRM-MG 100025"
+    },
+    "identificacao": {
+      "nome": "João Costa Gomes",
+      "idade": 59,
+      "sexo": "Masculino",
+      "telefone": "(31) 97025-1025"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 20/03/2026 durante eletroencefalograma (eeg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "129 x 79 mmHg",
+          "frequencia_cardiaca": 73,
+          "frequencia_respiratoria": 19,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Eletroencefalograma (EEG)",
+          "descricao": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Repouso relativo, hidratação e analgesia se dor.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "2cc8de62-6b5d-4b21-88e0-9414a60d6b87",
+      "cabecalho_identificador": {
+        "nome_paciente": "João Costa Gomes",
+        "data_exame": "2026-03-20",
+        "local_exame": "Hospital Central",
+        "medico_solicitante": "Dr(a). Juliana Lima",
+        "crm_solicitante": "89580-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletroencefalograma (EEG)",
+        "descricao_tecnica": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "69da841c-41ca-41ef-b30a-952baf5bcd74",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:26:00",
+    "profissional": {
+      "nome": "Dra. Camila Oliveira",
+      "registro": "CRM-MG 100026"
+    },
+    "identificacao": {
+      "nome": "Ana Costa Ferreira",
+      "idade": 66,
+      "sexo": "Feminino",
+      "telefone": "(31) 97026-1026"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata dispneia leve aos esforços e tosse seca ocasional, sem febre.",
+        "historia_da_doenca_atual": "Quadro avaliado em 10/04/2026 durante espirometria. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Nenhuma medicação específica iniciada; manter hidratação e avaliação pneumológica."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "124 x 78 mmHg",
+          "frequencia_cardiaca": 80,
+          "frequencia_respiratoria": 18,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Saturação periférica preservada em repouso, com crepitações discretas à ausculta.",
+        "exames_complementares": {
+          "tipo": "Espirometria",
+          "descricao": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Doença pulmonar intersticial não especificada",
+        "cid_10": "J84.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Nenhuma conduta terapêutica específica necessária no momento.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "69da841c-41ca-41ef-b30a-952baf5bcd74",
+      "cabecalho_identificador": {
+        "nome_paciente": "Ana Costa Ferreira",
+        "data_exame": "2026-04-10",
+        "local_exame": "Polo de Telemedicina",
+        "medico_solicitante": "Dr(a). Rafael Lima",
+        "crm_solicitante": "76285-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Espirometria",
+        "descricao_tecnica": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Doença pulmonar intersticial não especificada",
+        "cid_10": "J84.9",
+        "conduta_terapeutica": "Nenhuma conduta terapêutica específica necessária no momento.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "25743114-b95a-4562-bf3d-eae5bc540dd2",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:27:00",
+    "profissional": {
+      "nome": "Dra. Joao Oliveira",
+      "registro": "CRM-MG 100027"
+    },
+    "identificacao": {
+      "nome": "Maria Silva Martins",
+      "idade": 73,
+      "sexo": "Masculino",
+      "telefone": "(31) 97027-1027"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata dispneia leve aos esforços e tosse seca ocasional, sem febre.",
+        "historia_da_doenca_atual": "Quadro avaliado em 16/11/2025 durante espirometria. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Nenhuma medicação específica iniciada; manter hidratação e avaliação pneumológica."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "119 x 77 mmHg",
+          "frequencia_cardiaca": 69,
+          "frequencia_respiratoria": 17,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Saturação periférica preservada em repouso, com crepitações discretas à ausculta.",
+        "exames_complementares": {
+          "tipo": "Espirometria",
+          "descricao": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Doença pulmonar intersticial não especificada",
+        "cid_10": "J84.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "25743114-b95a-4562-bf3d-eae5bc540dd2",
+      "cabecalho_identificador": {
+        "nome_paciente": "Maria Silva Martins",
+        "data_exame": "2025-11-16",
+        "local_exame": "Clínica Mais Saúde",
+        "medico_solicitante": "Dr(a). Juliana Ribeiro",
+        "crm_solicitante": "55341-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Espirometria",
+        "descricao_tecnica": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Doença pulmonar intersticial não especificada",
+        "cid_10": "J84.9",
+        "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "bd721f2b-7ecf-4ad0-b58d-f03a2e475ae1",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:28:00",
+    "profissional": {
+      "nome": "Dra. Mariana Oliveira",
+      "registro": "CRM-MG 100028"
+    },
+    "identificacao": {
+      "nome": "Lucas Oliveira Souza",
+      "idade": 32,
+      "sexo": "Feminino",
+      "telefone": "(31) 97028-1028"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata cefaleia episódica e dificuldade de concentração, sem alteração de consciência no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 19/06/2026 durante ressonância magnética do crânio. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor, até avaliação neurológica especializada."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "126 x 76 mmHg",
+          "frequencia_cardiaca": 82,
+          "frequencia_respiratoria": 16,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Orientado em tempo e espaço, força preservada e sem déficit neurológico focal evidente.",
+        "exames_complementares": {
+          "tipo": "Ressonância Magnética do Crânio",
+          "descricao": "Focos de hipersinal em T2/FLAIR na substância branca periventricular e subcortical, de aspecto microangiopático/desmielinizante.",
+          "evolucao": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Outras afecções desmielinizantes do sistema nervoso central",
+        "cid_10": "G37.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "bd721f2b-7ecf-4ad0-b58d-f03a2e475ae1",
+      "cabecalho_identificador": {
+        "nome_paciente": "Lucas Oliveira Souza",
+        "data_exame": "2026-06-19",
+        "local_exame": "Hospital Central",
+        "medico_solicitante": "Dr(a). Rafael Martins",
+        "crm_solicitante": "35736-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Ressonância Magnética do Crânio",
+        "descricao_tecnica": "Focos de hipersinal em T2/FLAIR na substância branca periventricular e subcortical, de aspecto microangiopático/desmielinizante.",
+        "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Outras afecções desmielinizantes do sistema nervoso central",
+        "cid_10": "G37.9",
+        "conduta_terapeutica": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "fcd71e16-3892-47b8-8639-53ad1cd78afd",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:29:00",
+    "profissional": {
+      "nome": "Dra. Rafael Oliveira",
+      "registro": "CRM-MG 100029"
+    },
+    "identificacao": {
+      "nome": "Mariana Almeida Costa",
+      "idade": 39,
+      "sexo": "Masculino",
+      "telefone": "(31) 97029-1029"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata falta de ar aos esforços e cansaço progressivo, sem dor torácica no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 14/12/2025 durante raio-x de tórax. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Enalapril 10 mg por via oral a cada 12 horas e furosemida 40 mg pela manhã, conforme acompanhamento cardiológico."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "121 x 83 mmHg",
+          "frequencia_cardiaca": 71,
+          "frequencia_respiratoria": 19,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Perfusão periférica preservada, com discreto edema maleolar bilateral.",
+        "exames_complementares": {
+          "tipo": "Raio-X de Tórax",
+          "descricao": "Aumento global da área cardíaca. Congestão hilar bilateral. Linhas B de Kerley presentes.",
+          "evolucao": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Insuficiência cardíaca",
+        "cid_10": "I50.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "fcd71e16-3892-47b8-8639-53ad1cd78afd",
+      "cabecalho_identificador": {
+        "nome_paciente": "Mariana Almeida Costa",
+        "data_exame": "2025-12-14",
+        "local_exame": "Clínica Mais Saúde",
+        "medico_solicitante": "Dr(a). Marcos Ribeiro",
+        "crm_solicitante": "41691-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Raio-X de Tórax",
+        "descricao_tecnica": "Aumento global da área cardíaca. Congestão hilar bilateral. Linhas B de Kerley presentes.",
+        "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Insuficiência cardíaca",
+        "cid_10": "I50.9",
+        "conduta_terapeutica": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "54600471-5fcf-4a1a-94b0-0ce4c0e3a651",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:30:00",
+    "profissional": {
+      "nome": "Dra. Camila Oliveira",
+      "registro": "CRM-MG 100030"
+    },
+    "identificacao": {
+      "nome": "Pedro Rodrigues Carvalho",
+      "idade": 46,
+      "sexo": "Feminino",
+      "telefone": "(31) 97030-1030"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata falta de ar aos esforços, tosse seca intermitente e chiado ocasional.",
+        "historia_da_doenca_atual": "Quadro avaliado em 29/01/2026 durante raio-x de tórax. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Brometo de tiotrópio 18 mcg por inalação uma vez ao dia e salbutamol se necessário."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "128 x 82 mmHg",
+          "frequencia_cardiaca": 78,
+          "frequencia_respiratoria": 18,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Expansibilidade torácica discretamente reduzida, sem sinais de desconforto respiratório agudo.",
+        "exames_complementares": {
+          "tipo": "Raio-X de Tórax",
+          "descricao": "Hiperinsuflação pulmonar bilateral, retificação das cúpulas diafragmáticas e aumento do espaço retroesternal.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Doença pulmonar obstrutiva crônica",
+        "cid_10": "J44.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "54600471-5fcf-4a1a-94b0-0ce4c0e3a651",
+      "cabecalho_identificador": {
+        "nome_paciente": "Pedro Rodrigues Carvalho",
+        "data_exame": "2026-01-29",
+        "local_exame": "Centro Médico Avançado",
+        "medico_solicitante": "Dr(a). Felipe Souza",
+        "crm_solicitante": "86800-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Raio-X de Tórax",
+        "descricao_tecnica": "Hiperinsuflação pulmonar bilateral, retificação das cúpulas diafragmáticas e aumento do espaço retroesternal.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Doença pulmonar obstrutiva crônica",
+        "cid_10": "J44.9",
+        "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "b776defb-8620-4bd1-a674-9497e7757590",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:31:00",
+    "profissional": {
+      "nome": "Dra. Joao Oliveira",
+      "registro": "CRM-MG 100031"
+    },
+    "identificacao": {
+      "nome": "Aline Silva Gomes",
+      "idade": 53,
+      "sexo": "Masculino",
+      "telefone": "(31) 97031-1031"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 29/12/2025 durante eletroencefalograma (eeg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "123 x 81 mmHg",
+          "frequencia_cardiaca": 85,
+          "frequencia_respiratoria": 17,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Eletroencefalograma (EEG)",
+          "descricao": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Repouso relativo, hidratação e analgesia se dor.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "b776defb-8620-4bd1-a674-9497e7757590",
+      "cabecalho_identificador": {
+        "nome_paciente": "Aline Silva Gomes",
+        "data_exame": "2025-12-29",
+        "local_exame": "Centro Médico Avançado",
+        "medico_solicitante": "Dr(a). Felipe Costa",
+        "crm_solicitante": "44296-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletroencefalograma (EEG)",
+        "descricao_tecnica": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "df24cc66-27c5-433a-a480-057b297976bf",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:32:00",
+    "profissional": {
+      "nome": "Dra. Mariana Oliveira",
+      "registro": "CRM-MG 100032"
+    },
+    "identificacao": {
+      "nome": "Lucas Pereira Pereira",
+      "idade": 60,
+      "sexo": "Feminino",
+      "telefone": "(31) 97032-1032"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata palpitações intermitentes e cansaço aos esforços, sem síncope recente.",
+        "historia_da_doenca_atual": "Quadro avaliado em 17/07/2026 durante eletrocardiograma (ecg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Metoprolol 25 mg por via oral a cada 12 horas, com avaliação cardiológica para ajuste."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "118 x 80 mmHg",
+          "frequencia_cardiaca": 74,
+          "frequencia_respiratoria": 16,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Paciente estável, pulsos periféricos palpáveis e sem sinais de baixo débito.",
+        "exames_complementares": {
+          "tipo": "Eletrocardiograma (ECG)",
+          "descricao": "Ritmo sinusal com extrassístoles ventriculares isoladas e frequentes.",
+          "evolucao": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Arritmia não especificada",
+        "cid_10": "I49.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "df24cc66-27c5-433a-a480-057b297976bf",
+      "cabecalho_identificador": {
+        "nome_paciente": "Lucas Pereira Pereira",
+        "data_exame": "2026-07-17",
+        "local_exame": "Instituto de Diagnóstico",
+        "medico_solicitante": "Dr(a). Fernanda Alves",
+        "crm_solicitante": "64659-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletrocardiograma (ECG)",
+        "descricao_tecnica": "Ritmo sinusal com extrassístoles ventriculares isoladas e frequentes.",
+        "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Arritmia não especificada",
+        "cid_10": "I49.9",
+        "conduta_terapeutica": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "f680d12e-0c4c-4de3-b1d3-33d29aa94033",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:33:00",
+    "profissional": {
+      "nome": "Dra. Rafael Oliveira",
+      "registro": "CRM-MG 100033"
+    },
+    "identificacao": {
+      "nome": "Mariana Lima Oliveira",
+      "idade": 67,
+      "sexo": "Masculino",
+      "telefone": "(31) 97033-1033"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata palpitações intermitentes e cansaço aos esforços, sem síncope recente.",
+        "historia_da_doenca_atual": "Quadro avaliado em 21/10/2025 durante eletrocardiograma (ecg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Metoprolol 25 mg por via oral a cada 12 horas, com avaliação cardiológica para ajuste."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "125 x 79 mmHg",
+          "frequencia_cardiaca": 81,
+          "frequencia_respiratoria": 19,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Paciente estável, pulsos periféricos palpáveis e sem sinais de baixo débito.",
+        "exames_complementares": {
+          "tipo": "Eletrocardiograma (ECG)",
+          "descricao": "Ritmo irregular. Fibrilação atrial com resposta ventricular controlada. Sobrecarga de átrio esquerdo.",
+          "evolucao": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Fibrilação e *flutter* atriais",
+        "cid_10": "I48",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "f680d12e-0c4c-4de3-b1d3-33d29aa94033",
+      "cabecalho_identificador": {
+        "nome_paciente": "Mariana Lima Oliveira",
+        "data_exame": "2025-10-21",
+        "local_exame": "Hospital da Cidade",
+        "medico_solicitante": "Dr(a). Marcos Souza",
+        "crm_solicitante": "11809-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletrocardiograma (ECG)",
+        "descricao_tecnica": "Ritmo irregular. Fibrilação atrial com resposta ventricular controlada. Sobrecarga de átrio esquerdo.",
+        "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Fibrilação e *flutter* atriais",
+        "cid_10": "I48",
+        "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "59af8572-87db-47d8-8159-295e298c3e01",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:34:00",
+    "profissional": {
+      "nome": "Dra. Camila Oliveira",
+      "registro": "CRM-MG 100034"
+    },
+    "identificacao": {
+      "nome": "Marcos Carvalho Pereira",
+      "idade": 74,
+      "sexo": "Feminino",
+      "telefone": "(31) 97034-1034"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 26/02/2026 durante eletrocardiograma (ecg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "120 x 78 mmHg",
+          "frequencia_cardiaca": 70,
+          "frequencia_respiratoria": 18,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Eletrocardiograma (ECG)",
+          "descricao": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "59af8572-87db-47d8-8159-295e298c3e01",
+      "cabecalho_identificador": {
+        "nome_paciente": "Marcos Carvalho Pereira",
+        "data_exame": "2026-02-26",
+        "local_exame": "Hospital da Cidade",
+        "medico_solicitante": "Dr(a). Pedro Gomes",
+        "crm_solicitante": "23341-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletrocardiograma (ECG)",
+        "descricao_tecnica": "Ritmo sinusal normal. Eixo elétrico do complexo QRS normal. Sem alterações isquêmicas agudas.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "17ed4955-2270-48be-bb4d-fa89be8551e2",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:35:00",
+    "profissional": {
+      "nome": "Dra. Joao Oliveira",
+      "registro": "CRM-MG 100035"
+    },
+    "identificacao": {
+      "nome": "Bruno Carvalho Almeida",
+      "idade": 33,
+      "sexo": "Masculino",
+      "telefone": "(31) 97035-1035"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata dispneia leve aos esforços e tosse seca ocasional, sem febre.",
+        "historia_da_doenca_atual": "Quadro avaliado em 27/05/2026 durante espirometria. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Nenhuma medicação específica iniciada; manter hidratação e avaliação pneumológica."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "127 x 77 mmHg",
+          "frequencia_cardiaca": 83,
+          "frequencia_respiratoria": 17,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Saturação periférica preservada em repouso, com crepitações discretas à ausculta.",
+        "exames_complementares": {
+          "tipo": "Espirometria",
+          "descricao": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Doença pulmonar intersticial não especificada",
+        "cid_10": "J84.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Repouso relativo, hidratação e analgesia se dor.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "17ed4955-2270-48be-bb4d-fa89be8551e2",
+      "cabecalho_identificador": {
+        "nome_paciente": "Bruno Carvalho Almeida",
+        "data_exame": "2026-05-27",
+        "local_exame": "Clínica Mais Saúde",
+        "medico_solicitante": "Dr(a). Rafael Martins",
+        "crm_solicitante": "93948-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Espirometria",
+        "descricao_tecnica": "Redução proporcional de VEF1 e CVF, com relação VEF1/CVF mantida. Sugestivo de distúrbio ventilatório restritivo.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Doença pulmonar intersticial não especificada",
+        "cid_10": "J84.9",
+        "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "f8295d6c-d7f1-4691-8412-cb0a71d673fc",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:36:00",
+    "profissional": {
+      "nome": "Dra. Mariana Oliveira",
+      "registro": "CRM-MG 100036"
+    },
+    "identificacao": {
+      "nome": "Fernanda Almeida Carvalho",
+      "idade": 40,
+      "sexo": "Feminino",
+      "telefone": "(31) 97036-1036"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata cefaleia episódica e dificuldade de concentração, sem alteração de consciência no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 07/02/2026 durante eletroencefalograma (eeg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor, até avaliação neurológica especializada."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "122 x 76 mmHg",
+          "frequencia_cardiaca": 72,
+          "frequencia_respiratoria": 16,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Orientado em tempo e espaço, força preservada e sem déficit neurológico focal evidente.",
+        "exames_complementares": {
+          "tipo": "Eletroencefalograma (EEG)",
+          "descricao": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Transtorno não especificado do encéfalo",
+        "cid_10": "G93.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Repouso relativo, hidratação e analgesia se dor.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "f8295d6c-d7f1-4691-8412-cb0a71d673fc",
+      "cabecalho_identificador": {
+        "nome_paciente": "Fernanda Almeida Carvalho",
+        "data_exame": "2026-02-07",
+        "local_exame": "Hospital da Cidade",
+        "medico_solicitante": "Dr(a). Fernanda Almeida",
+        "crm_solicitante": "34422-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletroencefalograma (EEG)",
+        "descricao_tecnica": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Transtorno não especificado do encéfalo",
+        "cid_10": "G93.9",
+        "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "0e1a4356-e0e6-435d-81cf-ef252decd0c1",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:37:00",
+    "profissional": {
+      "nome": "Dra. Rafael Oliveira",
+      "registro": "CRM-MG 100037"
+    },
+    "identificacao": {
+      "nome": "Lucas Lima Santos",
+      "idade": 47,
+      "sexo": "Masculino",
+      "telefone": "(31) 97037-1037"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 01/07/2026 durante raio-x de tórax. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "129 x 83 mmHg",
+          "frequencia_cardiaca": 79,
+          "frequencia_respiratoria": 19,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Raio-X de Tórax",
+          "descricao": "Campos pulmonares com transparência normal. Seios costofrênicos livres. Área cardíaca dentro dos limites da normalidade.",
+          "evolucao": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Acompanhamento ambulatorial de rotina.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "0e1a4356-e0e6-435d-81cf-ef252decd0c1",
+      "cabecalho_identificador": {
+        "nome_paciente": "Lucas Lima Santos",
+        "data_exame": "2026-07-01",
+        "local_exame": "Hospital Central",
+        "medico_solicitante": "Dr(a). Mariana Carvalho",
+        "crm_solicitante": "15137-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Raio-X de Tórax",
+        "descricao_tecnica": "Campos pulmonares com transparência normal. Seios costofrênicos livres. Área cardíaca dentro dos limites da normalidade.",
+        "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Acompanhamento ambulatorial de rotina.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "61d5d785-e6a4-448a-a7f0-a12bd1f2579e",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:38:00",
+    "profissional": {
+      "nome": "Dra. Camila Oliveira",
+      "registro": "CRM-MG 100038"
+    },
+    "identificacao": {
+      "nome": "João Silva Almeida",
+      "idade": 54,
+      "sexo": "Feminino",
+      "telefone": "(31) 97038-1038"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 23/12/2025 durante ressonância magnética do crânio. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "124 x 82 mmHg",
+          "frequencia_cardiaca": 68,
+          "frequencia_respiratoria": 18,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Ressonância Magnética do Crânio",
+          "descricao": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "61d5d785-e6a4-448a-a7f0-a12bd1f2579e",
+      "cabecalho_identificador": {
+        "nome_paciente": "João Silva Almeida",
+        "data_exame": "2025-12-23",
+        "local_exame": "Centro Médico Avançado",
+        "medico_solicitante": "Dr(a). Fernanda Silva",
+        "crm_solicitante": "93589-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Ressonância Magnética do Crânio",
+        "descricao_tecnica": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "9bd3f1b0-4343-44fe-bf38-281591fc107b",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:39:00",
+    "profissional": {
+      "nome": "Dra. Joao Oliveira",
+      "registro": "CRM-MG 100039"
+    },
+    "identificacao": {
+      "nome": "Carlos Rodrigues Costa",
+      "idade": 61,
+      "sexo": "Masculino",
+      "telefone": "(31) 97039-1039"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata cefaleia episódica e dificuldade de concentração, sem alteração de consciência no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 03/01/2026 durante ressonância magnética do crânio. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor, até avaliação neurológica especializada."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "119 x 81 mmHg",
+          "frequencia_cardiaca": 75,
+          "frequencia_respiratoria": 17,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Orientado em tempo e espaço, força preservada e sem déficit neurológico focal evidente.",
+        "exames_complementares": {
+          "tipo": "Ressonância Magnética do Crânio",
+          "descricao": "Lesão expansiva frontoparietal direita, com captação anelar de contraste e edema vasogênico perilesional, exercendo efeito de massa.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Neoplasia de comportamento incerto ou desconhecido do encéfalo",
+        "cid_10": "D43.2",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Avaliação com especialista em caráter de urgência.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "9bd3f1b0-4343-44fe-bf38-281591fc107b",
+      "cabecalho_identificador": {
+        "nome_paciente": "Carlos Rodrigues Costa",
+        "data_exame": "2026-01-03",
+        "local_exame": "Clínica Mais Saúde",
+        "medico_solicitante": "Dr(a). Carlos Carvalho",
+        "crm_solicitante": "27276-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Ressonância Magnética do Crânio",
+        "descricao_tecnica": "Lesão expansiva frontoparietal direita, com captação anelar de contraste e edema vasogênico perilesional, exercendo efeito de massa.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Neoplasia de comportamento incerto ou desconhecido do encéfalo",
+        "cid_10": "D43.2",
+        "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "cf2982de-f537-45e9-9fad-aa29b2549ab3",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:40:00",
+    "profissional": {
+      "nome": "Dra. Mariana Oliveira",
+      "registro": "CRM-MG 100040"
+    },
+    "identificacao": {
+      "nome": "Mariana Silva Souza",
+      "idade": 68,
+      "sexo": "Feminino",
+      "telefone": "(31) 97040-1040"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 13/10/2025 durante eletroencefalograma (eeg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "126 x 80 mmHg",
+          "frequencia_cardiaca": 82,
+          "frequencia_respiratoria": 16,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Eletroencefalograma (EEG)",
+          "descricao": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+          "evolucao": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Repouso relativo, hidratação e analgesia se dor.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "cf2982de-f537-45e9-9fad-aa29b2549ab3",
+      "cabecalho_identificador": {
+        "nome_paciente": "Mariana Silva Souza",
+        "data_exame": "2025-10-13",
+        "local_exame": "Instituto de Diagnóstico",
+        "medico_solicitante": "Dr(a). Maria Costa",
+        "crm_solicitante": "18516-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletroencefalograma (EEG)",
+        "descricao_tecnica": "Atividade elétrica cerebral de base fisiológica, simétrica, composta por ritmo alfa posterior. Sem atividade paroxística.",
+        "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "6a4c8bb5-8974-47e7-8ed4-6257db7863e0",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:41:00",
+    "profissional": {
+      "nome": "Dra. Rafael Oliveira",
+      "registro": "CRM-MG 100041"
+    },
+    "identificacao": {
+      "nome": "Fernanda Silva Oliveira",
+      "idade": 75,
+      "sexo": "Masculino",
+      "telefone": "(31) 97041-1041"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata falta de ar aos esforços, tosse seca intermitente e chiado ocasional.",
+        "historia_da_doenca_atual": "Quadro avaliado em 11/06/2026 durante raio-x de tórax. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Brometo de tiotrópio 18 mcg por inalação uma vez ao dia e salbutamol se necessário."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "121 x 79 mmHg",
+          "frequencia_cardiaca": 71,
+          "frequencia_respiratoria": 19,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Expansibilidade torácica discretamente reduzida, sem sinais de desconforto respiratório agudo.",
+        "exames_complementares": {
+          "tipo": "Raio-X de Tórax",
+          "descricao": "Hiperinsuflação pulmonar bilateral, retificação das cúpulas diafragmáticas e aumento do espaço retroesternal.",
+          "evolucao": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Doença pulmonar obstrutiva crônica",
+        "cid_10": "J44.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Acompanhamento ambulatorial de rotina.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "6a4c8bb5-8974-47e7-8ed4-6257db7863e0",
+      "cabecalho_identificador": {
+        "nome_paciente": "Fernanda Silva Oliveira",
+        "data_exame": "2026-06-11",
+        "local_exame": "Clínica Mais Saúde",
+        "medico_solicitante": "Dr(a). Mariana Ferreira",
+        "crm_solicitante": "96516-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Raio-X de Tórax",
+        "descricao_tecnica": "Hiperinsuflação pulmonar bilateral, retificação das cúpulas diafragmáticas e aumento do espaço retroesternal.",
+        "evolucao_clinica": "Paciente apresentou leve desconforto ou agitação, mas exame concluído com sucesso."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Doença pulmonar obstrutiva crônica",
+        "cid_10": "J44.9",
+        "conduta_terapeutica": "Acompanhamento ambulatorial de rotina.",
+        "tempo_repouso_estimado_dias": 5
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "d60687ac-20a6-4b3f-ad7f-b40e8b77ec83",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:42:00",
+    "profissional": {
+      "nome": "Dra. Camila Oliveira",
+      "registro": "CRM-MG 100042"
+    },
+    "identificacao": {
+      "nome": "Ana Souza Carvalho",
+      "idade": 34,
+      "sexo": "Feminino",
+      "telefone": "(31) 97042-1042"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata falta de ar aos esforços, tosse seca intermitente e chiado ocasional.",
+        "historia_da_doenca_atual": "Quadro avaliado em 01/11/2025 durante raio-x de tórax. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Brometo de tiotrópio 18 mcg por inalação uma vez ao dia e salbutamol se necessário."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "128 x 78 mmHg",
+          "frequencia_cardiaca": 84,
+          "frequencia_respiratoria": 18,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Expansibilidade torácica discretamente reduzida, sem sinais de desconforto respiratório agudo.",
+        "exames_complementares": {
+          "tipo": "Raio-X de Tórax",
+          "descricao": "Hiperinsuflação pulmonar bilateral, retificação das cúpulas diafragmáticas e aumento do espaço retroesternal.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Doença pulmonar obstrutiva crônica",
+        "cid_10": "J44.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Repouso relativo, hidratação e analgesia se dor.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "d60687ac-20a6-4b3f-ad7f-b40e8b77ec83",
+      "cabecalho_identificador": {
+        "nome_paciente": "Ana Souza Carvalho",
+        "data_exame": "2025-11-01",
+        "local_exame": "Instituto de Diagnóstico",
+        "medico_solicitante": "Dr(a). João Silva",
+        "crm_solicitante": "91229-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Raio-X de Tórax",
+        "descricao_tecnica": "Hiperinsuflação pulmonar bilateral, retificação das cúpulas diafragmáticas e aumento do espaço retroesternal.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Doença pulmonar obstrutiva crônica",
+        "cid_10": "J44.9",
+        "conduta_terapeutica": "Repouso relativo, hidratação e analgesia se dor.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "d845b388-57f4-4a6f-8a7c-8eb2e7419497",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:43:00",
+    "profissional": {
+      "nome": "Dra. Joao Oliveira",
+      "registro": "CRM-MG 100043"
+    },
+    "identificacao": {
+      "nome": "Carlos Martins Pereira",
+      "idade": 41,
+      "sexo": "Masculino",
+      "telefone": "(31) 97043-1043"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata cefaleia episódica e dificuldade de concentração, sem alteração de consciência no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 04/10/2025 durante ressonância magnética do crânio. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor, até avaliação neurológica especializada."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "123 x 77 mmHg",
+          "frequencia_cardiaca": 73,
+          "frequencia_respiratoria": 17,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Orientado em tempo e espaço, força preservada e sem déficit neurológico focal evidente.",
+        "exames_complementares": {
+          "tipo": "Ressonância Magnética do Crânio",
+          "descricao": "Focos de hipersinal em T2/FLAIR na substância branca periventricular e subcortical, de aspecto microangiopático/desmielinizante.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Outras afecções desmielinizantes do sistema nervoso central",
+        "cid_10": "G37.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Avaliação com especialista em caráter de urgência.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 15
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "d845b388-57f4-4a6f-8a7c-8eb2e7419497",
+      "cabecalho_identificador": {
+        "nome_paciente": "Carlos Martins Pereira",
+        "data_exame": "2025-10-04",
+        "local_exame": "Hospital Central",
+        "medico_solicitante": "Dr(a). Patricia Silva",
+        "crm_solicitante": "92192-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Ressonância Magnética do Crânio",
+        "descricao_tecnica": "Focos de hipersinal em T2/FLAIR na substância branca periventricular e subcortical, de aspecto microangiopático/desmielinizante.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Outras afecções desmielinizantes do sistema nervoso central",
+        "cid_10": "G37.9",
+        "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+        "tempo_repouso_estimado_dias": 15
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "45e22e18-8845-4ad2-b5c1-56fbffb6934c",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:44:00",
+    "profissional": {
+      "nome": "Dra. Mariana Oliveira",
+      "registro": "CRM-MG 100044"
+    },
+    "identificacao": {
+      "nome": "Mariana Ferreira Ribeiro",
+      "idade": 48,
+      "sexo": "Feminino",
+      "telefone": "(31) 97044-1044"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 28/07/2026 durante ressonância magnética do crânio. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "118 x 76 mmHg",
+          "frequencia_cardiaca": 80,
+          "frequencia_respiratoria": 16,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Ressonância Magnética do Crânio",
+          "descricao": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Nenhuma conduta terapêutica específica necessária no momento.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "45e22e18-8845-4ad2-b5c1-56fbffb6934c",
+      "cabecalho_identificador": {
+        "nome_paciente": "Mariana Ferreira Ribeiro",
+        "data_exame": "2026-07-28",
+        "local_exame": "Instituto de Diagnóstico",
+        "medico_solicitante": "Dr(a). João Pereira",
+        "crm_solicitante": "28200-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Ressonância Magnética do Crânio",
+        "descricao_tecnica": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Nenhuma conduta terapêutica específica necessária no momento.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "6aa03e90-7ff0-4681-83f8-0658a882697b",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:45:00",
+    "profissional": {
+      "nome": "Dra. Rafael Oliveira",
+      "registro": "CRM-MG 100045"
+    },
+    "identificacao": {
+      "nome": "Pedro Rodrigues Rodrigues",
+      "idade": 55,
+      "sexo": "Masculino",
+      "telefone": "(31) 97045-1045"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 07/06/2026 durante raio-x de tórax. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "125 x 83 mmHg",
+          "frequencia_cardiaca": 69,
+          "frequencia_respiratoria": 19,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Raio-X de Tórax",
+          "descricao": "Campos pulmonares com transparência normal. Seios costofrênicos livres. Área cardíaca dentro dos limites da normalidade.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 15
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "6aa03e90-7ff0-4681-83f8-0658a882697b",
+      "cabecalho_identificador": {
+        "nome_paciente": "Pedro Rodrigues Rodrigues",
+        "data_exame": "2026-06-07",
+        "local_exame": "Instituto de Diagnóstico",
+        "medico_solicitante": "Dr(a). Rafael Gomes",
+        "crm_solicitante": "31304-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Raio-X de Tórax",
+        "descricao_tecnica": "Campos pulmonares com transparência normal. Seios costofrênicos livres. Área cardíaca dentro dos limites da normalidade.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Uso de medicação conforme prescrição médica anexada. Retorno em 30 dias.",
+        "tempo_repouso_estimado_dias": 15
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "ade88e99-1ca9-4959-b6ed-eb5c4f224e3c",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:46:00",
+    "profissional": {
+      "nome": "Dra. Camila Oliveira",
+      "registro": "CRM-MG 100046"
+    },
+    "identificacao": {
+      "nome": "Fernanda Pereira Souza",
+      "idade": 62,
+      "sexo": "Feminino",
+      "telefone": "(31) 97046-1046"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Comparece para avaliação complementar, sem queixas agudas no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 22/06/2026 durante ressonância magnética do crânio. Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor ou febre, respeitando orientação profissional."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "120 x 82 mmHg",
+          "frequencia_cardiaca": 76,
+          "frequencia_respiratoria": 18,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Bom estado geral, consciente, orientado e sem alterações clínicas relevantes ao exame inicial.",
+        "exames_complementares": {
+          "tipo": "Ressonância Magnética do Crânio",
+          "descricao": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Exame normal",
+        "cid_10": "Z00.0",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Nenhuma conduta terapêutica específica necessária no momento.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "ade88e99-1ca9-4959-b6ed-eb5c4f224e3c",
+      "cabecalho_identificador": {
+        "nome_paciente": "Fernanda Pereira Souza",
+        "data_exame": "2026-06-22",
+        "local_exame": "Hospital da Cidade",
+        "medico_solicitante": "Dr(a). Maria Alves",
+        "crm_solicitante": "30400-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Ressonância Magnética do Crânio",
+        "descricao_tecnica": "Sistema ventricular de morfologia e dimensões normais. Sulcos e fissuras cerebrais preservados. Sem áreas de restrição à difusão.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Exame normal",
+        "cid_10": "Z00.0",
+        "conduta_terapeutica": "Nenhuma conduta terapêutica específica necessária no momento.",
+        "tempo_repouso_estimado_dias": 7
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "c45253bb-421e-4917-8f88-8ff443bf061e",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:47:00",
+    "profissional": {
+      "nome": "Dra. Joao Oliveira",
+      "registro": "CRM-MG 100047"
+    },
+    "identificacao": {
+      "nome": "Lucas Pereira Souza",
+      "idade": 69,
+      "sexo": "Masculino",
+      "telefone": "(31) 97047-1047"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata cefaleia episódica e dificuldade de concentração, sem alteração de consciência no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 18/04/2026 durante eletroencefalograma (eeg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor, até avaliação neurológica especializada."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "127 x 81 mmHg",
+          "frequencia_cardiaca": 83,
+          "frequencia_respiratoria": 17,
+          "saturacao_oxigenio": 96,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Orientado em tempo e espaço, força preservada e sem déficit neurológico focal evidente.",
+        "exames_complementares": {
+          "tipo": "Eletroencefalograma (EEG)",
+          "descricao": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Transtorno não especificado do encéfalo",
+        "cid_10": "G93.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "c45253bb-421e-4917-8f88-8ff443bf061e",
+      "cabecalho_identificador": {
+        "nome_paciente": "Lucas Pereira Souza",
+        "data_exame": "2026-04-18",
+        "local_exame": "Centro Médico Avançado",
+        "medico_solicitante": "Dr(a). Pedro Alves",
+        "crm_solicitante": "21112-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletroencefalograma (EEG)",
+        "descricao_tecnica": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Transtorno não especificado do encéfalo",
+        "cid_10": "G93.9",
+        "conduta_terapeutica": "Fisioterapia respiratória e uso de broncodilatadores.",
+        "tempo_repouso_estimado_dias": 0
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "fe57ce74-c7cc-4a07-9443-fb57463d742c",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:48:00",
+    "profissional": {
+      "nome": "Dra. Mariana Oliveira",
+      "registro": "CRM-MG 100048"
+    },
+    "identificacao": {
+      "nome": "Ana Ferreira Ferreira",
+      "idade": 28,
+      "sexo": "Feminino",
+      "telefone": "(31) 97048-1048"
+    },
+    "historico": "Hipertensao arterial controlada, sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata palpitações intermitentes e cansaço aos esforços, sem síncope recente.",
+        "historia_da_doenca_atual": "Quadro avaliado em 24/08/2026 durante eletrocardiograma (ecg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Metoprolol 25 mg por via oral a cada 12 horas, com avaliação cardiológica para ajuste."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "122 x 80 mmHg",
+          "frequencia_cardiaca": 78,
+          "frequencia_respiratoria": 16,
+          "saturacao_oxigenio": 97,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Paciente estável, pulsos periféricos palpáveis e sem sinais de baixo débito.",
+        "exames_complementares": {
+          "tipo": "Eletrocardiograma (ECG)",
+          "descricao": "Ritmo irregular. Fibrilação atrial com resposta ventricular controlada. Sobrecarga de átrio esquerdo.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Fibrilação e *flutter* atriais",
+        "cid_10": "I48",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Nenhuma conduta terapêutica específica necessária no momento.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "fe57ce74-c7cc-4a07-9443-fb57463d742c",
+      "cabecalho_identificador": {
+        "nome_paciente": "Ana Ferreira Ferreira",
+        "data_exame": "2026-08-24",
+        "local_exame": "Centro Médico Avançado",
+        "medico_solicitante": "Dr(a). Bruno Rodrigues",
+        "crm_solicitante": "65520-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletrocardiograma (ECG)",
+        "descricao_tecnica": "Ritmo irregular. Fibrilação atrial com resposta ventricular controlada. Sobrecarga de átrio esquerdo.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Fibrilação e *flutter* atriais",
+        "cid_10": "I48",
+        "conduta_terapeutica": "Nenhuma conduta terapêutica específica necessária no momento.",
+        "tempo_repouso_estimado_dias": 2
+      }
+    },
+    "dados_sinteticos": true
+  },
+  {
+    "id_prontuario": "fb8eb091-d873-4530-8ccb-d0b4cb63a94c",
+    "data_registro": "2026-09-13",
+    "data_hora": "2026-09-13T10:49:00",
+    "profissional": {
+      "nome": "Dra. Rafael Oliveira",
+      "registro": "CRM-MG 100049"
+    },
+    "identificacao": {
+      "nome": "Bruno Rodrigues Oliveira",
+      "idade": 35,
+      "sexo": "Masculino",
+      "telefone": "(31) 97049-1049"
+    },
+    "historico": "Sem comorbidades relevantes relatadas e sem alergias medicamentosas conhecidas.",
+    "soap": {
+      "subjetivo": {
+        "queixa_principal": "Relata cefaleia episódica e dificuldade de concentração, sem alteração de consciência no momento.",
+        "historia_da_doenca_atual": "Quadro avaliado em 19/05/2026 durante eletroencefalograma (eeg). Dados narrativos complementares são sintéticos e servem apenas para composição do prontuário.",
+        "medicamentos_em_uso": "Dipirona 500 mg por via oral se dor, até avaliação neurológica especializada."
+      },
+      "objetivo": {
+        "sinais_vitais": {
+          "pressao_arterial": "129 x 79 mmHg",
+          "frequencia_cardiaca": 85,
+          "frequencia_respiratoria": 19,
+          "saturacao_oxigenio": 98,
+          "temperatura": 36.5
+        },
+        "estado_geral": "Bom estado geral, corado, hidratado e afebril.",
+        "exame_fisico": "Orientado em tempo e espaço, força preservada e sem déficit neurológico focal evidente.",
+        "exames_complementares": {
+          "tipo": "Eletroencefalograma (EEG)",
+          "descricao": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+          "evolucao": "Paciente colaborativo durante a realização do exame."
+        }
+      },
+      "avaliacao": {
+        "diagnostico_principal": "Transtorno não especificado do encéfalo",
+        "cid_10": "G93.9",
+        "impressao_clinica": "Achados compatíveis com o diagnóstico descrito no laudo médico de origem."
+      },
+      "plano": {
+        "conduta_registrada": "Avaliação com especialista em caráter de urgência.",
+        "orientacoes": "Manter acompanhamento com profissional habilitado e retornar em caso de piora clínica.",
+        "encaminhamento": "Avaliação especializada conforme o diagnóstico e a conduta do laudo.",
+        "tempo_repouso_estimado_dias": 15
+      }
+    },
+    "laudo_origem": {
+      "id_laudo": "fb8eb091-d873-4530-8ccb-d0b4cb63a94c",
+      "cabecalho_identificador": {
+        "nome_paciente": "Bruno Rodrigues Oliveira",
+        "data_exame": "2026-05-19",
+        "local_exame": "Hospital da Cidade",
+        "medico_solicitante": "Dr(a). Carlos Ferreira",
+        "crm_solicitante": "88458-RJ"
+      },
+      "corpo_tecnico": {
+        "tipo_exame": "Eletroencefalograma (EEG)",
+        "descricao_tecnica": "Desorganização difusa da atividade de base. Presença de ondas lentas nas regiões frontotemporais à esquerda.",
+        "evolucao_clinica": "Paciente colaborativo durante a realização do exame."
+      },
+      "conclusao": {
+        "impressao_diagnostica": "Transtorno não especificado do encéfalo",
+        "cid_10": "G93.9",
+        "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+        "tempo_repouso_estimado_dias": 15
+      }
+    },
+    "dados_sinteticos": true
+  }
+]

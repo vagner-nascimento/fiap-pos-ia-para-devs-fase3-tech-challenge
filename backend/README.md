@@ -34,13 +34,20 @@ O backend expoe endpoints para:
 3. gerar a base RAG para uso futuro por um agente de IA;
 4. realizar consultas semanticas por similaridade na base RAG;
 5. consultar laudos médicos pelo nome do paciente;
-6. verificar a saude da aplicacao.
+6. consultar prontuários médicos sintéticos pelo nome do paciente;
+7. verificar a saude da aplicacao.
 
 Na inicializacao, a API testa a conexao com o MongoDB e importa
 `datasets/files/laudos_medicos/dataset_laudos_medicos.json` para a collection
 `medical_reports` somente quando ela não existe ou está vazia. Se a collection já
 possuir dados, a importação é ignorada. Se a conexão ou a importação falhar, a
 aplicacao nao sobe.
+
+Os prontuários são gerados a partir de `datasets/files/laudos_medicos/dataset_laudos_medicos.json`
+e salvos em `datasets/files/medical_record/medical_records.json`. Os dados do laudo
+são preservados e os campos complementares são sintéticos, identificados pela flag
+`dados_sinteticos`. Na inicialização, esse arquivo é importado para a collection
+`medical_record` somente quando ela não existe ou está vazia.
 
 ## Arquitetura
 
@@ -84,6 +91,13 @@ O processamento pesado roda em background task do FastAPI. O endpoint POST /prep
 Retorna os laudos cujo campo `cabecalho_identificador.nome_paciente` coincide
 exatamente com o nome informado, ignorando maiúsculas e minúsculas. Quando não
 há correspondências, a API retorna uma lista vazia.
+
+### Consulta de prontuários médicos
+
+`GET /medical-record/?patient_name=Pedro%20Oliveira%20Pereira`
+
+Retorna o prontuário sintético associado ao nome completo do paciente, incluindo
+os dados SOAP, a origem do laudo e os campos complementares sintéticos.
 
 Quando ha uma GPU Nvidia disponivel com driver/runtime configurados, o backend usa CUDA automaticamente para a etapa de traducao. Se nao houver GPU, ele faz fallback para CPU, o que deixa a traducao bem mais lenta.
 
