@@ -126,6 +126,70 @@ class TestMedicalAgentHappyPath:
 
 
 # ---------------------------------------------------------------------------
+# Testes da Jornada 2 (Consulta contextualizada por prontuário)
+# ---------------------------------------------------------------------------
+class TestMedicalAgentJornada2:
+    """Testa a Jornada 2 quando patient_name é fornecido."""
+
+    @patch("services.nodes.audit_logger.create_audit_log", side_effect=_mock_create_audit_log)
+    @patch("services.nodes.rag_retriever._query_rag", side_effect=_mock_rag_query)
+    @patch("services.nodes.llm_generator._get_llm_client", return_value=_make_mock_llm())
+    @patch("services.nodes.patient_context_retriever.requests.get")
+    def test_jornada_2_paciente_encontrado_usa_contexto(
+        self, mock_patient_get, mock_llm, mock_rag, mock_audit
+    ):
+        from services.medical_agent import run_medical_agent
+
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = [
+            {
+                "avaliacao": {"itens": ["Hipertensão"]},
+                "plano": {"prescricao": "Losartana 50mg"},
+                "alergias": ["Dipirona"],
+            }
+        ]
+        mock_resp.raise_for_status.return_value = None
+        mock_patient_get.return_value = mock_resp
+
+        result = run_medical_agent(
+            query="Quais orientações para o quadro clínico deste paciente?",
+            session_id="test-jornada-2",
+            patient_name="João Silva",
+        )
+
+        assert result["patient_context_used"] is True
+        assert "avaliacao" in result["patient_fields_used"]
+        assert result["topic_valid"] is True
+        assert result["safety_triggered"] is False
+        assert len(result["final_response"]) > 0
+
+    @patch("services.nodes.audit_logger.create_audit_log", side_effect=_mock_create_audit_log)
+    @patch("services.nodes.rag_retriever._query_rag", side_effect=_mock_rag_query)
+    @patch("services.nodes.llm_generator._get_llm_client", return_value=_make_mock_llm())
+    @patch("services.nodes.patient_context_retriever.requests.get")
+    def test_jornada_2_paciente_nao_encontrado_degrada_jornada_1(
+        self, mock_patient_get, mock_llm, mock_rag, mock_audit
+    ):
+        from services.medical_agent import run_medical_agent
+
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = []
+        mock_resp.raise_for_status.return_value = None
+        mock_patient_get.return_value = mock_resp
+
+        result = run_medical_agent(
+            query="Quais orientações para o quadro clínico?",
+            session_id="test-jornada-2-fallback",
+            patient_name="Paciente Inexistente",
+        )
+
+        assert result["patient_context_used"] is False
+        assert result["patient_fields_used"] == []
+        assert result["topic_valid"] is True
+        assert len(result["final_response"]) > 0
+
+
+# ---------------------------------------------------------------------------
 # Testes de rejeição por tópico inválido
 # ---------------------------------------------------------------------------
 class TestMedicalAgentTopicRejection:

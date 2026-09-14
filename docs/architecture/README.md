@@ -273,7 +273,7 @@ sequenceDiagram
 
 ## Diagrama de Sequência — Agente Médico
 
-Fluxo completo de uma consulta ao assistente médico com o pipeline LangGraph.
+Fluxo completo de uma consulta ao assistente médico com o pipeline LangGraph de 8 nós (Jornadas 1 e 2).
 
 ```mermaid
 sequenceDiagram
@@ -281,16 +281,19 @@ sequenceDiagram
     participant API as Agente API (FastAPI :8001)
     participant TV as topic_validator
     participant SG as safety_guard
+    participant PCR as patient_context_retriever
     participant RAG as rag_retriever
+    participant CS as context_summarizer
     participant LLM as llm_generator
     participant FMT as response_formatter
     participant AUD as audit_logger
     participant CP as MongoDBSaver
     participant DB as MongoDB
-    participant BE as Backend API (/rag-database)
+    participant BE as Backend API (:3000)
+    participant GROQ as Groq API (compound-mini)
     participant HF as HuggingFace / ngrok
 
-    U->>API: POST /agent/chat { session_id, query }
+    U->>API: POST /agent/chat { session_id, query, patient_name? }
     API->>CP: Recupera checkpoint por thread_id=session_id
     CP->>DB: read agent_checkpoints
     DB-->>CP: estado persistido ou vazio
@@ -298,10 +301,25 @@ sequenceDiagram
     TV-->>API: topic_valid=true
     API->>SG: invoke(state)
     SG-->>API: safety_triggered=false
+    API->>PCR: invoke(state)
+    alt patient_name fornecido (Jornada 2)
+        PCR->>BE: GET /medical-record?patient_name=...
+        BE-->>PCR: Prontuário estruturado
+        PCR->>PCR: Sanitiza LGPD (remove PII, extrai diagnóstico, prescrições, vitais)
+    end
+    PCR-->>API: patient_context, patient_record_used, patient_fields_used
     API->>RAG: invoke(state)
-    RAG->>BE: POST /rag-database/query { query, top_k }
+    RAG->>BE: POST /rag-database/query { query + diagnóstico, top_k }
     BE-->>RAG: { documents: [...] }
     RAG-->>API: rag_documents, rag_context
+    API->>CS: invoke(state)
+    alt total_tokens > 3000 (LLM_MAX_CONTEXT_TOKENS)
+        CS->>GROQ: chat/completions (destilar contexto clínico + RAG em <800 tokens)
+        GROQ-->>CS: resumo clínico estruturado
+    else tokens dentro da janela de 3K
+        CS->>CS: mantém contexto íntegro (ou fallback Python determinístico)
+    end
+    CS-->>API: context_summarized, context_summarizer_mode
     API->>LLM: invoke(state)
     Note over LLM,HF: Template SFT (Instrução/Entrada/Resposta)
     LLM->>HF: generate(pergunta, contexto, prompt) via Gradio API / FastAPI ngrok
@@ -310,13 +328,13 @@ sequenceDiagram
     API->>FMT: invoke(state)
     FMT-->>API: final_response (com fontes + disclaimer)
     API->>AUD: invoke(state)
-    AUD->>DB: insert agent_audit_logs
+    AUD->>DB: insert agent_audit_logs (incluindo metadados de prontuário e sumarizador)
     DB-->>AUD: { _id: audit_id }
     AUD-->>API: audit_id, duration_ms
     API->>CP: Persiste checkpoint do thread
     CP->>DB: write agent_checkpoints / agent_checkpoint_writes
     DB-->>CP: checkpoint persistido
-    API-->>U: { response, sources, topic_valid, audit_id, ... }
+    API-->>U: { response, sources, topic_valid, patient_record_used, context_summarized, audit_id, ... }
 
     Note over TV,SG: Se query inválida ou guardrail ativado,
     Note over TV,SG: pula direto para audit_logger (early-exit)
@@ -347,3 +365,6 @@ As decisões técnicas que moldaram esta arquitetura estão documentadas como **
 | [ADR-015](adr/ADR-015-anonimizacao-laudos-lgpd.md)               | Anonimização de laudos médicos antes da RAG                | ✅ Aceito     |
 | [ADR-016](adr/ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md) | Metodologia de avaliação empírica e calibração de decodificação LLM | ✅ Aceito |
 | [ADR-017](adr/ADR-017-mongodb-saver-memoria-sessao-agente.md)    | MongoDBSaver para memória de sessão do agente médico       | ✅ Aceito     |
+| [ADR-018](adr/ADR-018-curadoria-rastreabilidade-datasets.md)     | Curadoria automática versionada e rastreabilidade dos datasets | ✅ Aceito |
+| [ADR-019](adr/ADR-019-compatibilizacao-instructor-embedding-rag.md) | Compatibilização do InstructorEmbedding com Sentence-Transformers modernos e alinhamento de dimensão vetorial no RAG | ✅ Aceito |
+| [ADR-020](adr/ADR-020-jornada2-contexto-paciente-sumarizador.md) | Contextualização clínica estruturada por paciente (Jornada 2) e sumarizador para janela SFT de 3K tokens | ✅ Aceito |

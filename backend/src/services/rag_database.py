@@ -19,6 +19,32 @@ from infra.database.collections.rag_database import (
 )
 
 
+def _patch_instructor_compatibility() -> None:
+    """Compatibiliza a biblioteca InstructorEmbedding com versoes modernas do sentence-transformers."""
+    try:
+        from InstructorEmbedding import INSTRUCTOR  # type: ignore
+
+        if hasattr(INSTRUCTOR, "_target_device"):
+            INSTRUCTOR._target_device = property(lambda self: self.device)
+
+        if not hasattr(INSTRUCTOR, "_text_length"):
+            def _text_length(self: Any, text: Any) -> int:
+                if isinstance(text, dict):
+                    return len(next(iter(text.values())))
+                elif not hasattr(text, "__len__"):
+                    return 1
+                elif len(text) == 0 or isinstance(text[0], int):
+                    return len(text)
+                else:
+                    return sum([len(t) for t in text])
+
+            INSTRUCTOR._text_length = _text_length
+    except Exception:
+        pass
+
+
+_patch_instructor_compatibility()
+
 try:
     from langchain_community.embeddings import HuggingFaceInstructEmbeddings as _RealEmbeddingModel
 except Exception:  # pragma: no cover - optional dependency fallback
@@ -574,10 +600,6 @@ def query_rag_documents(
     if top_k < 1:
         raise HTTPException(status_code=400, detail="O parametro top_k deve ser maior ou igual a 1.")
 
-    embedding_model = _build_embedding_model(embedding_model_name)
-    query_vector = embedding_model.embed_query(normalized_query)
-    query_tokens = set(_tokenize_pt(normalized_query))
-
     raw_documents = get_rag_documents_for_search(preprocess_id=preprocess_id)
     if not raw_documents:
         return {
@@ -585,6 +607,23 @@ def query_rag_documents(
             "total_results": 0,
             "documents": [],
         }
+
+    # Detectar dimensao dos embeddings armazenados na base para compatibilidade de busca
+    sample_embedding = next(
+        (doc.get("embedding") for doc in raw_documents if isinstance(doc.get("embedding"), list) and doc.get("embedding")),
+        None,
+    )
+    database_embedding_dim = len(sample_embedding) if sample_embedding else None
+
+    # Se os documentos armazenados foram gerados com o fallback (256 dims) e nenhum modelo foi especificado,
+    # usamos o mesmo fallback na query para garantir comparabilidade imediata:
+    if database_embedding_dim == 256 and not embedding_model_name:
+        embedding_model = _FallbackEmbeddingModel(DEFAULT_RAG_EMBEDDING_MODEL)
+    else:
+        embedding_model = _build_embedding_model(embedding_model_name)
+
+    query_vector = embedding_model.embed_query(normalized_query)
+    query_tokens = set(_tokenize_pt(normalized_query))
 
     # Obtem as pontuacoes da busca textual via indice nativo do MongoDB
     text_scores = get_text_search_scores(normalized_query, preprocess_id=preprocess_id, limit=200)
@@ -596,11 +635,11 @@ def query_rag_documents(
         doc_content = doc.get("content", "")
         doc_embedding = doc.get("embedding")
 
-        # Recalcular embedding caso os vetores não tenham a mesma dimensão
+        # Evita reprocessamento massivo sincrono na requisicao HTTP caso dimensao divirja
         if not isinstance(doc_embedding, list) or len(doc_embedding) != len(query_vector):
-            doc_embedding = embedding_model.embed_query(doc_content)
-
-        cos_sim = _cosine_similarity(query_vector, doc_embedding)
+            cos_sim = 0.0
+        else:
+            cos_sim = _cosine_similarity(query_vector, doc_embedding)
 
         # Normaliza o score textual retornado pelo MongoDB [0, 1]
         raw_text_score = text_scores.get(doc_id, 0.0)

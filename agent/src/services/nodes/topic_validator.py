@@ -26,7 +26,10 @@ MEDICAL_KEYWORDS: Final[Set[str]] = {
     "exame", "cirurgia", "cirurgiao", "cirurgião", "enfermagem", "enfermeiro",
     "enfermeira", "farmacia", "farmácia", "farmacologia", "medicamento",
     "remedio", "remédio", "droga", "dose", "posologia", "prescricao",
-    "prescrição", "receita",
+    "prescrição", "prescrever", "prescreve", "receituario", "receituário",
+    "antibiotico", "antibiótico", "amoxicilina", "paracetamol", "dipirona",
+    "ibuprofeno", "losartana", "metformina", "insulina", "omeprazol",
+    "corticoide", "corticóide",
     # Anatomia e fisiologia
     "coracao", "coração", "pulmao", "pulmão", "figado", "fígado", "rim",
     "cerebro", "cérebro", "nervoso", "osseo", "ósseo", "musculo", "músculo",
@@ -66,6 +69,7 @@ CONTEXTUAL_MEDICAL_PATTERNS: Final[list] = [
     r"\bpaciente\b",
     r"\b(tomar|usar|aplicar)\b.{0,30}\b(medicament|remedio|remédio|antibiotico|antibiótico)\b",
     r"\b(câncer|cancer|cancro|neoplas|tumor|maligno|benigno)\b",
+    r"\breceita\b.{0,20}\b(medica|médica|remedio|remédio|medicament)\b",
 ]
 
 
@@ -73,7 +77,7 @@ def _normalize(text: str) -> str:
     """Remove acentos e converte para minúsculas para comparação."""
     import unicodedata
     normalized = unicodedata.normalize("NFD", text.lower())
-    return "".join(c for c in normalized if unicodedata.category(c) != "MN")
+    return "".join(c for c in normalized if unicodedata.category(c) != "Mn")
 
 
 def is_medical_topic(query: str, last_history_turn: str = "") -> tuple[bool, str]:

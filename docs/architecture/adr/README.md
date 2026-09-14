@@ -26,7 +26,10 @@
 | [ADR-014](ADR-014-skip-preprocess-translation.md) | Opção de pular a tradução no pré-processamento | ✅ Aceito | 2026-08-28 |
 | [ADR-015](ADR-015-anonimizacao-laudos-lgpd.md) | Anonimização de laudos médicos antes da RAG | ✅ Aceito | 2026-09-03 |
 | [ADR-016](ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md) | Metodologia de avaliação empírica e calibração de decodificação LLM | ✅ Aceito | 2026-09-07 |
+| [ADR-017](ADR-017-mongodb-saver-memoria-sessao-agente.md) | MongoDBSaver para memória de sessão do agente médico | ✅ Aceito | 2026-09-08 |
 | [ADR-018](ADR-018-curadoria-rastreabilidade-datasets.md) | Curadoria automática versionada e rastreabilidade dos datasets | ✅ Aceito | 2026-09-10 |
+| [ADR-019](ADR-019-compatibilizacao-instructor-embedding-rag.md) | Compatibilização do InstructorEmbedding com Sentence-Transformers modernos e alinhamento de dimensão vetorial no RAG | ✅ Aceito | 2026-09-13 |
+| [ADR-020](ADR-020-jornada2-contexto-paciente-sumarizador.md) | Contextualização clínica estruturada por paciente (Jornada 2) e sumarizador para janela SFT de 3K tokens | ✅ Aceito | 2026-09-14 |
 
 ---
 

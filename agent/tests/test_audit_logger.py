@@ -123,3 +123,35 @@ class TestCreateAuditLog:
         assert result["safety_triggered"] is True
         assert result["safety_reason"] == "Solicitação de prescrição com dose específica"
         assert result["rag_documents_count"] == 0
+
+    @patch(
+        "infra.database.collections.agent_audit_logs.get_collection",
+        return_value=_make_mock_collection(),
+    )
+    def test_campos_jornada_2_e_sumarizacao_registrados(self, mock_col):
+        """Verifica que campos de paciente e sumarização são persistidos."""
+        from infra.database.collections.agent_audit_logs import create_audit_log
+
+        result = create_audit_log(
+            session_id="sess-004",
+            query="Quais cuidados para este paciente?",
+            topic_valid=True,
+            safety_triggered=False,
+            safety_reason=None,
+            rag_documents_used=[],
+            llm_response_raw="resp",
+            final_response="final",
+            sources_cited=[],
+            has_disclaimer=True,
+            preprocess_id=None,
+            duration_ms=1200,
+            patient_record_used=True,
+            patient_fields_used=["avaliacao", "plano.prescricao"],
+            context_summarized=True,
+            context_summarizer_mode="groq",
+        )
+
+        assert result["patient_record_used"] is True
+        assert result["patient_fields_used"] == ["avaliacao", "plano.prescricao"]
+        assert result["context_summarized"] is True
+        assert result["context_summarizer_mode"] == "groq"
