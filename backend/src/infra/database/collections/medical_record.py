@@ -1,11 +1,14 @@
+from pymongo import cursor_shared
 import copy
 import json
 import re
+import logging
 from pathlib import Path
 from typing import Any, Dict, Final, List
 
 from infra.database.mongodb import get_collection, get_db
 
+logger = logging.getLogger(__name__)
 
 MEDICAL_RECORD_COLLECTION: Final[str] = "medical_record"
 PATIENT_NAME_FIELD: Final[str] = "identificacao.nome"
@@ -61,6 +64,7 @@ def initialize_medical_record_collection() -> Dict[str, Any]:
 
 def find_medical_records_by_patient_name(patient_name: str) -> List[Dict[str, Any]]:
     """Busca prontuários pelo nome completo, ignorando maiúsculas/minúsculas."""
+ #   logger.info(f"[MEDICAL RECORDS] Buscando {patient_name}")
     escaped_name = re.escape(patient_name)
     cursor = get_collection(MEDICAL_RECORD_COLLECTION).find(
         {
@@ -70,4 +74,5 @@ def find_medical_records_by_patient_name(patient_name: str) -> List[Dict[str, An
             }
         }
     )
+#    logger.info(f"[MEDICA RECORDS] Encontrados {len(doclist)} documentos.")
     return [_serialize_value(copy.deepcopy(document)) for document in cursor]

@@ -1,3 +1,5 @@
+import logging
+
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException
@@ -5,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from services.rag_database import generate_rag_database, query_rag_documents
 
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/rag-database", tags=["rag-database"])
 
@@ -70,6 +73,7 @@ def rag_database_endpoint(request: RagDatabaseRequest) -> Dict[str, Any]:
 
 @router.post("/query", response_model=RagQueryResponse)
 def rag_query_endpoint(request: RagQueryRequest) -> Dict[str, Any]:
+    logger.info(f"[RAG_DATABASE] Querying db for {request.query[:80]}")
     try:
         return query_rag_documents(
             query=request.query,
@@ -80,5 +84,6 @@ def rag_query_endpoint(request: RagQueryRequest) -> Dict[str, Any]:
     except HTTPException:
         raise
     except Exception as exc:
+        logger.exception("[RAG_DATABASE] Erro ao consultar base RAG: %s", exc)
         raise HTTPException(status_code=500, detail=f"Erro ao consultar base RAG: {str(exc)}")
 
