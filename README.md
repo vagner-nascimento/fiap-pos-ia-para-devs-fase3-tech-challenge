@@ -35,23 +35,25 @@ O fluxo completo acontece em etapas encadeadas:
 1. O avaliador acessa o frontend em `http://localhost:8080` e inicia o processamento dos datasets.
 2. O frontend envia a solicitação ao backend, que registra a execução no MongoDB e processa os dados em background. O status pode ser consultado até a tarefa terminar.
 3. O backend organiza QAs, laudos e protocolos clínicos, gera os arquivos estruturados e cria a base RAG para buscas por similaridade.
-4. No chat, o agente valida se a pergunta é médica, aplica os guardrails de segurança e consulta a base RAG antes de chamar o modelo fine-tunado.
+4. No chat, o agente valida se a pergunta é médica, aplica guardrails de segurança, identifica se há referência a um paciente (Jornada 2 com busca e anonimização de prontuário), sumariza o contexto caso exceda a janela de 3K tokens do SFT e consulta a base RAG antes de chamar o modelo fine-tunado.
 5. O agente devolve a resposta com fontes, disclaimer e indicação de validação humana, enquanto registra a interação para auditoria no MongoDB.
 
 O modelo fine-tunado utilizado pelo agente está disponível publicamente no [Hugging Face](https://huggingface.co/fiap-hospital-helper/hospital-helper-qwen2.5-1.5b) (tag oficial `v2.0`). O endpoint de inferência pode ser o [Space do projeto](https://huggingface.co/spaces/fiap-hospital-helper/hospital-helper) (com alocação ZeroGPU) ou uma URL FastAPI exposta via ngrok.
 
 ## Tela do Assistente Médico
 
-O frontend possui a tela `Assistente Médico`, disponível como último item do menu lateral. Ela permite enviar perguntas sobre saúde ao agente médico e receber respostas contextualizadas pela base RAG.
+O frontend possui a tela `Assistente Médico`, disponível como último item do menu lateral. Ela suporta duas jornadas clínicas principais:
+- **Jornada 1 — Dúvida clínica pontual:** Pergunta clínica geral sem identificação de paciente, respondida com busca RAG sobre protocolos e literatura médica.
+- **Jornada 2 — Consulta contextualizada por paciente:** Ao preencher o campo opcional *Nome do paciente*, o assistente consulta o prontuário no MongoDB via backend, extrai dados clínicos anonimizados (diagnósticos, alergias, medicações em uso e sinais vitais), enriquece a busca vetorial e gera uma recomendação contextualizada com badges visuais (`🏥 Prontuário consultado` e `⚡ Contexto resumido`).
 
 Para usar a tela:
 
 1. Suba o backend, o agente, o MongoDB e o frontend com o Docker Compose.
-2. Garanta que o agente esteja configurado com uma URL de inferência da LLM em `LLM_ENDPOINT_URL`.
+2. Garanta que o agente esteja configurado com uma URL de inferência da LLM em `LLM_ENDPOINT_URL` (e opcionalmente `GROQ_API_KEY` para sumarização avançada).
 3. Acesse `http://localhost:8080` e selecione `Assistente Médico`.
-4. Digite uma pergunta e, se necessário, informe um `preprocess_id` para limitar a consulta a uma execução específica.
+4. Digite uma pergunta. Para a Jornada 2, preencha o campo *Nome do paciente* (ex.: "João da Silva"). Se necessário, informe um `preprocess_id` para limitar a consulta a uma execução RAG específica.
 
-A tela chama `POST http://localhost:8001/agent/chat`. A resposta apresenta o texto do assistente e, quando disponíveis, as fontes consultadas, o dataset, o tipo de fonte, a prévia do conteúdo e o score de similaridade. Solicitações bloqueadas pelos guardrails exibem o motivo de segurança. As respostas do agente incluem disclaimer e indicação de validação humana, conforme descrito em [agent/README.md](agent/README.md).
+A tela chama `POST http://localhost:8001/agent/chat`. A resposta apresenta o texto do assistente, badges de status, fontes consultadas e detalhes clínicos utilizados. Solicitações bloqueadas pelos guardrails exibem o motivo de segurança. As respostas do agente incluem disclaimer e indicação de validação humana, conforme descrito em [agent/README.md](agent/README.md).
 
 Em desenvolvimento local, a URL do agente no frontend pode ser ajustada pela variável `VITE_AGENT_URL`, cujo padrão é `http://localhost:8001`.
 
@@ -69,18 +71,25 @@ docker compose -f app-docker-compose.yaml up --build -d
 # 3. Confirme que backend e agente estão disponíveis
 curl http://localhost:3000/health && curl http://localhost:8001/health
 
-# 4. Envie uma pergunta médica ao agente
+# 4. Envie uma pergunta médica geral (Jornada 1)
 curl -X POST http://localhost:8001/agent/chat \
 	-H "Content-Type: application/json" \
 	-d '{"query":"Quais são os sintomas da tuberculose?"}'
+
+# 5. Envie uma consulta contextualizada por paciente (Jornada 2)
+curl -X POST http://localhost:8001/agent/chat \
+	-H "Content-Type: application/json" \
+	-d '{"patient_name":"João da Silva","query":"Quais cuidados prescrever para o quadro clínico deste paciente?"}'
 ```
 
-Depois, abra http://localhost:8080 para usar a interface web. A documentação interativa da API fica em http://localhost:3000/docs. O primeiro build e o primeiro processamento dos datasets podem demorar; acompanhe a inicialização com `docker compose -f app-docker-compose.yaml logs -f`.
+Depois, abra http://localhost:8080 para usar a interface web. A documentação interativa da API fica em http://localhost:3000/docs (backend) e http://localhost:8001/docs (agente). O primeiro build e o primeiro processamento dos datasets podem demorar; acompanhe a inicialização com `docker compose -f app-docker-compose.yaml logs -f`.
 
 ## Documentação Técnica e Arquitetura
 
 Para detalhes aprofundados sobre a arquitetura e decisões de projeto:
 
+- **Jornadas do Usuário (J1, J2 e J3):** [docs/jornadas_agente_medico.md](docs/jornadas_agente_medico.md)
+- **Walkthrough do Agente Médico:** [docs/agent-walkthrough.md](docs/agent-walkthrough.md)
 - **Arquitetura Geral & C4 Models:** [docs/architecture/README.md](docs/architecture/README.md)
 - **Decisões de Arquitetura (ADRs):** [docs/architecture/adr/README.md](docs/architecture/adr/README.md)
 - **Relatório de Avaliação do Modelo (ROUGE/BLEU):** [docs/avaliacao-modelo.md](docs/avaliacao-modelo.md)

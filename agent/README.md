@@ -53,12 +53,14 @@ agent/
     |   |-- llm_client.py    # Cliente LLM unificado (HF Spaces ZeroGPU + FastAPI ngrok)
     |   |-- medical_agent.py # StateGraph LangGraph — orquestrador principal
     |   `-- nodes/
-    |       |-- topic_validator.py    # No 1: valida dominio medico
-    |       |-- safety_guard.py       # No 2: guardrails de seguranca
-    |       |-- rag_retriever.py      # No 3: busca RAG via backend
-    |       |-- llm_generator.py      # No 4: chamada ao modelo fine-tunado (template SFT)
-    |       |-- response_formatter.py # No 5: formata fontes e disclaimer
-    |       `-- audit_logger.py       # No 6: persiste log no MongoDB
+    |       |-- topic_validator.py           # No 1: valida dominio medico
+    |       |-- safety_guard.py              # No 2: guardrails de seguranca
+    |       |-- patient_context_retriever.py # No 3.1: busca e anonimiza prontuario (Jornada 2)
+    |       |-- rag_retriever.py             # No 3.2: busca RAG via backend
+    |       |-- context_summarizer.py        # No 3.3: comprime para janela SFT 3K (Groq/Python)
+    |       |-- llm_generator.py             # No 4: chamada ao modelo fine-tunado (template SFT)
+    |       |-- response_formatter.py        # No 5: formata fontes e disclaimer
+    |       `-- audit_logger.py              # No 6: persiste log no MongoDB
     `-- infra/
         `-- database/
             |-- mongodb.py   # Conexao singleton com MongoDB
@@ -70,41 +72,51 @@ agent/
 
 ## Pipeline LangGraph
 
-O agente executa um grafo dirigido com **early-exit** nos nós de guardrail:
-quando uma violação é detectada, o grafo pula direto para o `audit_logger`
-sem chamar RAG nem LLM, economizando latência e custo de inferência.
+O agente executa um grafo dirigido com **early-exit** nos nós de guardrail e suporte dinâmico para as duas jornadas clínicas:
+- **Jornada 1**: Pergunta clínica genérica sem paciente (`patient_name` omitido).
+- **Jornada 2**: Consulta contextualizada com prontuário (`patient_name` preenchido).
 
 ```
 [START] → init → topic_validator
-                      |
-             (invalido)         (valido)
-                 |                  |
-                 v                  v
-           audit_logger       safety_guard
-                              |            |
-                        (bloqueado)     (seguro)
-                              |            |
-                              v            v
-                        audit_logger  rag_retriever
-                                           |
-                                           v
-                                     llm_generator
-                                           |
-                                           v
-                                   response_formatter
-                                           |
-                                           v
-                                     audit_logger --> [END]
+                      │
+             ┌────────┴───────────┐
+         (inválido)            (válido)
+             │                    │
+             ▼                    ▼
+        audit_logger         safety_guard
+                                  │
+                        ┌─────────┴──────────┐
+                    (bloqueado)           (seguro)
+                        │                    │
+                        ▼                    ▼
+                  audit_logger   patient_context_retriever
+                                             │
+                                             ▼
+                                       rag_retriever
+                                             │
+                                             ▼
+                                     context_summarizer
+                                             │
+                                             ▼
+                                       llm_generator
+                                             │
+                                             ▼
+                                     response_formatter
+                                             │
+                                             ▼
+                                       audit_logger → [END]
 ```
 
-| No                   | Responsabilidade                                                                          |
-| -------------------- | ----------------------------------------------------------------------------------------- |
-| `topic_validator`    | Rejeita perguntas fora do domínio médico/saúde (keywords PT/EN + regex contextual)        |
-| `safety_guard`       | Bloqueia pedidos de prescrição com dose, diagnóstico definitivo ou substituição de médico |
-| `rag_retriever`      | Consulta a API `/rag-database/query` do backend e monta o contexto com fontes             |
-| `llm_generator`      | Constrói o prompt no formato SFT do modelo e invoca o Qwen2.5 (Spaces/ngrok)              |
-| `response_formatter` | Adiciona citações de fontes inline e o disclaimer obrigatório                             |
-| `audit_logger`       | Persiste o log completo da interação na collection `agent_audit_logs`                     |
+| No                          | Responsabilidade                                                                          |
+| --------------------------- | ----------------------------------------------------------------------------------------- |
+| `topic_validator`           | Rejeita perguntas fora do domínio médico/saúde (keywords PT/EN + regex contextual)        |
+| `safety_guard`              | Bloqueia pedidos de prescrição com dose, diagnóstico definitivo ou substituição de médico |
+| `patient_context_retriever` | Roteia jornada; se `patient_name` presente, consulta `GET /medical-record` e extrai dados clínicos anonimizados (Jornada 2) |
+| `rag_retriever`             | Consulta `/rag-database/query` do backend, enriquecendo busca com termos do paciente      |
+| `context_summarizer`        | Garante que o contexto caiba na janela de 3K tokens SFT via `groq/compound-mini` ou fallback Python |
+| `llm_generator`             | Constrói o prompt SFT com dados clínicos anonimizados e invoca o Qwen2.5                   |
+| `response_formatter`        | Adiciona citações de fontes inline, limpa loops repetitivos e insere disclaimer           |
+| `audit_logger`              | Persiste o log completo (incluindo dados de paciente e sumarização) em `agent_audit_logs` |
 
 ---
 
@@ -165,7 +177,10 @@ cp agent/.env.example agent/.env
 | `LLM_PROVIDER`             | Provedor da LLM (`auto`, `hf_space`, `fastapi`)                         | `auto`                  |
 | `LLM_ENDPOINT_URL`         | URL do Space Gradio ou endpoint FastAPI/ngrok                           | —                       |
 | `LLM_API_TOKEN`            | Token de autenticacao HuggingFace (necessario para Spaces privados)     | —                       |
-| `BACKEND_API_URL`          | URL interna do backend para consultas RAG                               | `http://localhost:3000` |
+| `BACKEND_API_URL`          | URL interna do backend para consultas RAG e prontuários               | `http://localhost:3000` |
+| `LLM_MAX_CONTEXT_TOKENS`   | Janela máxima de contexto do modelo fine-tunado (SFT)                   | `3000`                  |
+| `GROQ_API_KEY`             | Chave de API da Groq para sumarização de contexto (opcional)            | —                       |
+| `GROQ_SUMMARIZER_MODEL`    | Modelo Groq para sumarização (70K TPM, sem limite de tokens/dia)        | `groq/compound-mini`    |
 | `AGENT_MAX_TOKENS`         | Numero maximo de tokens na resposta da LLM (calibrado para evitar truncamento e repetições) | `450` |
 | `AGENT_TEMPERATURE`        | Temperatura de amostragem (0.10 recomendado para precisao clinica e determinismo) | `0.10`                  |
 | `AGENT_TOP_P`              | Amostragem nucleus top_p (0.85 conservador para mitigar alucinações)     | `0.85`                  |
@@ -173,7 +188,7 @@ cp agent/.env.example agent/.env
 | `RAG_TOP_K`                | Quantidade maxima de documentos RAG retornados                          | `5`                     |
 | `RAG_SIMILARITY_THRESHOLD` | Score minimo de similaridade para incluir documento                     | `0.25`                  |
 
-> **Calibração de Hiperparâmetros:** Os valores padrão de decodificação acima foram empiricamente validados na avaliação formal do modelo (GAP02 / M10), detalhada em [docs/avaliacao-modelo.md](../docs/avaliacao-modelo.md) e [ADR-016](../docs/architecture/adr/ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md). Essa configuração reduziu a latência média em 57% e eliminou loops de repetição degenerativa.
+> **Calibração de Hiperparâmetros:** Os valores padrão de decodificação acima foram empiricamente validados na avaliação formal do modelo (GAP02 / M10), detalhada em [docs/avaliacao-modelo.md](../docs/avaliacao-modelo.md) e [ADR-016](../docs/architecture/adr/ADR-016-metodologia-avaliacao-e-calibracao-decodificacao-llm.md). Essa configuração reduziu a latência média em 57% e eliminou loops de repetição degenerativa. O limite de 3.000 tokens de contexto reflete a extensão máxima das sequências de treino no fine-tuning supervisionado (SFT).
 
 > Com Docker Compose, `MONGODB_HOST` deve ser `mongodb` e `BACKEND_API_URL` deve ser `http://fiap-pos-ia-backend:3000`.
 
@@ -285,17 +300,18 @@ Health check do servico.
 
 ### `POST /agent/chat`
 
-Envia uma pergunta ao assistente medico e recebe a resposta contextualizada. O agente executa o pipeline LangGraph completo: valida o topico, aplica guardrails, busca contexto via RAG, gera a resposta com a LLM e persiste o log de auditoria.
+Envia uma pergunta ao assistente médico e recebe a resposta contextualizada. O agente executa o pipeline LangGraph completo: valida o tópico, aplica guardrails, roteia a jornada (consultando prontuário na Jornada 2), busca contexto via RAG, sumariza para a janela de 3K tokens, gera a resposta com a LLM e persiste o log de auditoria.
 
 **Body:**
 
-| Campo           | Tipo  | Obrigatorio | Descricao                                                  |
-| --------------- | ----- | ----------- | ---------------------------------------------------------- |
-| `query`         | `str` | Sim         | Pergunta em linguagem natural (3 a 2000 caracteres)        |
-| `session_id`    | `str` | Nao         | Identificador da sessao. Gerado automaticamente se omitido |
-| `preprocess_id` | `str` | Nao         | ID do pre-processamento para filtrar a base RAG            |
+| Campo           | Tipo  | Obrigatorio | Descricao                                                              |
+| --------------- | ----- | ----------- | ---------------------------------------------------------------------- |
+| `query`         | `str` | Sim         | Pergunta em linguagem natural (3 a 2000 caracteres)                    |
+| `session_id`    | `str` | Nao         | Identificador da sessao. Gerado automaticamente se omitido             |
+| `preprocess_id` | `str` | Nao         | ID do pre-processamento para filtrar a base RAG                        |
+| `patient_name`  | `str` | Nao         | Nome do paciente (ativa a **Jornada 2** — consulta ao prontuário médico) |
 
-**Exemplo:**
+**Exemplo — Jornada 1 (Q&A clínico geral sem paciente):**
 
 ```bash
 curl -X POST http://localhost:8001/agent/chat \
@@ -322,8 +338,50 @@ curl -X POST http://localhost:8001/agent/chat \
   "safety_triggered": false,
   "safety_reason": null,
   "requires_human_validation": true,
+  "patient_context_used": false,
+  "patient_fields_used": [],
+  "context_summarized": false,
   "audit_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "duration_ms": 1842
+}
+```
+
+**Exemplo — Jornada 2 (Consulta contextualizada por paciente):**
+
+```bash
+curl -X POST http://localhost:8001/agent/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": "sess-002",
+    "patient_name": "João da Silva",
+    "query": "Quais cuidados prescrever para o quadro clínico deste paciente?"
+  }'
+```
+
+**Resposta:**
+
+```json
+{
+  "session_id": "sess-002",
+  "response": "Considerando o diagnóstico registrado no prontuário de Hipertensão Arterial Sistêmica e uso atual de Losartana 50mg, bem como alergia à Dipirona... [Fonte: FHEMIG (Protocolos Clínicos), score: 0.82]\nRecomenda-se acompanhamento pressórico e orientações dietéticas com restrição de sódio.\n\n---\n⚠️ AVISO IMPORTANTE: Este assistente médico fornece informações gerais baseadas em literatura médica e protocolos clínicos. Não substitui a avaliação, diagnóstico ou prescrição de um profissional de saúde habilitado.",
+  "sources": [
+    {
+      "dataset": "clinical_protocols",
+      "source_type": "clinical_protocols",
+      "similarity_score": 0.82,
+      "content_preview": "Protocolo Clínico: Manejo de Hipertensão Arterial..."
+    }
+  ],
+  "sources_cited": ["FHEMIG (Protocolos Clínicos)"],
+  "topic_valid": true,
+  "safety_triggered": false,
+  "safety_reason": null,
+  "requires_human_validation": true,
+  "patient_context_used": true,
+  "patient_fields_used": ["avaliacao", "plano.prescricao", "alergias"],
+  "context_summarized": false,
+  "audit_id": "d4e5f6a7-b8c9-0123-def4-567890abcdef",
+  "duration_ms": 2150
 }
 ```
 
@@ -331,7 +389,7 @@ curl -X POST http://localhost:8001/agent/chat \
 
 ```json
 {
-  "session_id": "sess-002",
+  "session_id": "sess-003",
   "response": "❌ Desculpe, sou um assistente especializado exclusivamente no domínio médico e de saúde...",
   "sources": [],
   "sources_cited": [],
@@ -339,16 +397,19 @@ curl -X POST http://localhost:8001/agent/chat \
   "safety_triggered": false,
   "safety_reason": null,
   "requires_human_validation": true,
+  "patient_context_used": false,
+  "patient_fields_used": [],
+  "context_summarized": false,
   "audit_id": "b2c3d4e5-...",
   "duration_ms": 12
 }
 ```
 
-**Resposta quando um guardrail e ativado (ex: pedido de prescricao):**
+**Resposta quando um guardrail e ativado (ex: pedido de prescricao com dose):**
 
 ```json
 {
-  "session_id": "sess-003",
+  "session_id": "sess-004",
   "response": "⚠️ Solicitação não permitida. Por razões de segurança, este assistente não pode prescrever medicamentos com doses específicas...",
   "sources": [],
   "sources_cited": [],
@@ -356,6 +417,9 @@ curl -X POST http://localhost:8001/agent/chat \
   "safety_triggered": true,
   "safety_reason": "Instrução de administração com dose ou unidade específica",
   "requires_human_validation": true,
+  "patient_context_used": false,
+  "patient_fields_used": [],
+  "context_summarized": false,
   "audit_id": "c3d4e5f6-...",
   "duration_ms": 8
 }
@@ -370,7 +434,7 @@ Retorna o historico de auditoria de uma sessao de usuario, ordenado cronologicam
 **Exemplo:**
 
 ```bash
-curl http://localhost:8001/agent/audit/sess-001
+curl http://localhost:8001/agent/audit/sess-002
 ```
 
 **Resposta:**
@@ -378,19 +442,32 @@ curl http://localhost:8001/agent/audit/sess-001
 ```json
 [
   {
-    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    "session_id": "sess-001",
-    "query": "Quais sao os sintomas da tuberculose?",
+    "id": "d4e5f6a7-b8c9-0123-def4-567890abcdef",
+    "session_id": "sess-002",
+    "query": "Quais cuidados prescrever para o quadro clínico deste paciente?",
     "topic_valid": true,
     "safety_triggered": false,
     "safety_reason": null,
-    "rag_documents_count": 5,
-    "sources_cited": ["PubMedQA/MedQuAD"],
+    "rag_documents_count": 3,
+    "rag_documents_used": [
+      {
+        "dataset": "clinical_protocols",
+        "source_type": "clinical_protocols",
+        "similarity_score": 0.82,
+        "content_preview": "Protocolo Clínico: Manejo de Hipertensão Arterial..."
+      }
+    ],
+    "llm_response_raw": "Considerando o diagnóstico registrado no prontuário...",
+    "sources_cited": ["FHEMIG (Protocolos Clínicos)"],
     "has_disclaimer": true,
     "preprocess_id": null,
-    "duration_ms": 1842,
-    "created_date": "2026-08-19T12:00:00.000000+00:00",
-    "final_response": "A tuberculose é..."
+    "duration_ms": 2150,
+    "patient_record_used": true,
+    "patient_fields_used": ["avaliacao", "plano.prescricao", "alergias"],
+    "context_summarized": false,
+    "context_summarizer_mode": "not_needed",
+    "created_date": "2026-09-14T00:00:00.000000+00:00",
+    "final_response": "Considerando o diagnóstico..."
   }
 ]
 ```
@@ -479,55 +556,61 @@ acesso ao MongoDB de acordo com os requisitos de privacidade do ambiente.
 
 Toda interacao — incluindo as bloqueadas pelos guardrails — e persistida na collection MongoDB `agent_audit_logs` com os seguintes campos:
 
-| Campo                 | Descricao                                             |
-| --------------------- | ----------------------------------------------------- |
-| `session_id`          | Identificador da sessao do usuario                    |
-| `query`               | Pergunta original                                     |
-| `topic_valid`         | Se passou na validacao de dominio                     |
-| `safety_triggered`    | Se um guardrail foi ativado                           |
-| `safety_reason`       | Descricao do guardrail violado                        |
-| `rag_documents_used`  | Preview dos documentos RAG utilizados (max 200 chars) |
-| `rag_documents_count` | Quantidade de documentos RAG consultados              |
-| `llm_response_raw`    | Resposta bruta da LLM antes da formatacao             |
-| `final_response`      | Resposta final enviada ao usuario                     |
-| `sources_cited`       | Lista de datasets citados na resposta                 |
-| `has_disclaimer`      | Confirmacao de que o disclaimer esta presente         |
-| `preprocess_id`       | ID do pre-processamento usado no RAG                  |
-| `duration_ms`         | Tempo total de execucao do pipeline                   |
-| `created_date`        | Timestamp da interacao (UTC)                          |
+| Campo                     | Descricao                                                             |
+| ------------------------- | --------------------------------------------------------------------- |
+| `session_id`              | Identificador da sessao do usuario                                    |
+| `query`                   | Pergunta original                                                     |
+| `topic_valid`             | Se passou na validacao de dominio                                     |
+| `safety_triggered`        | Se um guardrail foi ativado                                           |
+| `safety_reason`           | Descricao do guardrail violado                                        |
+| `rag_documents_used`      | Preview dos documentos RAG utilizados (max 200 chars)                 |
+| `rag_documents_count`     | Quantidade de documentos RAG consultados                              |
+| `llm_response_raw`        | Resposta bruta da LLM antes da formatacao                             |
+| `final_response`          | Resposta final enviada ao usuario                                     |
+| `sources_cited`           | Lista de datasets citados na resposta                                 |
+| `has_disclaimer`          | Confirmacao de que o disclaimer esta presente                         |
+| `preprocess_id`           | ID do pre-processamento usado no RAG                                  |
+| `duration_ms`             | Tempo total de execucao do pipeline                                   |
+| `patient_record_used`     | Se o prontuário foi utilizado como contexto clínico (Jornada 2)       |
+| `patient_fields_used`     | Lista de seções do prontuário extraídas (ex: avaliacao, prescricao)    |
+| `context_summarized`      | Se o contexto foi comprimido para a janela SFT de 3K tokens           |
+| `context_summarizer_mode` | Modo de sumarização empregado (`groq`, `python_fallback`, `not_needed`) |
+| `created_date`            | Timestamp da interacao (UTC)                                          |
 
 A explainability das fontes e garantida por dois mecanismos:
 
 1. **Citacao inline** no corpo da resposta: `[Fonte: PubMedQA/MedQuAD, score: 0.87]`
 2. **Campo estruturado** `sources` na resposta da API com dataset, source_type e score de similaridade.
+3. **Detalhamento do paciente** nos campos `patient_context_used` e `patient_fields_used` para auditoria clínica.
 
 ---
 
 ## Testes
 
-Os testes unitarios cobrem os nos criticos do pipeline sem dependencia de banco de dados real ou LLM.
+Os testes unitários e de integração cobrem todos os nós do pipeline LangGraph sem dependência de banco de dados real ou inferência remota.
 
 ```bash
 cd agent
 
-# Com uv
-uv run python -m pytest tests/ -v
+# Execução com uv
+uv run --with pytest pytest tests/ -v
 
-# Resultado esperado
-# tests/test_topic_validator.py  15 passed
-# tests/test_safety_guard.py     12 passed
-# tests/test_audit_logger.py      3 passed
-# ================================ 30 passed ================================
+# ================================ 64 passed in 3.00s ================================
 ```
 
-Cada suite de testes:
+Suites de testes:
 
-| Suite                     | O que cobre                                                                          |
-| ------------------------- | ------------------------------------------------------------------------------------ |
-| `test_topic_validator.py` | Queries medicas aceitas, queries off-topic rejeitadas, comportamento do no LangGraph |
-| `test_safety_guard.py`    | Padroes de prescricao bloqueados, padroes informativos permitidos, no LangGraph      |
-| `test_medical_agent.py`   | Pipeline completo com mocks de LLM, RAG e MongoDB; early-exit nos guardrails         |
-| `test_audit_logger.py`    | Criacao de documentos, truncamento de preview, persistencia de safety fields         |
+| Suite                                 | O que cobre                                                                          |
+| ------------------------------------- | ------------------------------------------------------------------------------------ |
+| `test_topic_validator.py`             | Queries médicas aceitas, queries off-topic rejeitadas, normalização Unicode          |
+| `test_safety_guard.py`                | Padrões de prescrição bloqueados, padrões informativos permitidos                    |
+| `test_patient_context_retriever.py`   | Roteamento J1/J2, extração e anonimização de prontuário, degradação graciosa         |
+| `test_context_summarizer.py`          | Janela SFT 3K: caso nominal, compressão via Groq API, fallback em Python puro         |
+| `test_medical_agent.py`               | Pipeline completo (J1 e J2) com mocks de LLM, RAG e MongoDB; early-exit nos guardrails |
+| `test_audit_logger.py`                | Criação de documentos, truncamento de preview, persistência de campos J2 e Groq       |
+| `test_llm_client.py`                  | Cliente híbrido Gradio (ZeroGPU) e FastAPI (ngrok) com repetition_penalty            |
+| `test_llm_generator.py`               | Injeção de histórico, dados de prontuário e formatação do prompt SFT                 |
+| `test_response_formatter.py`          | Remoção de repetições degenerativas, injeção de disclaimer e links                   |
 
 ---
 
@@ -553,7 +636,9 @@ agent/
     |       |-- __init__.py
     |       |-- topic_validator.py
     |       |-- safety_guard.py
+    |       |-- patient_context_retriever.py
     |       |-- rag_retriever.py
+    |       |-- context_summarizer.py
     |       |-- llm_generator.py
     |       |-- response_formatter.py
     |       `-- audit_logger.py
@@ -570,8 +655,13 @@ tests/
 |-- __init__.py
 |-- test_topic_validator.py
 |-- test_safety_guard.py
+|-- test_patient_context_retriever.py
+|-- test_context_summarizer.py
 |-- test_medical_agent.py
-`-- test_audit_logger.py
+|-- test_audit_logger.py
+|-- test_llm_client.py
+|-- test_llm_generator.py
+`-- test_response_formatter.py
 ```
 
 ---

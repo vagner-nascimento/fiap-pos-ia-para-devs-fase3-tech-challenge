@@ -81,22 +81,22 @@ flowchart TD
     class E safety
 ```
 
-**Etapas:**
+**Etapas implementadas:**
 
-1. **Médico referencia paciente** — informa ID ou nome do paciente na conversa.
-2. **Consulta ao prontuário** — LangChain busca dados na base estruturada (registros, exames, histórico).
-3. **Contextualização dinâmica** — combina o protocolo clínico com os dados atualizados do paciente.
-4. **Sugestão de conduta gerada** — resposta cita tanto o protocolo quanto os dados do prontuário usados.
-5. **Requer validação médica** — o sistema nunca prescreve ou age sozinho; a decisão final é humana.
-6. **Log detalhado + trilha de auditoria** — registra paciente, dados consultados e decisão sugerida.
+1. **Médico referencia paciente** — informa o nome do paciente no campo explícito `patient_name` da interface ou do payload HTTP da API (`POST /agent/chat`). O roteamento determinístico elimina a necessidade de regex frágil no texto da pergunta e evita alucinações de nomes inexistentes.
+2. **Consulta e anonimização do prontuário (`patient_context_retriever`)** — nó LangGraph consulta `GET /medical-record?patient_name=...` na API do backend, recupera os dados estruturados e filtra apenas campos clinicamente relevantes (`avaliacao`/diagnóstico, `plano.prescricao`, `alergias`, `objetivo.vitais`), descartando dados sensíveis e PIIs (CPF, leito, data de nascimento).
+3. **Enriquecimento da busca RAG (`rag_retriever`)** — o diagnóstico e o contexto clínico do paciente são combinados à pergunta do médico na busca vetorial para recuperar protocolos hospitalares estritamente pertinentes ao quadro do paciente.
+4. **Sumarização adaptativa de contexto (`context_summarizer`)** — nó LangGraph calcula a estimativa de tokens do pacote completo (pergunta + prontuário + RAG). Se o tamanho exceder a janela de contexto SFT do modelo fine-tunado (`LLM_MAX_CONTEXT_TOKENS=3000`), aciona uma LLM sumarizadora de alta capacidade (`groq/compound-mini`, 70k TPM sem limite diário de tokens) para destilar os pontos críticos em menos de 800 tokens. Caso offline ou sem chave Groq, executa fallback determinístico em Python puro truncando por prioridade clínica.
+5. **Geração com a LLM Fine-Tuned (`llm_generator`)** — gera a resposta respeitando o template SFT (`hospital-helper-qwen2.5-1.5b`), correlacionando os achados do prontuário com os protocolos institucionais.
+6. **Formatação e Transparência UI (`response_formatter` / Frontend)** — a resposta final é formatada com disclaimer legal, fontes citadas e badges no frontend (`🏥 Prontuário consultado` e `⚡ Contexto resumido`), com dropdown expansível permitindo ao médico auditar exatamente quais dados do prontuário foram injetados no modelo.
+7. **Trilha de Auditoria Completa (`audit_logger`)** — persiste no MongoDB (`agent_audit_logs`) os metadados da consulta: `patient_record_used`, `patient_fields_used`, `context_summarized`, `context_summarizer_mode` e duração total.
 
 **Exemplos de prompts:**
 
-- "O paciente 12345 pode receber o protocolo de anticoagulação, considerando os exames dele?"
-- "Quais são os últimos resultados de função renal do paciente Maria Silva e isso muda a dose recomendada?"
-- "O histórico do paciente 98421 tem alguma contraindicação para o protocolo de sedação?"
-- "Baseado no prontuário do leito 305, o protocolo de sepse ainda se aplica?"
-- "O paciente João tem alergias registradas que conflitem com o tratamento sugerido pelo protocolo X?"
+- "O paciente tem indicação para o protocolo de anticoagulação considerando seu histórico?" (com `patient_name: "Carlos Eduardo Oliveira"`)
+- "Quais são as contraindicações nos nossos protocolos considerando o quadro atual do paciente?" (com `patient_name: "Maria Silva"`)
+- "Existe risco de interação medicamentosa entre a prescrição atual do paciente e o protocolo de sedação?" (com `patient_name: "João Santos"`)
+- "Quais exames adicionais são recomendados para o diagnóstico atual deste paciente segundo as diretrizes?"
 
 ---
 
@@ -155,8 +155,8 @@ As três jornadas compartilham os mesmos "trilhos" de segurança, que devem ser 
 
 ## Mapeamento com o estado atual do projeto
 
-| Jornada | O que já existe | O que falta implementar |
+| Jornada | O que já existe | Status |
 |---|---|---|
-| 1 — Q&A pontual | Modelo fine-tuned (`hospital-helper-qwen2.5-1.5b`) e `app.py` servindo respostas | RAG sobre protocolos + etapa de citação de fonte |
-| 2 — Consulta por paciente | — | Integração LangChain com base de prontuários estruturada |
-| 3 — Fluxo automatizado | — | Orquestração via LangGraph disparada por eventos |
+| 1 — Q&A pontual | Pipeline LangGraph de 8 nós (`topic_validator`, `safety_guard`, `rag_retriever`, `llm_generator`, `response_formatter`, `audit_logger`), RAG sobre protocolos internos FHEMIG/PubMedQA e LLM fine-tuned (`hospital-helper-qwen2.5-1.5b`). | ✅ Implementado |
+| 2 — Consulta por paciente | Roteamento explícito por `patient_name`, nó `patient_context_retriever` com consulta ao MongoDB via backend e sanitização LGPD, nó `context_summarizer` com Groq `compound-mini` (70k TPM) e fallback Python para limite de 3.000 tokens SFT, badges e contexto expansível no frontend, auditoria detalhada. | ✅ Implementado |
+| 3 — Fluxo automatizado | Arquitetura de nós LangGraph preparada para acionamento por eventos assíncronos. | 🔄 Previsto para fase posterior |

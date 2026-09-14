@@ -478,9 +478,16 @@ Para garantir a precisao da busca vetorial e contornar limitacoes de ambiente se
   $$\text{Score Final} = (0.6 \times \text{CosineSimilarity}) + (0.4 \times \text{KeywordOverlapRatio})$$
 - Essa abordagem híbrida prioriza documentos que contêm os termos médicos centrais da pergunta do usuário.
 
-#### 4. Recalculamento Dnamico de Embeddings Incompativeis ou Legados
-- Para evitar a necessidade de reprocessar toda a base RAG no MongoDB quando a dimensão do vetor muda (ex: bases antigas de 16d ou alterações no modelo), o serviço `query_rag_documents` verifica a dimensão do vetor armazenado em cada documento.
-- Caso ocorra divergência de dimensão entre a query e o documento no banco, o sistema recalcula dinamicamente o embedding do campo `content` usando o modelo ativo, garantindo consultas precisas instantaneamente.
+#### 4. Compatibilização do InstructorEmbedding com Sentence-Transformers Modernos
+- O modelo oficial de embeddings do projeto é o `hkunlp/instructor-base` (768 dimensões), operado via `InstructorEmbedding` através de `HuggingFaceInstructEmbeddings`.
+- Versões recentes do `sentence-transformers` ($\ge$ 3.0.0) descontinuaram `_target_device` e removeram o método interno `_text_length`, o que causava `AttributeError: 'INSTRUCTOR' object has no attribute '_text_length'` e `HTTP 500` nas consultas.
+- O backend aplica um patch dinâmico de compatibilidade em tempo de importação (`_patch_instructor_compatibility`), injetando `_text_length` e mapeando `_target_device` diretamente para `self.device`. Isso viabiliza o uso pleno do modelo de 768d com as bibliotecas mais recentes sem forçar downgrades em cascata no `transformers` e no modelo de tradução médica Marian.
+
+#### 5. Detecção de Dimensionalidade da Base e Prevenção de Gargalo Síncrono
+- Para garantir alta disponibilidade e consultas sub-100ms, o serviço `query_rag_documents` inspeciona a dimensão vetorial presente na collection `rag_documents` antes da busca.
+- Se a base foi populada com o fallback determinístico (256 dimensões), a busca automaticamente alinha o vetor da query para 256 dimensões, garantindo comparabilidade matemática imediata e evitando travamentos.
+- Se a base contiver documentos gerados pelo modelo Instructor (768 dimensões), a consulta utiliza o modelo de 768 dimensões.
+- Foi eliminado qualquer loop de recálculo massivo síncrono durante a requisição web: documentos pontualmente inconsistentes recebem similaridade zero ($0.0$), prevenindo timeouts no gateway e no agente. Detalhes documentados no [ADR-019](../docs/architecture/adr/ADR-019-compatibilizacao-instructor-embedding-rag.md).
 
 
 ## Fluxo de preprocessamento
