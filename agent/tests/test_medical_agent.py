@@ -188,6 +188,114 @@ class TestMedicalAgentJornada2:
         assert result["topic_valid"] is True
         assert len(result["final_response"]) > 0
 
+    @patch("services.nodes.audit_logger.create_audit_log", side_effect=_mock_create_audit_log)
+    @patch("services.nodes.rag_retriever._query_rag", return_value=[])
+    @patch("services.nodes.llm_generator._get_llm_client")
+    @patch("services.nodes.patient_context_retriever.requests.get")
+    def test_jornada_2_sem_laudo_nao_hallucina_exames(
+        self, mock_patient_get, mock_llm_factory, mock_rag, mock_audit
+    ):
+        from services.medical_agent import run_medical_agent
+
+        record_resp = MagicMock()
+        record_resp.json.return_value = [{
+            "avaliacao": {"itens": ["Hipertensão arterial sistêmica"]},
+            "plano": {"orientacoes": "Manter acompanhamento ambulatorial."},
+        }]
+        record_resp.raise_for_status.return_value = None
+
+        report_resp = MagicMock()
+        report_resp.json.return_value = []
+        report_resp.raise_for_status.return_value = None
+        mock_patient_get.side_effect = [record_resp, report_resp]
+
+        result = run_medical_agent(
+            query="Quais foram os últimos exames e resultados realizados pela paciente?",
+            session_id="test-jornada-2-sem-laudo",
+            patient_name="Maria Santos Almeida",
+        )
+
+        assert "Não encontrei exames" in result["final_response"]
+        mock_llm_factory.assert_not_called()
+
+    @patch("services.nodes.audit_logger.create_audit_log", side_effect=_mock_create_audit_log)
+    @patch("services.nodes.rag_retriever._query_rag", return_value=[])
+    @patch("services.nodes.llm_generator._get_llm_client")
+    @patch("services.nodes.patient_context_retriever.requests.get")
+    def test_jornada_2_tipo_exame_usa_laudo_consolidado(
+        self, mock_patient_get, mock_llm_factory, mock_rag, mock_audit
+    ):
+        from services.medical_agent import run_medical_agent
+
+        record_resp = MagicMock()
+        record_resp.json.return_value = [{
+            "avaliacao": {"diagnostico_principal": "Bloqueio de ramo direito"},
+            "plano": {"orientacoes": "Acompanhamento cardiológico."},
+        }]
+        record_resp.raise_for_status.return_value = None
+
+        report_resp = MagicMock()
+        report_resp.json.return_value = [{
+            "cabecalho_identificador": {"data_exame": "2025-10-18"},
+            "corpo_tecnico": {
+                "tipo_exame": "Eletrocardiograma (ECG)",
+                "descricao_tecnica": "Ritmo sinusal. Bloqueio de ramo direito incompleto.",
+            },
+            "conclusao": {
+                "impressao_diagnostica": "Bloqueio de ramo direito",
+                "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+            },
+        }]
+        report_resp.raise_for_status.return_value = None
+        mock_patient_get.side_effect = [record_resp, report_resp]
+
+        result = run_medical_agent(
+            query="Qual foi o tipo do último exame feito pela paciente?",
+            session_id="test-jornada-2-tipo-exame",
+            patient_name="Ana Souza Ferreira",
+        )
+
+        assert "Eletrocardiograma (ECG)" in result["final_response"]
+        assert "conduta" in result["final_response"].lower()
+        mock_llm_factory.assert_not_called()
+
+    @patch("services.nodes.audit_logger.create_audit_log", side_effect=_mock_create_audit_log)
+    @patch("services.nodes.rag_retriever._query_rag", return_value=[])
+    @patch("services.nodes.llm_generator._get_llm_client")
+    @patch("services.nodes.patient_context_retriever.requests.get")
+    def test_jornada_2_cuidados_prescricao_contextualiza(self, mock_patient_get, mock_llm_factory, mock_rag, mock_audit):
+        from services.medical_agent import run_medical_agent
+
+        record_resp = MagicMock()
+        record_resp.json.return_value = [{
+            "avaliacao": {"diagnostico_principal": "Bloqueio de ramo direito"},
+            "plano": {"orientacoes": "Acompanhamento cardiológico e avaliação com especialista."},
+        }]
+        record_resp.raise_for_status.return_value = None
+
+        report_resp = MagicMock()
+        report_resp.json.return_value = [{
+            "corpo_tecnico": {
+                "tipo_exame": "Eletrocardiograma (ECG)",
+            },
+            "conclusao": {
+                "impressao_diagnostica": "Bloqueio de ramo direito",
+                "conduta_terapeutica": "Avaliação com especialista em caráter de urgência.",
+            },
+        }]
+        report_resp.raise_for_status.return_value = None
+        mock_patient_get.side_effect = [record_resp, report_resp]
+
+        result = run_medical_agent(
+            query="Quais cuidados prescrever para o quadro clínico deste paciente?",
+            session_id="test-jornada-2-cuidados",
+            patient_name="Ana Souza Ferreira",
+        )
+
+        assert "Bloqueio de ramo direito" in result["final_response"]
+        assert "avaliação" in result["final_response"].lower() or "especialista" in result["final_response"].lower()
+        mock_llm_factory.assert_not_called()
+
 
 # ---------------------------------------------------------------------------
 # Testes de rejeição por tópico inválido

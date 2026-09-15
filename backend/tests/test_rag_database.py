@@ -62,6 +62,27 @@ def test_insert_rag_documents_serializes_documents(monkeypatch) -> None:
     assert "updated_date" in inserted[0]
 
 
+def test_insert_rag_documents_creates_search_indexes(monkeypatch) -> None:
+    class IndexedCollection(FakeCollection):
+        def __init__(self) -> None:
+            super().__init__()
+            self.indexes = []
+
+        def create_index(self, keys, **kwargs):
+            self.indexes.append((keys, kwargs))
+            return "ok"
+
+    collections = {rag_collection.RAG_DOCUMENTS_COLLECTION: IndexedCollection()}
+    monkeypatch.setattr(rag_collection, "get_collection", lambda name: collections[name])
+
+    rag_collection.insert_rag_documents([
+        {"_id": "rag-2", "batch_id": "batch-2", "content": "conteudo"}
+    ])
+
+    assert any(index[0] == [("preprocess_id", 1)] for index in collections[rag_collection.RAG_DOCUMENTS_COLLECTION].indexes)
+    assert any(index[0] == [("content", "text")] for index in collections[rag_collection.RAG_DOCUMENTS_COLLECTION].indexes)
+
+
 def test_generate_rag_database_creates_documents_with_sources(monkeypatch, tmp_path) -> None:
     collections = _make_collections()
     monkeypatch.setattr(rag_collection, "get_collection", lambda name: collections[name])

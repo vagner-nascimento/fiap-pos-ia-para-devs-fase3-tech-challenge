@@ -1,6 +1,11 @@
 """Testes unitários para o cliente LLM híbrido e suporte a repetition_penalty."""
+import sys
+from pathlib import Path
 from unittest.mock import MagicMock, patch
+
 import pytest
+
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from services.llm_client import GradioSpaceLLMClient, FastApiLLMClient, build_llm_client
 
@@ -44,6 +49,29 @@ def test_gradio_client_fallback_retrocompatibilidade_se_space_nao_suportar_repet
     with patch.object(client, "_get_gradio_client", return_value=mock_gradio):
         res = client.invoke("Qual o protocolo?")
         assert res == "Resposta via fallback sem repetition_penalty"
+
+
+def test_fastapi_client_usa_prompt_completo_quando_fornecido():
+    client = FastApiLLMClient(
+        endpoint_url="https://example.ngrok-free.dev",
+        repetition_penalty=1.15,
+    )
+    mock_response = MagicMock()
+    mock_response.json.return_value = {"resposta": "Resposta com contexto completo"}
+    mock_response.raise_for_status.return_value = None
+
+    with patch("requests.post", return_value=mock_response) as mock_post:
+        res = client.generate(
+            pergunta="Pergunta curta",
+            contexto="Contexto clínico do paciente",
+            prompt="### Instrucao:\nResponda em pt-BR\n\n### Entrada:\nPergunta: Quais foram os exames?\n\n### Dados Clinicos do Paciente\nTeste\n\n### Resposta:",
+        )
+
+    assert res == "Resposta com contexto completo"
+    payload = mock_post.call_args.kwargs["json"]
+    assert payload["pergunta"].startswith("### Instrucao:")
+    assert "Contexto clínico do paciente" in payload["contexto"]
+    assert payload["pergunta"] != "Pergunta curta"
 
 
 def test_build_llm_client_passa_repetition_penalty():

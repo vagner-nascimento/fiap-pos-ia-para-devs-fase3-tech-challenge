@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from services.nodes.patient_context_retriever import (
     _extract_clinical_fields,
+    _extract_medical_report_context,
     _fetch_medical_record,
     patient_context_retriever_node,
 )
@@ -77,10 +78,27 @@ class TestPatientContextRetrieverJornada2:
 
     @patch("services.nodes.patient_context_retriever.requests.get")
     def test_sucesso_extrai_campos_clinicos(self, mock_get):
-        mock_response = MagicMock()
-        mock_response.json.return_value = [MOCK_PATIENT_RECORD]
-        mock_response.raise_for_status.return_value = None
-        mock_get.return_value = mock_response
+        record_response = MagicMock()
+        record_response.json.return_value = [MOCK_PATIENT_RECORD]
+        record_response.raise_for_status.return_value = None
+
+        report_response = MagicMock()
+        report_response.json.return_value = [
+            {
+                "corpo_tecnico": {
+                    "tipo_exame": "RM de Crânio",
+                    "descricao_tecnica": "Lesão hipodensa frontal com edema perifocal.",
+                    "evolucao_clinica": "Paciente evoluiu com melhora clínica.",
+                },
+                "conclusao": {
+                    "impressao_diagnostica": "Neoplasia cerebral",
+                    "cid_10": "C71.9",
+                    "conduta_terapeutica": "Encaminhamento para oncologia.",
+                },
+            }
+        ]
+        report_response.raise_for_status.return_value = None
+        mock_get.side_effect = [record_response, report_response]
 
         state = {
             "patient_name": "Maria de Oliveira",
@@ -92,14 +110,42 @@ class TestPatientContextRetrieverJornada2:
         assert "avaliacao" in result["patient_fields_used"]
         assert "plano.prescricao" in result["patient_fields_used"]
         assert "alergias" in result["patient_fields_used"]
+        assert "Laudos médicos" in result["patient_context"]
+        assert "Neoplasia cerebral" in result["patient_context"]
         assert "Hipertensão" in result["patient_context"]
         assert "Dipirona" in result["patient_context"]
         assert "Losartana" in result["patient_context"]
 
-        # Garantia de anonimização: CPF, telefone e nome não devem constar no contexto clínico
         assert "123.456.789-00" not in result["patient_context"]
         assert "(31) 98765-4321" not in result["patient_context"]
         assert "Maria de Oliveira" not in result["patient_context"]
+        assert "Dr(a). Bruno Carvalho" not in result["patient_context"]
+
+    def test_extracao_laudos_medicinais_remove_pii(self):
+        reports = [{
+            "cabecalho_identificador": {
+                "nome_paciente": "Maria da Silva",
+                "medico_solicitante": "Dr. Alexandre",
+                "crm_solicitante": "12345-SP",
+            },
+            "corpo_tecnico": {
+                "tipo_exame": "Hemograma",
+                "descricao_tecnica": "Leucocitose com neutrofilia.",
+            },
+            "conclusao": {
+                "impressao_diagnostica": "Processo infeccioso",
+                "cid_10": "A09",
+                "conduta_terapeutica": "Antibioticoterapia conforme avaliação clínica.",
+            },
+        }]
+
+        text, fields = _extract_medical_report_context(reports)
+        assert "Processo infeccioso" in text
+        assert "Hemograma" in text
+        assert "Maria da Silva" not in text
+        assert "Dr. Alexandre" not in text
+        assert "12345-SP" not in text
+        assert "laudos.impressao_diagnostica" in fields
 
     @patch("services.nodes.patient_context_retriever.requests.get")
     def test_prontuario_nao_encontrado_degrada_silenciosamente(self, mock_get):
