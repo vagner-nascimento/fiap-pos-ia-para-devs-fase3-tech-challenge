@@ -222,6 +222,47 @@ class TestMedicalAgentJornada2:
     @patch("services.nodes.rag_retriever._query_rag", return_value=[])
     @patch("services.nodes.llm_generator._get_llm_client")
     @patch("services.nodes.patient_context_retriever.requests.get")
+    def test_jornada_2_exame_com_erro_de_digitacao_usa_laudo_consolidado(
+        self, mock_patient_get, mock_llm_factory, mock_rag, mock_audit
+    ):
+        from services.medical_agent import run_medical_agent
+
+        record_resp = MagicMock()
+        record_resp.json.return_value = [{
+            "avaliacao": {"diagnostico_principal": "Asma brônquica"},
+            "plano": {"orientacoes": "Acompanhamento ambulatorial em 30 dias."},
+        }]
+        record_resp.raise_for_status.return_value = None
+
+        report_resp = MagicMock()
+        report_resp.json.return_value = [{
+            "cabecalho_identificador": {"data_exame": "2026-08-15"},
+            "corpo_tecnico": {
+                "tipo_exame": "Exame Cardiorespiratório",
+                "descricao_tecnica": "Teste de função pulmonar revelou redução do VEF1 e broncoespasmo reversível.",
+            },
+            "conclusao": {
+                "impressao_diagnostica": "Asma brônquica",
+                "conduta_terapeutica": "Início de tratamento com corticosteroides inalados e broncodilatadores.",
+            },
+        }]
+        report_resp.raise_for_status.return_value = None
+        mock_patient_get.side_effect = [record_resp, report_resp]
+
+        result = run_medical_agent(
+            query="Qual foi o examente que o paciente fez?",
+            session_id="test-jornada-2-exame-digitacao",
+            patient_name="Lucas Almeida Santos",
+        )
+
+        assert "Exame Cardiorespiratório" in result["final_response"]
+        assert "Asma brônquica" in result["final_response"]
+        mock_llm_factory.assert_not_called()
+
+    @patch("services.nodes.audit_logger.create_audit_log", side_effect=_mock_create_audit_log)
+    @patch("services.nodes.rag_retriever._query_rag", return_value=[])
+    @patch("services.nodes.llm_generator._get_llm_client")
+    @patch("services.nodes.patient_context_retriever.requests.get")
     def test_jornada_2_tipo_exame_usa_laudo_consolidado(
         self, mock_patient_get, mock_llm_factory, mock_rag, mock_audit
     ):

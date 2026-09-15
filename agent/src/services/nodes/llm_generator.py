@@ -107,9 +107,20 @@ def _extract_sources_from_context(rag_documents: list) -> List[str]:
     return sorted(sources)
 
 
+def _normalize_question_text(question: str) -> str:
+    """Normaliza a pergunta para reduzir variações de digitação comuns em consultas clínicas."""
+    text = question.lower()
+    text = text.replace("examente", "exame")
+    text = text.replace("último", "ultimo").replace("últimos", "ultimos")
+    text = text.replace("última", "ultima")
+    text = re.sub(r"[^a-z0-9\s]", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
 def _looks_like_exam_history_question(question: str) -> bool:
     """Heurística para detectar perguntas sobre exames/resultados/relatórios."""
-    text = question.lower()
+    text = _normalize_question_text(question)
     keywords = (
         "exame",
         "exames",
@@ -118,12 +129,11 @@ def _looks_like_exam_history_question(question: str) -> bool:
         "laudo",
         "laudos",
         "relatorio",
-        "relatórios",
+        "relatorios",
         "arquivo",
         "ultima",
-        "última",
-        "últimos",
-        "histórico",
+        "ultimos",
+        "historico",
     )
     return bool(re.search(r"\b(?:" + "|".join(re.escape(k) for k in keywords) + r")\b", text))
 
@@ -138,7 +148,7 @@ def _has_grounded_exam_evidence(text: str) -> bool:
 
 def _extract_direct_exam_answer(question: str, patient_context: str, medical_reports_context: str) -> str | None:
     """Responde de forma direta perguntas sobre tipo/último exame quando há contexto de laudo."""
-    q = question.lower()
+    q = _normalize_question_text(question)
     evidence = "\n".join(filter(None, [patient_context, medical_reports_context]))
     if not evidence or not _looks_like_exam_history_question(question):
         return None
@@ -151,6 +161,7 @@ def _extract_direct_exam_answer(question: str, patient_context: str, medical_rep
     for pattern in [
         r"tipo de exame\s*[:\-]?\s*([^\n.;]+)",
         r"tipo do exame\s*[:\-]?\s*([^\n.;]+)",
+        r"exame\s*[:\-]?\s*([^\n.;]+)",
     ]:
         match = re.search(pattern, evidence, flags=re.IGNORECASE)
         if match:
@@ -174,16 +185,23 @@ def _extract_direct_exam_answer(question: str, patient_context: str, medical_rep
     if match_conduta:
         conduta = match_conduta.group(1).strip()
 
-    if any(term in q for term in ("tipo do último exame", "tipo do exame", "qual foi o tipo", "quais foram os últimos exames", "último exame")):
-        if exam_type:
-            details = [f"O último exame registrado foi um {exam_type}."]
-            if exam_date:
-                details.append(f"Ele foi realizado em {exam_date}.")
-            if impression:
-                details.append(f"A impressão diagnóstica registrada foi: {impression}.")
-            if conduta:
-                details.append(f"A conduta documentada foi: {conduta}.")
-            return " ".join(details)
+    exam_question = bool(
+        re.search(
+            r"(?:qual(?: foi)?(?: o| do)?(?: tipo do)?(?: ultimo)? exame|qual exame|quais foram os ultimos exames|ultimo exame)",
+            q,
+        )
+    )
+    if exam_question:
+        if not exam_type:
+            return None
+        details = [f"O exame registrado foi: {exam_type}."]
+        if exam_date:
+            details.append(f"Ele foi realizado em {exam_date}.")
+        if impression:
+            details.append(f"A impressão diagnóstica registrada foi: {impression}.")
+        if conduta:
+            details.append(f"A conduta documentada foi: {conduta}.")
+        return " ".join(details)
 
     if any(term in q for term in ("resultado", "resultados")):
         has_exam_indicators = bool(re.search(r"(?:tipo de exame|impressao diagnostica|cid-10|conduta|laudo)\b", evidence, flags=re.IGNORECASE))

@@ -37,9 +37,9 @@ def get_mongo_client() -> MongoClient:
             mongo_uri,
             tz_aware=True,
             tzinfo=timezone.utc,
-            connectTimeoutMS=5000,
-            serverSelectionTimeoutMS=5000,
-            socketTimeoutMS=5000
+            connectTimeoutMS=15000,
+            serverSelectionTimeoutMS=15000,
+            socketTimeoutMS=15000
         )
     
     return _mongo_client
