@@ -903,6 +903,27 @@
     }
   },
   {
+    "id_laudo": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
+    "cabecalho_identificador": {
+      "nome_paciente": "Lucas Almeida Santos",
+      "data_exame": "2026-08-15",
+      "local_exame": "Clínica Respiratória Avançada",
+      "medico_solicitante": "Dr(a). Mariana Costa",
+      "crm_solicitante": "12345-RJ"
+    },
+    "corpo_tecnico": {
+      "tipo_exame": "Exame Cardiorespiratório",
+      "descricao_tecnica": "Teste de função pulmonar revelou redução do VEF1 e aumento da resistência das vias aéreas. O exame indicou broncoespasmo reversível após administração de broncodilatador.",
+      "evolucao_clinica": "Paciente adolescente apresentou leve ansiedade durante o exame, mas cooperou adequadamente."
+    },
+    "conclusao": {
+      "impressao_diagnostica": "Asma brônquica",
+      "cid_10": "J45.9",
+      "conduta_terapeutica": "Início de tratamento com corticosteroides inalados e broncodilatadores conforme prescrição médica. Acompanhamento ambulatorial em 30 dias.",
+      "tempo_repouso_estimado_dias": 0
+    }
+  },
+  {
     "id_laudo": "d845b388-57f4-4a6f-8a7c-8eb2e7419497",
     "cabecalho_identificador": {
       "nome_paciente": "Carlos Martins Pereira",

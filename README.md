@@ -63,30 +63,28 @@ No terminal Bash, a partir da raiz do repositório:
 
 ```bash
 # 1. Configure o endpoint de inferência do modelo
-#export LLM_ENDPOINT_URL=https://huggingface.co/spaces/fiap-hospital-helper/hospital-helper
+export LLM_ENDPOINT_URL=https://huggingface.co/spaces/fiap-hospital-helper/hospital-helper
 
-# 2. Suba frontend, backend, agente e MongoDB
-#docker compose -f app-docker-compose.yaml up --build -d
+# 2. Rebuild and start all containers
+docker compose -f app-docker-compose.yaml up --build -d
 
-# 3. Confirme que backend e agente estão disponíveis
-#curl http://localhost:3000/health && curl http://localhost:8001/health
+# 3. Check health endpoints
+curl http://localhost:3000/health && curl http://localhost:8001/health
 
-# 4. Envie uma pergunta médica geral (Jornada 1)
-#curl -X POST http://localhost:8001/agent/chat \
-#	-H "Content-Type: application/json" \
-#	-d '{"query":"Quais são os sintomas da tuberculose?"}'
+# 4. Send a simple query to the agent (Jornada 1)
+curl.exe -X POST http://localhost:8001/agent/chat    -H "Content-Type: application/json"   --data-binary @- <<'JSON'
+{"query":"Quais são os protocolos clínicos para Asma?"}
+JSON
 
-# 5. Envie uma consulta contextualizada por paciente (Jornada 2)
+# 5. Send a contextualized query for a patient (Jornada 2)
 curl.exe -X POST http://localhost:8001/agent/chat    -H "Content-Type: application/json"   --data-binary @- <<'JSON'
 {"patient_name":"Ana Souza Ferreira","query":"Quais cuidados prescrever para o quadro clínico deste paciente?"}
 JSON
 
-# 6. Envie uma consulta contextualizada por paciente com laudos (Jornada 2)
+# 6. Send a contextualized query searching for exams and results (Jornada 2)
 curl.exe -X POST http://localhost:8001/agent/chat    -H "Content-Type: application/json"   --data-binary @- <<'JSON'
 {"patient_name":"Maria Santos Almeida","query":"Quais foram os últimos exames e resultados realizados pela paciente?"}
 JSON
-
-
 ```
 
 Depois, abra http://localhost:8080 para usar a interface web. A documentação interativa da API fica em http://localhost:3000/docs (backend) e http://localhost:8001/docs (agente). O primeiro build e o primeiro processamento dos datasets podem demorar; acompanhe a inicialização com `docker compose -f app-docker-compose.yaml logs -f`.
