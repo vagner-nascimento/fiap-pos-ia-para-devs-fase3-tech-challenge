@@ -45,11 +45,12 @@ def _estimate_chars(state: dict) -> int:
     query = state.get("query", "")
     rag = state.get("rag_context", "")
     patient = state.get("patient_context", "")
+    medical_reports = state.get("medical_reports_context", "")
     history = state.get("conversation_history", [])
     history_text = "".join(
         f"{t.get('query','')}{t.get('response','')}" for t in history
     )
-    return len(query) + len(rag) + len(patient) + len(history_text)
+    return len(query) + len(rag) + len(patient) + len(medical_reports) + len(history_text)
 
 
 # ---------------------------------------------------------------------------
@@ -72,39 +73,43 @@ def _python_fallback_compress(state: dict) -> dict:
     Prioridade (maior → menor):
       1. query — nunca truncada
       2. patient_context (alergias e diagnósticos)
-      3. rag_context (chunks com maior similarity_score primeiro)
-      4. conversation_history (turnos mais antigos removidos primeiro)
+      3. medical_reports_context (laudos médicos, em texto consolidado)
+      4. rag_context (chunks com maior similarity_score primeiro)
+      5. conversation_history (turnos mais antigos removidos primeiro)
     """
     remaining = BUDGET_CHARS
 
     query = state.get("query", "")
     remaining -= len(query)
 
-    # Patient context — trunca preservando início (diagnósticos/alergias)
     patient_raw = state.get("patient_context", "")
-    patient_alloc = min(len(patient_raw), int(BUDGET_CHARS * 0.30))
+    patient_alloc = min(len(patient_raw), int(BUDGET_CHARS * 0.25))
     patient_compressed = _truncate_at_sentence(patient_raw, patient_alloc)
     remaining -= len(patient_compressed)
 
-    # RAG context — trunca preservando início (chunk mais relevante)
+    med_raw = state.get("medical_reports_context", "")
+    med_alloc = min(len(med_raw), max(0, int(BUDGET_CHARS * 0.20)))
+    med_compressed = _truncate_at_sentence(med_raw, med_alloc)
+    remaining -= len(med_compressed)
+
     rag_raw = state.get("rag_context", "")
     rag_alloc = min(len(rag_raw), max(0, remaining - int(BUDGET_CHARS * 0.10)))
     rag_compressed = _truncate_at_sentence(rag_raw, rag_alloc)
     remaining -= len(rag_compressed)
 
-    # Histórico — remove turnos mais antigos até caber
     history: List[Dict[str, Any]] = list(state.get("conversation_history", []))
     while history and remaining < 0:
         history.pop(0)
         history_chars = sum(
             len(t.get("query", "")) + len(t.get("response", "")) for t in history
         )
-        remaining = BUDGET_CHARS - len(query) - len(patient_compressed) - len(rag_compressed) - history_chars
+        remaining = BUDGET_CHARS - len(query) - len(patient_compressed) - len(med_compressed) - len(rag_compressed) - history_chars
 
     logger.info(
         "[SUMMARIZER] Fallback Python: "
-        "patient=%d→%d chars | rag=%d→%d chars | history=%d turnos",
+        "patient=%d→%d chars | reports=%d→%d chars | rag=%d→%d chars | history=%d turnos",
         len(patient_raw), len(patient_compressed),
+        len(med_raw), len(med_compressed),
         len(rag_raw), len(rag_compressed),
         len(history),
     )
@@ -112,6 +117,7 @@ def _python_fallback_compress(state: dict) -> dict:
     return {
         **state,
         "compressed_patient_context": patient_compressed,
+        "compressed_medical_reports_context": med_compressed,
         "compressed_rag_context": rag_compressed,
         "conversation_history": history,
         "context_summarized": True,
@@ -223,6 +229,7 @@ def context_summarizer_node(state: dict) -> dict:
             **state,
             "compressed_rag_context": state.get("rag_context", ""),
             "compressed_patient_context": state.get("patient_context", ""),
+            "compressed_medical_reports_context": state.get("medical_reports_context", ""),
             "context_summarized": False,
             "context_summarizer_mode": "not_needed",
         }
@@ -238,11 +245,12 @@ def context_summarizer_node(state: dict) -> dict:
     if not GROQ_API_KEY:
         return _python_fallback_compress(state)
 
-    # Sumarização via Groq — combina patient_context + rag_context
+    # Sumarização via Groq — combina patient_context + medical_reports_context + rag_context
     query = state.get("query", "")
     patient_ctx = state.get("patient_context", "")
+    medical_reports_ctx = state.get("medical_reports_context", "")
     rag_ctx = state.get("rag_context", "")
-    full_context = "\n\n".join(filter(None, [patient_ctx, rag_ctx]))
+    full_context = "\n\n".join(filter(None, [patient_ctx, medical_reports_ctx, rag_ctx]))
 
     max_summary_chars = int(BUDGET_CHARS * 0.80)
     summary = _groq_summarize(query, full_context, max_summary_chars)
@@ -251,22 +259,36 @@ def context_summarizer_node(state: dict) -> dict:
         # Groq falhou → fallback Python
         return _python_fallback_compress(state)
 
-    # Divide o resumo entre patient e rag proporcionalmente
-    if patient_ctx and rag_ctx:
-        split = int(len(summary) * 0.35)  # ~35% para dados do paciente
+    # Divide o resumo entre patient, laudos e rag em proporções realistas
+    if patient_ctx and medical_reports_ctx and rag_ctx:
+        split = int(len(summary) * 0.45)
+        split_2 = int(len(summary) * 0.70)
         compressed_patient = summary[:split].strip()
-        compressed_rag = summary[split:].strip()
+        compressed_medical_reports = summary[split:split_2].strip()
+        compressed_rag = summary[split_2:].strip()
+    elif patient_ctx and medical_reports_ctx:
+        split = int(len(summary) * 0.55)
+        compressed_patient = summary[:split].strip()
+        compressed_medical_reports = summary[split:].strip()
+        compressed_rag = ""
     elif patient_ctx:
         compressed_patient = summary
+        compressed_medical_reports = ""
+        compressed_rag = ""
+    elif medical_reports_ctx:
+        compressed_patient = ""
+        compressed_medical_reports = summary
         compressed_rag = ""
     else:
         compressed_patient = ""
+        compressed_medical_reports = ""
         compressed_rag = summary
 
     return {
         **state,
         "compressed_rag_context": compressed_rag,
         "compressed_patient_context": compressed_patient,
+        "compressed_medical_reports_context": compressed_medical_reports,
         "context_summarized": True,
         "context_summarizer_mode": "groq",
     }

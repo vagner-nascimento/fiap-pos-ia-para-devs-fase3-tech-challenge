@@ -93,6 +93,14 @@ class AgentChatResponse(BaseModel):
         default_factory=list,
         description="Seções clínicas extraídas do prontuário (ex: avaliacao, alergias).",
     )
+    medical_reports_used: bool = Field(
+        False,
+        description="Se laudos médicos relevantes do paciente foram recuperados e usados no contexto.",
+    )
+    medical_reports_fields_used: List[str] = Field(
+        default_factory=list,
+        description="Campos clínicos extraídos dos laudos médicos (ex: laudos.tipo_exame, laudos.cid_10).",
+    )
     context_summarized: bool = Field(
         False,
         description="Se o contexto excedeu o limite de 3K tokens do SFT e foi comprimido.",
@@ -129,6 +137,8 @@ class AuditLogResponse(BaseModel):
     duration_ms: int
     patient_record_used: bool = False
     patient_fields_used: List[str] = Field(default_factory=list)
+    medical_reports_used: bool = False
+    medical_reports_fields_used: List[str] = Field(default_factory=list)
     context_summarized: bool = False
     context_summarizer_mode: str = "not_needed"
     created_date: str
@@ -196,6 +206,8 @@ def agent_chat(request: AgentChatRequest) -> Dict[str, Any]:
         "requires_human_validation": True,
         "patient_context_used": result.get("patient_context_used", False),
         "patient_fields_used": result.get("patient_fields_used", []),
+        "medical_reports_used": result.get("medical_reports_used", False),
+        "medical_reports_fields_used": result.get("medical_reports_fields_used", []),
         "context_summarized": result.get("context_summarized", False),
         "audit_id": result.get("audit_id", ""),
         "duration_ms": result.get("duration_ms", 0),

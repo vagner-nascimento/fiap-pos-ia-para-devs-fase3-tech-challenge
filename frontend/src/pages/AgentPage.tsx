@@ -33,7 +33,6 @@ function AgentResult({ response }: { response: AgentChatResponse }) {
 
       <div className="agent-answer">
         <div className="agent-section-heading">
-          <h2>Resposta do assistente</h2>
           <div className="agent-badges-group">
             {response.patient_context_used && (
               <span className="agent-badge agent-badge-patient">
@@ -45,9 +44,13 @@ function AgentResult({ response }: { response: AgentChatResponse }) {
                 ⚡ Contexto resumido
               </span>
             )}
+            {response.sources.length > 0 && (
+              <span className="agent-badge agent-badge-sourced">
+                📄 Fontes consultadas
+              </span>
+            )}
           </div>
         </div>
-        <div className="agent-answer-text">{response.response}</div>
       </div>
 
       {response.patient_context_used && response.patient_fields_used && response.patient_fields_used.length > 0 && (

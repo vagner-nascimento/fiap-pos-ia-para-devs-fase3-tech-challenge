@@ -35,8 +35,8 @@ O fluxo completo acontece em etapas encadeadas:
 1. O avaliador acessa o frontend em `http://localhost:8080` e inicia o processamento dos datasets.
 2. O frontend envia a solicitação ao backend, que registra a execução no MongoDB e processa os dados em background. O status pode ser consultado até a tarefa terminar.
 3. O backend organiza QAs, laudos e protocolos clínicos, gera os arquivos estruturados e cria a base RAG para buscas por similaridade.
-4. No chat, o agente valida se a pergunta é médica, aplica guardrails de segurança, identifica se há referência a um paciente (Jornada 2 com busca e anonimização de prontuário), sumariza o contexto caso exceda a janela de 3K tokens do SFT e consulta a base RAG antes de chamar o modelo fine-tunado.
-5. O agente devolve a resposta com fontes, disclaimer e indicação de validação humana, enquanto registra a interação para auditoria no MongoDB.
+4. No chat, o agente valida se a pergunta é médica, aplica guardrails de segurança, identifica se há referência a um paciente (Jornada 2 com busca e anonimização de prontuário e laudos), sumariza o contexto caso exceda a janela de 3K tokens do SFT e consulta a base RAG antes de chamar o modelo fine-tunado.
+5. O agente devolve a resposta com fontes, disclaimer e indicação de validação humana, enquanto registra a interação para auditoria no MongoDB. Quando a pergunta menciona exames, laudos ou resultados, ele prioriza o contexto clínico estruturado disponível e bloqueia respostas quando o dado não existe em datasets confiáveis.
 
 O modelo fine-tunado utilizado pelo agente está disponível publicamente no [Hugging Face](https://huggingface.co/fiap-hospital-helper/hospital-helper-qwen2.5-1.5b) (tag oficial `v2.0`). O endpoint de inferência pode ser o [Space do projeto](https://huggingface.co/spaces/fiap-hospital-helper/hospital-helper) (com alocação ZeroGPU) ou uma URL FastAPI exposta via ngrok.
 
@@ -44,7 +44,7 @@ O modelo fine-tunado utilizado pelo agente está disponível publicamente no [Hu
 
 O frontend possui a tela `Assistente Médico`, disponível como último item do menu lateral. Ela suporta duas jornadas clínicas principais:
 - **Jornada 1 — Dúvida clínica pontual:** Pergunta clínica geral sem identificação de paciente, respondida com busca RAG sobre protocolos e literatura médica.
-- **Jornada 2 — Consulta contextualizada por paciente:** Ao preencher o campo opcional *Nome do paciente*, o assistente consulta o prontuário no MongoDB via backend, extrai dados clínicos anonimizados (diagnósticos, alergias, medicações em uso e sinais vitais), enriquece a busca vetorial e gera uma recomendação contextualizada com badges visuais (`🏥 Prontuário consultado` e `⚡ Contexto resumido`).
+- **Jornada 2 — Consulta contextualizada por paciente:** Ao preencher o campo opcional *Nome do paciente*, o assistente consulta o prontuário e os laudos médicos do paciente no backend, extrai dados clínicos anonimizados (diagnósticos, alergias, medicações em uso, sinais vitais e resumo de exames/laudos), cruza esse contexto com a busca RAG e gera uma recomendação contextualizada com badges visuais (`🏥 Prontuário consultado`, `🧾 Laudos consultados` e `⚡ Contexto resumido`).
 
 Para usar a tela:
 
@@ -65,21 +65,26 @@ No terminal Bash, a partir da raiz do repositório:
 # 1. Configure o endpoint de inferência do modelo
 export LLM_ENDPOINT_URL=https://huggingface.co/spaces/fiap-hospital-helper/hospital-helper
 
-# 2. Suba frontend, backend, agente e MongoDB
+# 2. Rebuild and start all containers
 docker compose -f app-docker-compose.yaml up --build -d
 
-# 3. Confirme que backend e agente estão disponíveis
+# 3. Check health endpoints
 curl http://localhost:3000/health && curl http://localhost:8001/health
 
-# 4. Envie uma pergunta médica geral (Jornada 1)
-curl -X POST http://localhost:8001/agent/chat \
-	-H "Content-Type: application/json" \
-	-d '{"query":"Quais são os sintomas da tuberculose?"}'
+# 4. Send a simple query to the agent (Jornada 1)
+curl.exe -X POST http://localhost:8001/agent/chat    -H "Content-Type: application/json"   --data-binary @- <<'JSON'
+{"query":"Quais são os protocolos clínicos para Asma?"}
+JSON
 
-# 5. Envie uma consulta contextualizada por paciente (Jornada 2)
-curl -X POST http://localhost:8001/agent/chat \
-	-H "Content-Type: application/json" \
-	-d '{"patient_name":"João da Silva","query":"Quais cuidados prescrever para o quadro clínico deste paciente?"}'
+# 5. Send a contextualized query for a patient (Jornada 2)
+curl.exe -X POST http://localhost:8001/agent/chat    -H "Content-Type: application/json"   --data-binary @- <<'JSON'
+{"patient_name":"Ana Souza Ferreira","query":"Quais cuidados prescrever para o quadro clínico deste paciente?"}
+JSON
+
+# 6. Send a contextualized query searching for exams and results (Jornada 2)
+curl.exe -X POST http://localhost:8001/agent/chat    -H "Content-Type: application/json"   --data-binary @- <<'JSON'
+{"patient_name":"Maria Santos Almeida","query":"Quais foram os últimos exames e resultados realizados pela paciente?"}
+JSON
 ```
 
 Depois, abra http://localhost:8080 para usar a interface web. A documentação interativa da API fica em http://localhost:3000/docs (backend) e http://localhost:8001/docs (agente). O primeiro build e o primeiro processamento dos datasets podem demorar; acompanhe a inicialização com `docker compose -f app-docker-compose.yaml logs -f`.
@@ -141,6 +146,8 @@ Depois de subir a aplicação, acompanhe os logs em tempo real com `docker compo
 
 ```bash
 docker compose -f app-docker-compose.yaml logs -f
+# Ignorando o mongodb, use:
+docker compose -f app-docker-compose.yaml logs -f backend agent frontend
 # Ou em modo CPU:
 docker compose -f app-docker-compose.cpu.yaml logs -f
 ```

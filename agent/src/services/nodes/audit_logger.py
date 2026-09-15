@@ -52,6 +52,8 @@ def audit_logger_node(state: dict) -> dict:
 
     patient_record_used = state.get("patient_context_used", False)
     patient_fields_used = state.get("patient_fields_used", [])
+    medical_reports_used = state.get("medical_reports_used", False)
+    medical_reports_fields_used = state.get("medical_reports_fields_used", [])
     context_summarized = state.get("context_summarized", False)
     context_summarizer_mode = state.get("context_summarizer_mode", "not_needed")
 
@@ -82,6 +84,8 @@ def audit_logger_node(state: dict) -> dict:
             duration_ms=duration_ms,
             patient_record_used=patient_record_used,
             patient_fields_used=patient_fields_used,
+            medical_reports_used=medical_reports_used,
+            medical_reports_fields_used=medical_reports_fields_used,
             context_summarized=context_summarized,
             context_summarizer_mode=context_summarizer_mode,
         )

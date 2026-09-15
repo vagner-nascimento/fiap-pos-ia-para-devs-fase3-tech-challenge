@@ -42,6 +42,8 @@ def create_audit_log(
     duration_ms: int,
     patient_record_used: bool = False,
     patient_fields_used: Optional[List[str]] = None,
+    medical_reports_used: bool = False,
+    medical_reports_fields_used: Optional[List[str]] = None,
     context_summarized: bool = False,
     context_summarizer_mode: str = "not_needed",
 ) -> Dict[str, Any]:
@@ -99,6 +101,8 @@ def create_audit_log(
         "duration_ms": duration_ms,
         "patient_record_used": patient_record_used,
         "patient_fields_used": patient_fields_used or [],
+        "medical_reports_used": medical_reports_used,
+        "medical_reports_fields_used": medical_reports_fields_used or [],
         "context_summarized": context_summarized,
         "context_summarizer_mode": context_summarizer_mode,
         "created_date": now.isoformat(),
