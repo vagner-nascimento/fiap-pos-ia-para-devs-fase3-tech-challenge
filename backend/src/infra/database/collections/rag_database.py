@@ -23,8 +23,24 @@ def _serialize_document(document: Dict[str, Any]) -> Dict[str, Any]:
     return _serialize_value(copy.deepcopy(document))
 
 
+def _ensure_rag_indexes(collection: Any) -> None:
+    """Cria indices mínimos para filtrar e buscar texto sem varredura completa."""
+    try:
+        if hasattr(collection, "create_index"):
+            collection.create_index([("preprocess_id", 1)], name="preprocess_id_idx", background=True)
+            collection.create_index(
+                [("content", "text")],
+                name="content_text_idx",
+                default_language="portuguese",
+                background=True,
+            )
+    except Exception:
+        pass
+
+
 def insert_rag_documents(documents: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     collection = get_collection(RAG_DOCUMENTS_COLLECTION)
+    _ensure_rag_indexes(collection)
     now = datetime.now(timezone.utc)
     inserted_documents: List[Dict[str, Any]] = []
 
@@ -60,13 +76,7 @@ def get_text_search_scores(
     Executa busca textual no MongoDB usando o indice de texto e retorna as pontuacoes.
     """
     collection = get_collection(RAG_DOCUMENTS_COLLECTION)
-    
-    # Garantir que o indice de texto exista
-    if hasattr(collection, "create_index"):
-        try:
-            collection.create_index([("content", "text")], name="content_text_idx", default_language="portuguese")
-        except Exception:
-            pass
+    _ensure_rag_indexes(collection)
 
     filter_query: Dict[str, Any] = {"$text": {"$search": text_query}}
     if preprocess_id:
@@ -90,6 +100,7 @@ def get_text_search_scores(
 
 def get_rag_documents_for_search(preprocess_id: Optional[str] = None) -> List[Dict[str, Any]]:
     collection = get_collection(RAG_DOCUMENTS_COLLECTION)
+    _ensure_rag_indexes(collection)
     filter_query: Dict[str, Any] = {}
     if preprocess_id:
         filter_query["preprocess_id"] = preprocess_id

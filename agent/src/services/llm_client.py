@@ -252,8 +252,9 @@ class FastApiLLMClient:
         if self.api_token:
             headers["Authorization"] = f"Bearer {self.api_token}"
 
+        prompt_text = prompt or pergunta
         payload = {
-            "pergunta": pergunta,
+            "pergunta": prompt_text,
             "contexto": contexto or "",
             "max_new_tokens": self.max_new_tokens,
             "repetition_penalty": self.repetition_penalty,

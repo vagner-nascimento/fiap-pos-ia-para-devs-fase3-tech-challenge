@@ -16,6 +16,13 @@ DATASET_PATH: Final[Path] = (
     / "laudos_medicos"
     / "dataset_laudos_medicos.json"
 )
+RAW_LAUDOS_PATH: Final[Path] = (
+    Path(__file__).resolve().parents[4]
+    / "datasets"
+    / "preprocessed"
+    / "laudos_medicos"
+    / "laudos_medicos.json"
+)
 
 
 def _serialize_value(value: Any) -> Any:
@@ -59,10 +66,37 @@ def initialize_medical_reports_collection() -> Dict[str, Any]:
     }
 
 
+def _find_raw_reports_by_patient_name(patient_name: str) -> List[Dict[str, Any]]:
+    """Busca no dataset original de laudos o paciente pelo nome completo."""
+    if not patient_name or not RAW_LAUDOS_PATH.exists():
+        return []
+
+    try:
+        with RAW_LAUDOS_PATH.open("r", encoding="utf-8") as handle:
+            data = json.load(handle)
+    except (json.JSONDecodeError, OSError):
+        return []
+
+    if not isinstance(data, list):
+        return []
+
+    escaped_name = re.escape(patient_name.strip())
+    matches: List[Dict[str, Any]] = []
+    for record in data:
+        if not isinstance(record, dict):
+            continue
+        patient_header = record.get("cabecalho_identificador") or {}
+        name = patient_header.get("nome_paciente")
+        if isinstance(name, str) and re.fullmatch(f"{escaped_name}", name, flags=re.IGNORECASE):
+            matches.append(record)
+    return matches
+
+
 def find_medical_reports_by_patient_name(patient_name: str) -> List[Dict[str, Any]]:
-    """Busca laudos cujo nome completo coincide, ignorando maiúsculas/minúsculas."""
+    """Busca laudos do paciente por nome, com fallback para o dataset original por id_laudo."""
+    collection = get_collection(MEDICAL_REPORTS_COLLECTION)
     escaped_name = re.escape(patient_name)
-    cursor = get_collection(MEDICAL_REPORTS_COLLECTION).find(
+    cursor = collection.find(
         {
             PATIENT_NAME_FIELD: {
                 "$regex": f"^{escaped_name}$",
@@ -70,4 +104,20 @@ def find_medical_reports_by_patient_name(patient_name: str) -> List[Dict[str, An
             }
         }
     )
-    return [_serialize_value(copy.deepcopy(document)) for document in cursor]
+    matches = [_serialize_value(copy.deepcopy(document)) for document in cursor]
+    if matches:
+        return matches
+
+    raw_matches = _find_raw_reports_by_patient_name(patient_name)
+    if not raw_matches:
+        return []
+
+    report_ids = [record.get("id_laudo") for record in raw_matches if record.get("id_laudo")]
+    if not report_ids:
+        return raw_matches
+
+    anonymized_matches = [
+        _serialize_value(copy.deepcopy(document))
+        for document in collection.find({"id_laudo": {"$in": report_ids}})
+    ]
+    return anonymized_matches if anonymized_matches else raw_matches

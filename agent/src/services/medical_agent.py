@@ -79,6 +79,9 @@ class AgentState(TypedDict, total=False):
     patient_context: str
     patient_context_used: bool
     patient_fields_used: List[str]
+    medical_reports_context: str
+    medical_reports_used: bool
+    medical_reports_fields_used: List[str]
 
     # --- RAG ---
     rag_documents: List[Dict[str, Any]]
@@ -309,6 +312,9 @@ def run_medical_agent(
         "patient_context": "",
         "patient_context_used": False,
         "patient_fields_used": [],
+        "medical_reports_context": "",
+        "medical_reports_used": False,
+        "medical_reports_fields_used": [],
         "compressed_rag_context": "",
         "compressed_patient_context": "",
         "context_summarized": False,

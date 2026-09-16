@@ -15,6 +15,7 @@ Este documento descreve a arquitetura do sistema desenvolvido para o Tech Challe
 5. [Diagrama de Deployment](#diagrama-de-deployment)
 6. [Diagrama de Sequência — Pipeline de Pré-processamento](#diagrama-de-sequência--pipeline-de-pré-processamento)
 7. [Decisões de Arquitetura (ADRs)](#decisões-de-arquitetura-adrs)
+8. [Grounding de laudos e histórico de exames](../grounding-laudos-medicos.md)
 
 ---
 

@@ -64,9 +64,17 @@ Implementou-se a **Jornada 2** expandindo o grafo LangGraph de 6 para **8 nós o
   - `patient_name`: nome consultado;
   - `patient_record_used`: booleano indicando se o prontuário foi injetado;
   - `patient_fields_used`: lista de campos clínicos aproveitados;
+  - `medical_reports_used`: sinaliza se os laudos do paciente foram usados;
+  - `medical_reports_fields_used`: campos específicos extraídos dos laudos;
   - `context_summarized`: se houve sumarização;
   - `context_summarizer_mode`: `"none"`, `"groq"` ou `"fallback_python"`.
-- A interface exibe badges informativos (`🏥 Prontuário consultado` e `⚡ Contexto resumido`) com accordion expansível para que o médico possa auditar exatamente os dados que alimentaram a resposta.
+- A interface exibe badges informativos (`🏥 Prontuário consultado`, `🧾 Laudos consultados` e `⚡ Contexto resumido`) com accordion expansível para que o médico possa auditar exatamente os dados que alimentaram a resposta.
+
+### 6. Grounding real de laudos clínicos no fluxo do paciente
+- O contexto clínico do paciente não se limita ao prontuário estruturado: a arquitetura também incorpora laudos médicos como fonte de evidência para exames, resultados e acompanhamento clínico.
+- Como o dataset de RAG é anonimizadode forma intencional para evitar PII, o backend precisa manter uma correlação segura entre o registro raw do paciente e o laudo anonimizado através do campo `id_laudo`.
+- O fluxo arquitetural estabelece uma regra explícita: localizar o paciente no dataset raw, extrair o identificador do laudo correto e, em seguida, recuperar o documento equivalente em forma anonimizada, filtrando antes de injetar qualquer texto na LLM.
+- A etapa de geração também aplica um guardrail para perguntas sobre exames e resultados: quando não existe grounding documental confiável em laudos ou na base vetorial, a resposta é bloqueada em vez de inventar um achado clínico.
 
 ---
 

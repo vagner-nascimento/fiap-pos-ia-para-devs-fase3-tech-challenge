@@ -1,4 +1,5 @@
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -27,6 +28,30 @@ class FakeCollection:
 
     def find(self, query):
         self.last_filter = query
+        if not self.documents:
+            return iter([])
+
+        if "id_laudo" in query and isinstance(query["id_laudo"], dict) and "$in" in query["id_laudo"]:
+            ids = set(query["id_laudo"]["$in"])
+            return iter([doc for doc in self.documents if doc.get("id_laudo") in ids])
+
+        patient_filter = query.get("cabecalho_identificador.nome_paciente")
+        if isinstance(patient_filter, dict) and "$regex" in patient_filter:
+            regex = patient_filter["$regex"]
+            flags = re.IGNORECASE if patient_filter.get("$options") == "i" else 0
+            compiled = re.compile(regex, flags)
+            filtered = [
+                doc for doc in self.documents
+                if isinstance(doc, dict)
+                and isinstance(doc.get("cabecalho_identificador", {}).get("nome_paciente"), str)
+                and compiled.fullmatch(doc["cabecalho_identificador"]["nome_paciente"]) is not None
+            ]
+            if filtered:
+                return iter(filtered)
+            if any(isinstance(doc, dict) and "cabecalho_identificador" not in doc for doc in self.documents):
+                return iter(self.documents)
+            return iter([])
+
         return iter(self.documents)
 
 
@@ -87,3 +112,25 @@ def test_find_by_patient_name_uses_exact_case_insensitive_filter(monkeypatch):
             "$options": "i",
         }
     }
+
+
+def test_find_by_patient_name_falls_back_to_raw_dataset_by_id(monkeypatch, tmp_path):
+    collection = FakeCollection([])
+    raw_path = tmp_path / "laudos_medicos.json"
+    raw_path.write_text(
+        json.dumps([
+            {
+                "id_laudo": "report-42",
+                "cabecalho_identificador": {"nome_paciente": "Maria Santos Almeida"},
+            }
+        ]),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(medical_reports, "RAW_LAUDOS_PATH", raw_path)
+    monkeypatch.setattr(medical_reports, "get_collection", lambda _: collection)
+
+    collection.documents = [{"id_laudo": "report-42", "cabecalho_identificador": {"nome_paciente": "****************"}}]
+    result = medical_reports.find_medical_reports_by_patient_name("Maria Santos Almeida")
+
+    assert result == [{"id_laudo": "report-42", "cabecalho_identificador": {"nome_paciente": "****************"}}]
+    assert collection.last_filter == {"id_laudo": {"$in": ["report-42"]}}

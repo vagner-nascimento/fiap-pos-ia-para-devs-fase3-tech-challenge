@@ -136,6 +136,10 @@ def rag_retriever_node(state: dict) -> dict:
     """
     Nó LangGraph: recupera documentos relevantes da base RAG.
 
+    Agora executa duas consultas separadas ao backend RAG: uma focada em
+    'clinical_protocols' e outra em 'medical_reports'. Os resultados são
+    filtrados por dataset e mesclados (protocolos têm prioridade na ordenação).
+
     Lê:
     - `state['query']` — texto da consulta
     - `state['preprocess_id']` — filtro opcional de pré-processamento
@@ -143,28 +147,18 @@ def rag_retriever_node(state: dict) -> dict:
     Escreve:
     - `state['rag_documents']` — lista de documentos recuperados
     - `state['rag_context']` — contexto formatado para o prompt da LLM
-
-    Args:
-        state: Estado atual do grafo LangGraph.
-
-    Returns:
-        Estado atualizado com documentos RAG.
     """
     query = state.get("query", "")
     preprocess_id = state.get("preprocess_id")
     conversation_history = state.get("conversation_history", [])
     patient_context = state.get("patient_context", "")
 
-    # Enriquece a query do RAG com contexto do histórico quando a query é um
-    # follow-up (ex: "pode resumir?", "e os cuidados em casa?").
-    # Usa a última query do histórico para dar contexto médico à busca vetorial.
+    # Enriquece a query com histórico de conversa se necessário
     rag_query = query
     if conversation_history and isinstance(conversation_history, list):
         last_turn = conversation_history[-1]
         if isinstance(last_turn, dict):
             last_query = last_turn.get("query", "").strip()
-            # Heurística: query curta ou sem ponto de interrogação médico
-            # indica follow-up que precisa de contexto extra para o RAG
             is_short_followup = len(query.split()) <= 20
             if last_query and is_short_followup:
                 rag_query = f"{last_query} {query}"
@@ -173,8 +167,7 @@ def rag_retriever_node(state: dict) -> dict:
                     f"({len(query.split())} → {len(rag_query.split())} palavras)."
                 )
 
-    # Se patient_context estiver preenchido (Jornada 2), enriquece a busca vetorial
-    # com termos clínicos do paciente (diagnósticos, alergias, medicações)
+    # Enriquece com contexto do paciente (se houver)
     if patient_context:
         patient_excerpt = " ".join(patient_context.splitlines()[:3])
         rag_query = f"{rag_query} {patient_excerpt}".strip()
@@ -184,21 +177,39 @@ def rag_retriever_node(state: dict) -> dict:
 
     logger.info(f"[RAG] Buscando contexto para: '{rag_query[:120]}'")
 
-    documents = _query_rag(
-        query=rag_query,
-        preprocess_id=preprocess_id,
-    )
+    # Executa duas consultas RAG separadas e filtra por dataset
+    try:
+        raw_protocols = _query_rag(query=rag_query, preprocess_id=preprocess_id)
+    except Exception:
+        raw_protocols = []
+    protocols = [d for d in raw_protocols if str(d.get("dataset", "")).lower() == "clinical_protocols"]
+
+    try:
+        raw_reports = _query_rag(query=rag_query, preprocess_id=preprocess_id)
+    except Exception:
+        raw_reports = []
+    reports = [d for d in raw_reports if str(d.get("dataset", "")).lower() == "medical_reports"]
+
+    logger.info(f"[RAG] Protocolos encontrados: {len(protocols)}; Laudos encontrados: {len(reports)}")
+
+    # Mescla resultados: protocolos primeiro, depois laudos (sem duplicatas)
+    ids_seen = set()
+    merged_documents: List[Dict[str, Any]] = []
+    for doc in protocols + reports:
+        doc_id = str(doc.get("id") or doc.get("_id") or "")
+        if not doc_id or doc_id in ids_seen:
+            continue
+        ids_seen.add(doc_id)
+        merged_documents.append(doc)
 
     # Formata o contexto para injeção no prompt
     context_parts: List[str] = []
-    for i, doc in enumerate(documents, start=1):
+    for i, doc in enumerate(merged_documents, start=1):
         dataset = doc.get("dataset", "desconhecido")
         score = doc.get("similarity_score", 0.0)
         content = doc.get("content", "").strip()
         cleaned_content = _clean_content_for_prompt(content)
-        source_type = doc.get("source_type", "")
 
-        # Mapeia dataset para nome amigável para citação inline
         dataset_label = {
             "qas": "PubMedQA/MedQuAD",
             "clinical_protocols": "FHEMIG (Protocolos Clínicos)",
@@ -220,13 +231,13 @@ def rag_retriever_node(state: dict) -> dict:
 
     rag_context = "\n\n".join(context_parts) if context_parts else ""
 
-    if not documents:
+    if not merged_documents:
         logger.warning("[RAG] Nenhum documento relevante encontrado na base RAG.")
     else:
-        logger.info(f"[RAG] {len(documents)} documentos recuperados e contexto montado.")
+        logger.info(f"[RAG] {len(merged_documents)} documentos recuperados e contexto montado.")
 
     return {
         **state,
-        "rag_documents": documents,
+        "rag_documents": merged_documents,
         "rag_context": rag_context,
     }
